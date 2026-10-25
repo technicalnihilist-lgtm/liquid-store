@@ -22,10 +22,10 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 input{font-family:inherit}
 
 .stage{position:fixed;inset:0;overflow:hidden;background:
-  radial-gradient(58% 42% at 12% 4%, rgba(31,127,147,.55) 0%, transparent 70%),
-  radial-gradient(52% 38% at 92% 16%, rgba(138,90,42,.42) 0%, transparent 70%),
-  radial-gradient(64% 46% at 26% 96%, rgba(122,47,69,.42) 0%, transparent 72%),
-  radial-gradient(46% 34% at 88% 88%, rgba(47,107,82,.38) 0%, transparent 70%),
+  radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
+  radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
+  radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
+  radial-gradient(46% 34% at 88% 88%, rgba(58,132,100,.52) 0%, transparent 70%),
   radial-gradient(120% 80% at 15% 0%, #123043 0%, transparent 55%),
   radial-gradient(110% 70% at 90% 12%, #2a2033 0%, transparent 52%),
   radial-gradient(120% 90% at 50% 108%, #0d2a2c 0%, transparent 60%),
@@ -36,13 +36,21 @@ input{font-family:inherit}
 .blob{display:none}
 
 .phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;
-  background:linear-gradient(180deg,rgba(10,18,28,.40),rgba(6,10,16,.64))}
+  background:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54))}
 @media (min-width:640px){body{display:grid;place-items:center}
   .phone{height:min(900px,94dvh);border-radius:46px;border:1px solid var(--edge);
     box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}}
 
-.g{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-   border:1px solid var(--edge);box-shadow:inset 0 1px 0 var(--edge-hi),0 8px 22px rgba(0,0,0,.28)}
+/* Liquid Glass: a translucent body, a specular rim brightest along the top,
+   a faint bounce along the bottom, then a tight contact shadow plus a wide
+   ambient one. Two shadows is what stops it looking like a flat translucent box. */
+.g{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07) 52%,rgba(255,255,255,.11));
+   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+   border:1px solid rgba(255,255,255,.17);
+   box-shadow:inset 0 1px 0 rgba(255,255,255,.55),
+              inset 0 -1px 0 rgba(255,255,255,.09),
+              0 1px 1px rgba(0,0,0,.30),
+              0 12px 30px rgba(0,0,0,.42)}
 
 .statusbar{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + var(--safe-t)) 26px 4px;font-size:14px;font-weight:700}
 .statusbar .icons{display:flex;gap:6px;align-items:center;opacity:.9}
@@ -50,8 +58,10 @@ input{font-family:inherit}
 .sb-bat::after{content:"";position:absolute;right:-3px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0}
 .sb-bat i{position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:1px;display:block}
 
-.topbar{display:flex;align-items:center;gap:10px;padding:8px 18px 12px}
-.topbar h1{font-size:30px;font-weight:800;letter-spacing:-.8px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* the toolbar is its own floating capsule, inset from the screen edge */
+.topbar{position:relative;z-index:45;margin:2px 14px 10px;border-radius:24px;
+  display:flex;align-items:center;gap:8px;padding:7px 8px 7px 18px}
+.topbar h1{font-size:23px;font-weight:800;letter-spacing:-.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iconbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
 .iconbtn svg{width:18px;height:18px}
 
@@ -119,7 +129,7 @@ input{font-family:inherit}
 .tile small{font-size:12px;color:var(--dim)}
 .tile .tg{position:absolute;right:-6px;bottom:-10px;font-size:54px;opacity:.14;font-weight:800}
 
-.searchbar{display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:16px;margin-top:6px}
+.searchbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;margin-top:6px}
 .searchbar svg{width:18px;height:18px;color:var(--dim);flex:0 0 auto}
 .searchbar input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-size:16px}
 .searchbar input::placeholder{color:var(--dimmer)}
@@ -142,14 +152,14 @@ input{font-family:inherit}
 .tabbar{position:absolute;left:14px;right:14px;bottom:calc(12px + var(--safe-b));height:68px;border-radius:30px;
   display:flex;align-items:center;padding:0 7px;z-index:40;overflow:hidden;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 14px 34px rgba(0,0,0,.5)}
-.lens{position:absolute;top:7px;bottom:7px;left:7px;width:64px;border-radius:24px;z-index:0;pointer-events:none;
+.lens{position:absolute;top:7px;bottom:7px;left:7px;width:64px;border-radius:23px;z-index:0;pointer-events:none;
   background:linear-gradient(165deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 58%,rgba(255,255,255,.16));
-  border:1px solid rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.42);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px rgba(255,255,255,.07),
              0 6px 18px rgba(0,0,0,.4),0 0 24px rgba(43,182,201,.25);
   }
 .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:24px;
+  font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:23px;
   transition:color .25s}
 .tab svg{width:22px;height:22px;transition:transform .32s cubic-bezier(.34,1.4,.5,1)}
 .tab .lbl{opacity:.7;transition:opacity .25s}
@@ -237,7 +247,7 @@ input{font-family:inherit}
     </span>
   </div>
 
-  <div class="topbar">
+  <div class="topbar g">
     <h1 id="pageTitle">Today</h1>
     <button class="iconbtn g" id="sourceBtn" title="Sources">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></svg>
@@ -834,6 +844,11 @@ function onReady(){
   renderCategoryView('games','');
   renderCategoryView('apps','');
   renderSearch();
+  /* if a detail page is open, its buttons must stop saying "..." now that
+     installs are actually possible */
+  if(S.sheetPkg){
+    try { renderSheetActions(B.detail(S.sheetPkg)); } catch(e){}
+  }
   if(!first && S.refreshing){
     S.refreshing = false;
     toast(S.lastPhase === 'cache' ? 'Already up to date' : 'Catalogue updated');
