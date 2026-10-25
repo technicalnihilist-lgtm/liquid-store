@@ -153,16 +153,29 @@ input{font-family:inherit}
 .tab.on .lbl{opacity:1}
 .tab.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 10px rgba(43,182,201,.8))}
 
-.scrim{position:absolute;inset:0;background:rgba(3,6,10,.55);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:.3s;z-index:60}
-.scrim.on{opacity:1;visibility:visible}
-.sheet{position:absolute;left:0;right:0;bottom:0;height:92%;border-radius:32px 32px 0 0;z-index:70;
-  transform:translateY(101%);transition:transform .38s cubic-bezier(.22,.9,.28,1);display:flex;flex-direction:column;
-  background:rgba(16,24,34,.86);backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);
-  border-top:1px solid var(--edge-hi)}
+/* detail is a full-screen page that slides in from the right */
+.scrim{display:none}
+.sheet{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.9,.3,1);
+  background:rgba(11,17,25,.94);
+  backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);
+  border-left:1px solid rgba(255,255,255,.1)}
 .sheet.on{transform:none}
-.grab{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.3);margin:10px auto 4px}
-.sheet-body{flex:1;overflow-y:auto;padding:8px 22px 140px;scrollbar-width:none}
+.pagebar{display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 6px}
+.pagebar .spacer{flex:1}
+.pagebar .iconbtn{width:38px;height:38px}
+.sheet-body{flex:1;overflow-y:auto;padding:4px 22px 44px;scrollbar-width:none}
 .sheet-body::-webkit-scrollbar{display:none}
+/* paired actions: outlined secondary + filled primary, as in the reference */
+.acts{display:flex;gap:10px;margin:18px 0 4px}
+.pill,.pill2{flex:1;height:44px;border-radius:22px;font-size:15px;font-weight:800;
+  display:grid;place-items:center;position:relative;overflow:hidden;transition:transform .15s}
+.pill:active,.pill2:active{transform:scale(.97)}
+.pill{background:linear-gradient(180deg,#3ec6d8,#1f93a5);color:#03161b;
+  border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 20px rgba(43,182,201,.32)}
+.pill2{background:var(--glass-2);border:1px solid var(--edge);color:var(--ink)}
+.pill .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.18);transition:width .15s linear}
+.pill span{position:relative;z-index:2}
 .sheet-head{display:flex;gap:16px;align-items:flex-start}
 .sheet-head h2{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
 .sheet-head .dev{font-size:14px;color:var(--teal);font-weight:700;margin-top:3px}
@@ -262,10 +275,15 @@ input{font-family:inherit}
   <div class="scrim" id="scrim"></div>
 
   <div class="sheet" id="sheet">
-    <button class="x g" id="sheetClose">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-    </button>
-    <div class="grab"></div>
+    <div class="pagebar">
+      <button class="iconbtn g" id="sheetClose" title="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="spacer"></span>
+      <button class="iconbtn g" id="sheetMore" title="More">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>
+      </button>
+    </div>
     <div class="sheet-body" id="sheetBody"></div>
   </div>
 
@@ -612,10 +630,10 @@ function openSheet(pkg){
       <div style="flex:1;min-width:0">
         <h2>${esc(a.name)}</h2>
         ${a.author?`<div class="dev">${esc(a.author)}</div>`:''}
-        <div class="cat">${esc(a.category)}${a.license?' &middot; '+esc(a.license):''}</div>
+        <div class="cat">${esc([a.category, a.license].filter(Boolean).join(' \u00b7 '))}</div>
       </div>
     </div>
-    <div class="installrow" id="sheetActions"></div>
+    <div class="acts" id="sheetActions"></div>
     ${(a.shots && a.shots.length) ? `<div class="eyebrow">Screenshots</div><div class="shots">${a.shots.map(function(c,i){
         return '<div class="shot">' + imgTagFor(c, '') + '<div class="ph"></div><span>' + (i+1) + '</span></div>';
       }).join('')}</div>` : ''}
@@ -639,14 +657,23 @@ function openSheet(pkg){
 }
 function renderSheetActions(a){
   const box = $('#sheetActions'); if(!box) return;
-  let h = getBtnHtml(a).replace('class="get','class="bigget').replace(/<button class="bigget" data-/, '<button class="bigget" data-');
-  if(a.installed){
-    h += `<button class="ghost g" data-open="${esc(a.pkg)}">Open</button>
-          <button class="ghost g" data-uninstall="${esc(a.pkg)}">Uninstall</button>`;
+  const inst = S.installing[a.pkg];
+  let primary;
+  if(inst){
+    primary = `<button class="pill" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${inst.pct}%"></span><span>${inst.pct}%</span></button>`;
+  } else if(S.partial && !a.installed){
+    primary = `<button class="pill" data-busy="1" style="opacity:.55">&hellip;</button>`;
+  } else if(a.installed && a.hasUpdate){
+    primary = `<button class="pill" data-install="${esc(a.pkg)}">Update</button>`;
+  } else if(a.installed){
+    primary = `<button class="pill" data-open="${esc(a.pkg)}">Open</button>`;
   } else {
-    h += `<button class="ghost g" data-open="${esc(a.pkg)}" style="display:none"></button>`;
+    primary = `<button class="pill" data-install="${esc(a.pkg)}">Get</button>`;
   }
-  box.innerHTML = h;
+  const secondary = a.installed
+    ? `<button class="pill2" data-uninstall="${esc(a.pkg)}">Uninstall</button>`
+    : `<button class="pill2" data-share="1">Share</button>`;
+  box.innerHTML = secondary + primary;
 }
 function closeSheet(){
   $('#scrim').classList.remove('on');
@@ -950,6 +977,13 @@ document.addEventListener('click', function(e){
 });
 
 $('#sheetClose').addEventListener('click', closeSheet);
+$('#sheetMore').addEventListener('click', function(){
+  if(!S.sheetPkg) return;
+  let a = null;
+  try { a = B.detail(S.sheetPkg); } catch(e){}
+  if(a && a.source){ window.open(a.source, '_blank'); return; }
+  toast('Nothing else to show for this app');
+});
 $('#scrim').addEventListener('click', closeSheet);
 function doRefresh(){
   S.refreshing = true;
@@ -972,7 +1006,7 @@ function openSources(){
   $('#sheetBody').innerHTML =
     '<div class="sheet-head"><div style="flex:1"><h2>Sources</h2>' +
       '<div class="cat">Where the catalogue and apps come from</div></div></div>' +
-    '<div class="desc">Prism asks every source at once and downloads from whichever answers fastest. ' +
+    '<div class="desc">Liquid Store asks every source at once and downloads from whichever answers fastest. ' +
       'If loading keeps failing, pick one below, or enter your own repository address.</div>' +
     '<div class="searchbar g" style="margin:6px 0 14px">' +
       '<input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="' + esc(s.custom || '') + '">' +
