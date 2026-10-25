@@ -22,18 +22,18 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 input{font-family:inherit}
 
 .stage{position:fixed;inset:0;overflow:hidden;background:
+  radial-gradient(58% 42% at 12% 4%, rgba(31,127,147,.55) 0%, transparent 70%),
+  radial-gradient(52% 38% at 92% 16%, rgba(138,90,42,.42) 0%, transparent 70%),
+  radial-gradient(64% 46% at 26% 96%, rgba(122,47,69,.42) 0%, transparent 72%),
+  radial-gradient(46% 34% at 88% 88%, rgba(47,107,82,.38) 0%, transparent 70%),
   radial-gradient(120% 80% at 15% 0%, #123043 0%, transparent 55%),
   radial-gradient(110% 70% at 90% 12%, #2a2033 0%, transparent 52%),
   radial-gradient(120% 90% at 50% 108%, #0d2a2c 0%, transparent 60%),
   linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%)}
-.blob{position:absolute;border-radius:50%;filter:blur(78px);opacity:.78;mix-blend-mode:screen}
-.b1{width:52vw;height:52vw;background:radial-gradient(circle,#1f7f93,transparent 68%);top:-12vw;left:-10vw;animation:d1 22s ease-in-out infinite}
-.b2{width:46vw;height:46vw;background:radial-gradient(circle,#8a5a2a,transparent 68%);top:6vw;right:-14vw;animation:d2 27s ease-in-out infinite}
-.b3{width:58vw;height:58vw;background:radial-gradient(circle,#7a2f45,transparent 70%);bottom:-18vw;left:8vw;animation:d3 31s ease-in-out infinite}
-.b4{width:40vw;height:40vw;background:radial-gradient(circle,#2f6b52,transparent 68%);bottom:6vw;right:-8vw;animation:d1 25s ease-in-out infinite reverse}
-@keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,5vw)}}
-@keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,4vw)}}
-@keyframes d3{0%,100%{transform:translate(0,0)}50%{transform:translate(4vw,-6vw)}}
+/* The four 78px-blurred, screen-blended, endlessly animated blobs that used to
+   live here were the single largest cost while scrolling. The wash above is the
+   same look painted once. */
+.blob{display:none}
 
 .phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;
   background:linear-gradient(180deg,rgba(10,18,28,.40),rgba(6,10,16,.64))}
@@ -41,7 +41,7 @@ input{font-family:inherit}
   .phone{height:min(900px,94dvh);border-radius:46px;border:1px solid var(--edge);
     box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}}
 
-.g{background:var(--glass);backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%);
+.g{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
    border:1px solid var(--edge);box-shadow:inset 0 1px 0 var(--edge-hi),0 8px 22px rgba(0,0,0,.28)}
 
 .statusbar{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + var(--safe-t)) 26px 4px;font-size:14px;font-weight:700}
@@ -79,6 +79,7 @@ input{font-family:inherit}
 .hero-foot{display:flex;gap:12px;align-items:center;margin-top:14px}
 
 .row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid rgba(255,255,255,.06)}
+.row{content-visibility:auto;contain-intrinsic-size:68px}
 .row:first-child{border-top:none}
 .ic{width:60px;height:60px;border-radius:15px;flex:0 0 auto;position:relative;overflow:hidden;display:grid;place-items:center;
   border:1px solid rgba(255,255,255,.2);box-shadow:0 6px 14px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.28)}
@@ -96,7 +97,7 @@ input{font-family:inherit}
   background:rgba(43,182,201,.24);color:#bdeef5;vertical-align:1px}
 .badge.up{background:rgba(226,160,63,.24);color:#f3d59a}
 .get{padding:7px 19px;border-radius:20px;font-size:14px;font-weight:800;background:var(--glass-3);
-  border:1px solid var(--edge-hi);backdrop-filter:blur(10px);transition:transform .15s;min-width:74px;text-align:center;position:relative;overflow:hidden}
+  border:1px solid var(--edge-hi);transition:transform .15s;min-width:74px;text-align:center;position:relative;overflow:hidden}
 .get:active{transform:scale(.93)}
 .get.open{background:transparent;border-color:var(--edge);color:var(--dim);font-weight:700}
 .get .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(43,182,201,.35);transition:width .15s linear}
@@ -106,6 +107,10 @@ input{font-family:inherit}
 .chips{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;padding:9px 15px;border-radius:18px;font-size:13px;font-weight:700;white-space:nowrap}
+/* a backdrop blur per row button / chip is what made scrolling stutter */
+.g.chip,.g.get{backdrop-filter:none;-webkit-backdrop-filter:none}
+.g.chip{background:rgba(255,255,255,.10)}
+.g.get{background:rgba(255,255,255,.14)}
 .chip.act{background:rgba(43,182,201,.22);border-color:rgba(43,182,201,.55);color:#bdeef5}
 
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -142,8 +147,7 @@ input{font-family:inherit}
   border:1px solid rgba(255,255,255,.4);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px rgba(255,255,255,.07),
              0 6px 18px rgba(0,0,0,.4),0 0 24px rgba(43,182,201,.25);
-  backdrop-filter:blur(12px) saturate(190%);-webkit-backdrop-filter:blur(12px) saturate(190%);
-  will-change:left,width}
+  }
 .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:24px;
   transition:color .25s}
@@ -158,7 +162,7 @@ input{font-family:inherit}
 .sheet{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
   transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.9,.3,1);
   background:rgba(11,17,25,.94);
-  backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border-left:1px solid rgba(255,255,255,.1)}
 .sheet.on{transform:none}
 .pagebar{display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 6px}
