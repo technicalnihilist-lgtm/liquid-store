@@ -9,6 +9,17 @@ repository index. No account, no sign-in, no ads, no tracking.
   <img src="screenshots/04-sources.png" width="240" alt="Sources">
 </p>
 
+## Download
+
+**[LiquidStore.apk](https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest/download/LiquidStore.apk)** &nbsp;·&nbsp; Android 7.0+ (API 24) &nbsp;·&nbsp; ~193 KB
+
+That link always resolves to the newest release. See
+[Releases](https://github.com/technicalnihilist-lgtm/liquid-store/releases) for the
+version history.
+
+The APK is signed with a self-generated key rather than a Play Store key, so
+Android will ask you to allow "install unknown apps" the first time you open it.
+
 ## What it does
 
 - **Live catalogue.** Downloads F-Droid's signed `index-v1.jar` and parses it
