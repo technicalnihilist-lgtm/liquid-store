@@ -143,7 +143,7 @@ input{font-family:inherit}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px rgba(255,255,255,.07),
              0 6px 18px rgba(0,0,0,.4),0 0 24px rgba(43,182,201,.25);
   backdrop-filter:blur(12px) saturate(190%);-webkit-backdrop-filter:blur(12px) saturate(190%);
-  transition:left .44s cubic-bezier(.34,1.46,.5,1),width .44s cubic-bezier(.34,1.46,.5,1)}
+  will-change:left,width}
 .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:24px;
   transition:color .25s}
@@ -849,19 +849,69 @@ function switchTab(v){
   moveLens(false);
 }
 
-/* Slide the glass lens to sit under whichever tab is active. */
+/* The glass lens. At rest it is simply a glass pill; on a tab change it
+   stretches across the gap like a drop of liquid, then contracts onto the
+   target. Driven frame by frame because the stretch is not a plain tween. */
+let lensAnim = null;
+
 function moveLens(instant){
   const bar = document.getElementById('tabbar');
   const lens = document.getElementById('tabLens');
   if(!bar || !lens) return;
   const active = bar.querySelector('.tab.on');
   if(!active) return;
-  if(instant) lens.style.transition = 'none';
-  lens.style.left = (active.offsetLeft + 3) + 'px';
-  lens.style.width = Math.max(0, active.offsetWidth - 6) + 'px';
+
+  const tx = active.offsetLeft + 3;
+  const tw = Math.max(0, active.offsetWidth - 6);
+
   if(instant){
-    requestAnimationFrame(function(){ lens.style.transition = ''; });
+    if(lensAnim){ cancelAnimationFrame(lensAnim); lensAnim = null; }
+    lens.style.left = tx + 'px';
+    lens.style.width = tw + 'px';
+    return;
   }
+
+  const x0 = parseFloat(lens.style.left);
+  const w0 = parseFloat(lens.style.width);
+  if(isNaN(x0) || isNaN(w0)){                 /* first placement */
+    lens.style.left = tx + 'px';
+    lens.style.width = tw + 'px';
+    return;
+  }
+
+  const c0 = x0 + w0 / 2;
+  const c1 = tx + tw / 2;
+  const travel = Math.abs(c1 - c0);
+  const bulgeMax = Math.min(52, travel * 0.46);   /* how far it stretches */
+  const DUR = 430;
+  const start = performance.now();
+
+  /* gentle overshoot so it settles like a liquid rather than stopping dead */
+  const ease = function(t){
+    const c = 1.05;
+    return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
+  };
+
+  if(lensAnim) cancelAnimationFrame(lensAnim);
+
+  const step = function(now){
+    const t = Math.min(1, (now - start) / DUR);
+    const e = ease(t);
+    const centre = c0 + (c1 - c0) * e;
+    const baseW = w0 + (tw - w0) * e;
+    const bulge = bulgeMax * Math.sin(Math.PI * t);   /* peaks mid-flight */
+    const w = Math.max(20, baseW + bulge);
+    lens.style.width = w + 'px';
+    lens.style.left = (centre - w / 2) + 'px';
+    if(t < 1){
+      lensAnim = requestAnimationFrame(step);
+    } else {
+      lens.style.left = tx + 'px';                    /* land exactly */
+      lens.style.width = tw + 'px';
+      lensAnim = null;
+    }
+  };
+  lensAnim = requestAnimationFrame(step);
 }
 window.addEventListener('resize', function(){ moveLens(true); });
 
@@ -981,7 +1031,10 @@ tickClock(); setInterval(tickClock, 20000);
 })();
 
 boot();
+/* place the lens immediately: do not depend on a frame having run */
+moveLens(true);
 requestAnimationFrame(function(){ moveLens(true); });
+window.addEventListener('load', function(){ moveLens(true); });
 </script>
 </body>
 </html>
