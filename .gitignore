@@ -1,0 +1,14 @@
+# build output
+build/
+*.apk
+*.idsig
+*.part
+
+# never commit signing material
+*.keystore
+*.jks
+keystore.properties
+
+# scratch
+*.log
+hs_err_pid*.log

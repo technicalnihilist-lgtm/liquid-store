@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#070c14">
+<title>Liquid Store</title>
+<style>
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url("fonts/pjs.woff2") format("woff2")}
+:root{
+  --ink:#eef4f8; --dim:rgba(238,244,248,.60); --dimmer:rgba(238,244,248,.38);
+  --glass:rgba(255,255,255,.075); --glass-2:rgba(255,255,255,.11); --glass-3:rgba(255,255,255,.16);
+  --edge:rgba(255,255,255,.16); --edge-hi:rgba(255,255,255,.42);
+  --teal:#2bb6c9; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:#070c14;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input{font-family:inherit}
+
+.stage{position:fixed;inset:0;overflow:hidden;background:
+  radial-gradient(120% 80% at 15% 0%, #123043 0%, transparent 55%),
+  radial-gradient(110% 70% at 90% 12%, #2a2033 0%, transparent 52%),
+  radial-gradient(120% 90% at 50% 108%, #0d2a2c 0%, transparent 60%),
+  linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(78px);opacity:.78;mix-blend-mode:screen}
+.b1{width:52vw;height:52vw;background:radial-gradient(circle,#1f7f93,transparent 68%);top:-12vw;left:-10vw;animation:d1 22s ease-in-out infinite}
+.b2{width:46vw;height:46vw;background:radial-gradient(circle,#8a5a2a,transparent 68%);top:6vw;right:-14vw;animation:d2 27s ease-in-out infinite}
+.b3{width:58vw;height:58vw;background:radial-gradient(circle,#7a2f45,transparent 70%);bottom:-18vw;left:8vw;animation:d3 31s ease-in-out infinite}
+.b4{width:40vw;height:40vw;background:radial-gradient(circle,#2f6b52,transparent 68%);bottom:6vw;right:-8vw;animation:d1 25s ease-in-out infinite reverse}
+@keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,5vw)}}
+@keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,4vw)}}
+@keyframes d3{0%,100%{transform:translate(0,0)}50%{transform:translate(4vw,-6vw)}}
+
+.phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(180deg,rgba(10,18,28,.40),rgba(6,10,16,.64))}
+@media (min-width:640px){body{display:grid;place-items:center}
+  .phone{height:min(900px,94dvh);border-radius:46px;border:1px solid var(--edge);
+    box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}}
+
+.g{background:var(--glass);backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%);
+   border:1px solid var(--edge);box-shadow:inset 0 1px 0 var(--edge-hi),0 8px 22px rgba(0,0,0,.28)}
+
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + var(--safe-t)) 26px 4px;font-size:14px;font-weight:700}
+.statusbar .icons{display:flex;gap:6px;align-items:center;opacity:.9}
+.sb-bat{width:22px;height:11px;border:1.4px solid currentColor;border-radius:3px;position:relative;opacity:.85}
+.sb-bat::after{content:"";position:absolute;right:-3px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0}
+.sb-bat i{position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:1px;display:block}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:8px 18px 12px}
+.topbar h1{font-size:30px;font-weight:800;letter-spacing:-.8px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.iconbtn svg{width:18px;height:18px}
+
+.views{flex:1;position:relative;min-height:0}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 18px 140px;
+  -webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .26s ease,transform .26s ease,visibility .26s}
+.view.on{opacity:1;visibility:visible;transform:none}
+.view::-webkit-scrollbar{display:none}
+
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin:18px 2px 10px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:24px 2px 10px;gap:10px}
+.sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.5px}
+.sec-head span{font-size:13px;color:var(--teal);font-weight:700;white-space:nowrap}
+
+.hero{position:relative;border-radius:30px;padding:22px;min-height:236px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24))}
+.hero .tag{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--amber)}
+.hero h3{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.14;margin:6px 0 8px}
+.hero p{font-size:14px;color:rgba(255,255,255,.82);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hero .orb{position:absolute;top:-30px;right:-30px;width:190px;height:190px;border-radius:50%;z-index:-1;
+  background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),rgba(255,255,255,.05) 60%,transparent 72%);
+  border:1px solid rgba(255,255,255,.32)}
+.hero-foot{display:flex;gap:12px;align-items:center;margin-top:14px}
+
+.row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid rgba(255,255,255,.06)}
+.row:first-child{border-top:none}
+.ic{width:60px;height:60px;border-radius:15px;flex:0 0 auto;position:relative;overflow:hidden;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.2);box-shadow:0 6px 14px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.28)}
+.ic .ltr{font-size:24px;font-weight:800;color:rgba(255,255,255,.92)}
+.ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+/* once the real icon is in, drop the generated tile so the icon sits on nothing */
+.ic.has{background:none !important;border-color:transparent;box-shadow:none}
+.ic.has .ltr{display:none}
+.ic.sm{width:46px;height:46px;border-radius:12px}.ic.sm .ltr{font-size:19px}
+.ic.xl{width:92px;height:92px;border-radius:22px}.ic.xl .ltr{font-size:38px}
+.meta{flex:1;min-width:0}
+.meta b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta small{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:800;
+  background:rgba(43,182,201,.24);color:#bdeef5;vertical-align:1px}
+.badge.up{background:rgba(226,160,63,.24);color:#f3d59a}
+.get{padding:7px 19px;border-radius:20px;font-size:14px;font-weight:800;background:var(--glass-3);
+  border:1px solid var(--edge-hi);backdrop-filter:blur(10px);transition:transform .15s;min-width:74px;text-align:center;position:relative;overflow:hidden}
+.get:active{transform:scale(.93)}
+.get.open{background:transparent;border-color:var(--edge);color:var(--dim);font-weight:700}
+.get .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(43,182,201,.35);transition:width .15s linear}
+.get span{position:relative;z-index:2}
+.rank{width:18px;text-align:center;font-size:15px;font-weight:800;color:var(--dimmer);flex:0 0 auto}
+
+.chips{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:9px 15px;border-radius:18px;font-size:13px;font-weight:700;white-space:nowrap}
+.chip.act{background:rgba(43,182,201,.22);border-color:rgba(43,182,201,.55);color:#bdeef5}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border-radius:20px;padding:14px;min-height:100px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;text-align:left}
+.tile b{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.tile small{font-size:12px;color:var(--dim)}
+.tile .tg{position:absolute;right:-6px;bottom:-10px;font-size:54px;opacity:.14;font-weight:800}
+
+.searchbar{display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:16px;margin-top:6px}
+.searchbar svg{width:18px;height:18px;color:var(--dim);flex:0 0 auto}
+.searchbar input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-size:16px}
+.searchbar input::placeholder{color:var(--dimmer)}
+.empty{text-align:center;color:var(--dimmer);padding:56px 20px;font-size:15px;line-height:1.6}
+
+.strip{display:none;padding:0 18px 10px}
+.strip.on{display:block}
+.strip-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.strip-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
+.strip-text{font-size:11.5px;color:var(--dim);margin-top:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shots{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+.shots::-webkit-scrollbar{display:none}
+.shot{flex:0 0 auto;width:150px;height:266px;border-radius:18px;border:1px solid var(--edge);
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.02));position:relative;overflow:hidden}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.shot .ph{position:absolute;inset:14px;border-radius:12px;border:1px dashed rgba(255,255,255,.16);transition:opacity .25s}
+.shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px;text-transform:uppercase;transition:opacity .25s}
+.shot.has .ph,.shot.has span{opacity:0}
+.tabbar{position:absolute;left:12px;right:12px;bottom:calc(10px + var(--safe-b));height:64px;border-radius:24px;
+  display:flex;align-items:center;justify-content:space-around;z-index:40}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--dim);
+  padding:8px 12px;border-radius:16px;transition:color .2s;flex:1}
+.tab svg{width:23px;height:23px}
+.tab.on{color:var(--ink)}
+.tab.on svg{filter:drop-shadow(0 0 8px rgba(43,182,201,.7))}
+
+.scrim{position:absolute;inset:0;background:rgba(3,6,10,.55);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:.3s;z-index:60}
+.scrim.on{opacity:1;visibility:visible}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:92%;border-radius:32px 32px 0 0;z-index:70;
+  transform:translateY(101%);transition:transform .38s cubic-bezier(.22,.9,.28,1);display:flex;flex-direction:column;
+  background:rgba(16,24,34,.86);backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);
+  border-top:1px solid var(--edge-hi)}
+.sheet.on{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.3);margin:10px auto 4px}
+.sheet-body{flex:1;overflow-y:auto;padding:8px 22px 140px;scrollbar-width:none}
+.sheet-body::-webkit-scrollbar{display:none}
+.sheet-head{display:flex;gap:16px;align-items:flex-start}
+.sheet-head h2{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.sheet-head .dev{font-size:14px;color:var(--teal);font-weight:700;margin-top:3px}
+.sheet-head .cat{font-size:12px;color:var(--dim);margin-top:4px;text-transform:uppercase;letter-spacing:.6px}
+.installrow{display:flex;align-items:center;gap:12px;margin:18px 0 4px}
+.bigget{flex:1;height:48px;border-radius:24px;font-size:17px;font-weight:800;background:var(--glass-3);
+  border:1px solid var(--edge-hi);position:relative;overflow:hidden;display:grid;place-items:center;transition:transform .15s}
+.bigget:active{transform:scale(.97)}
+.bigget .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(43,182,201,.5),rgba(43,182,201,.28));transition:width .15s linear}
+.bigget span{position:relative;z-index:2}
+.ghost{height:48px;padding:0 18px;border-radius:24px;font-size:14px;font-weight:700}
+.stats{display:flex;margin:22px 0 6px;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09)}
+.stat{flex:1;text-align:center;padding:14px 6px;position:relative;min-width:0}
+.stat + .stat::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:1px;background:rgba(255,255,255,.1)}
+.stat b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat small{font-size:10px;color:var(--dimmer);text-transform:uppercase;letter-spacing:1px}
+.desc{font-size:14.5px;line-height:1.6;color:rgba(238,244,248,.86);margin:16px 0;white-space:pre-wrap}
+.linkrow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.linkrow a{padding:8px 14px;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;color:#bdeef5;
+  background:rgba(43,182,201,.14);border:1px solid rgba(43,182,201,.3)}
+.meta-list{margin:14px 0;font-size:13.5px;color:var(--dim);line-height:1.9}
+.meta-list b{color:var(--ink);font-weight:700}
+.x{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:var(--glass-2);border:1px solid var(--edge);z-index:5}
+.x svg{width:15px;height:15px}
+.toast{position:absolute;left:50%;bottom:96px;transform:translate(-50%,20px);padding:11px 20px;border-radius:18px;
+  font-size:13.5px;font-weight:700;opacity:0;transition:.3s;z-index:90;pointer-events:none;max-width:88%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.nofooter{display:flex;align-items:center;justify-content:center;gap:8px;padding:26px 0 10px;color:var(--dimmer);font-size:12px}
+.nofooter svg{width:14px;height:14px}
+
+.loader{position:absolute;inset:0;z-index:95;display:none;place-items:center;padding:32px;
+  background:linear-gradient(180deg,rgba(7,12,20,.72),rgba(7,12,20,.9));backdrop-filter:blur(10px)}
+.loader.on{display:grid}
+.loadcard{border-radius:26px;padding:26px 24px;text-align:center;width:100%;max-width:340px}
+.loadcard h3{font-size:19px;font-weight:800;margin-bottom:8px}
+.loadcard p{font-size:13.5px;color:var(--dim);line-height:1.5;min-height:40px}
+.bar{height:7px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin:18px 0 10px}
+.bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
+.spin{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--teal);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loadcard .bigget{margin-top:14px}
+</style>
+</head>
+<body>
+<div class="stage"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+<div class="phone">
+  <div class="statusbar">
+    <span id="clock">9:41</span>
+    <span class="icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="6" width="3" height="6" rx="1"/><rect x="9" y="3" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0L8 11.2Zm0-4.4a6 6 0 0 0-4.3 1.8L2 6.9a8.5 8.5 0 0 1 12 0l-1.7 1.7A6 6 0 0 0 8 6.8Z"/></svg>
+      <span class="sb-bat"><i></i></span>
+    </span>
+  </div>
+
+  <div class="topbar">
+    <h1 id="pageTitle">Today</h1>
+    <button class="iconbtn g" id="sourceBtn" title="Sources">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></svg>
+    </button>
+    <button class="iconbtn g" id="refreshBtn" title="Refresh catalogue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>
+    </button>
+  </div>
+
+  <div class="strip" id="strip">
+    <div class="strip-bar"><i id="stripBar"></i></div>
+    <div class="strip-text" id="stripText"></div>
+  </div>
+
+  <div class="views">
+    <section class="view on" id="view-today"></section>
+    <section class="view" id="view-games"></section>
+    <section class="view" id="view-apps"></section>
+    <section class="view" id="view-search"></section>
+  </div>
+
+  <nav class="tabbar g">
+    <button class="tab on" data-view="today">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2.5V5M16 2.5V5M3 9h18"/></svg>Today</button>
+    <button class="tab" data-view="games">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3M7.5 6.5v3M16 9h.01M18.5 11.5h.01"/><rect x="2.5" y="5.5" width="19" height="13" rx="5.5"/></svg>Games</button>
+    <button class="tab" data-view="apps">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>Apps</button>
+    <button class="tab" data-view="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>Search</button>
+  </nav>
+
+  <div class="toast g" id="toast"></div>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="sheet" id="sheet">
+    <button class="x g" id="sheetClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="grab"></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <div class="loader" id="loader">
+    <div class="loadcard g">
+      <div class="spin" id="spin"></div>
+      <h3 id="loadTitle">Loading catalogue</h3>
+      <p id="loadText">Contacting the app repository&hellip;</p>
+      <div class="bar"><i id="loadBar"></i></div>
+      <button class="bigget g" id="loadAction" style="display:none"><span>Retry</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Liquid Store - a real app store.
+   On Android every call below is served by the native bridge
+   (window.Android). In a plain browser the same interface is
+   served by an offline demo catalogue so the UI still runs.
+   ============================================================ */
+
+const hasNative = (typeof Android !== 'undefined') && Android && typeof Android.state === 'function';
+
+/* ---------- offline demo bridge (browser only) ---------- */
+const DEMO = [
+ ['org.fdroid.fdroid','F-Droid','The free and open source app store. Browse, install and update apps from independent developers.','System','4.2 MB','GPL-3.0-only'],
+ ['com.termux','Termux','A terminal emulator and Linux environment, no root required.','Development','38 MB','GPL-3.0-only'],
+ ['org.videolan.vlc','VLC','Plays anything - every codec, every container, offline.','Multimedia','62 MB','GPL-3.0-only'],
+ ['org.mozilla.fennec_fdroid','Fennec F-Droid','Firefox built without proprietary bits, with tracking protection on by default.','Internet','88 MB','MPL-2.0'],
+ ['com.simplemobiletools.gallery','Simple Gallery','A gallery that does one thing well: your photos, in folders, fast.','Multimedia','9 MB','Apache-2.0'],
+ ['net.osmand.plus','OsmAnd','Offline maps and navigation for the whole planet.','Navigation','112 MB','GPL-3.0-only'],
+ ['com.aurora.store','Aurora Store','An unofficial client for the Play Store catalogue, no account needed.','System','6 MB','GPL-3.0-only'],
+ ['org.schabi.newpipe','NewPipe','A lightweight YouTube front end with background play.','Multimedia','12 MB','GPL-3.0-only'],
+ ['com.lichess.mobileapp','Lichess','Play chess online or against the computer, free forever.','Games','24 MB','GPL-3.0-only'],
+ ['org.sufficientlysecure.keychain','OpenKeychain','Encryption for your email and files, built on OpenPGP.','Security','18 MB','GPL-3.0-only'],
+ ['de.markusfisch.android.binaryeye','Binary Eye','A barcode and QR scanner with no ads and no tracking.','Utilities','3 MB','MIT'],
+ ['com.kunzisoft.keepass.libre','KeePassDX','A password manager that keeps the database on your device.','Security','14 MB','GPL-3.0-only'],
+ ['org.fossify.calendar','Simple Calendar','A calendar you can actually read, with no account required.','Time','7 MB','Apache-2.0'],
+ ['com.github.axet.bookreader','Book Reader','Read EPUB, PDF and comics from your own library.','Reading','11 MB','GPL-3.0-only'],
+ ['org.telegram.messenger','Telegram FOSS','A libre build of Telegram, without the proprietary libraries.','Internet','46 MB','GPL-2.0-only'],
+ ['com.gianlu.music','Metro','A music player with a clean material design and no nagging.','Multimedia','8 MB','GPL-3.0-only'],
+ ['org.breezyweather','Breezy Weather','A fast, beautiful weather app with multiple sources.','Weather','16 MB','LGPL-3.0-only'],
+ ['com.junkfood.seal','Seal','Download videos and audio with a friendly interface.','Multimedia','10 MB','GPL-3.0-only']
+];
+function demoApp(a){
+  const slug = a[0];
+  return {pkg:slug, name:a[1], sum:a[2], cat:a[3], ver:'1.0', sizeText:a[4], icon:'',
+          installed:false, installedVer:0, hasUpdate:false, iconAlt:'', iconCand:[], shots:[],
+          description:a[2]+'\n\nThis is demo content shown because the store is running outside Android. Inside the app this page is filled from the live repository index.',
+          license:a[5], author:'', source:'', issues:'', web:'', version:'1.0', versionCode:1,
+          size:0, minSdk:24, updated:Date.now(), apkUrl:''};
+}
+const demoAll = DEMO.map(demoApp);
+
+/* The demo bridge fakes the streaming load so this page behaves like the app. */
+let mPhase = 'idle', mCount = 0, mPct = 0, mDetail = 'contacting the repository';
+function mockPush(t){ try{ if(window.__store) window.__store(t); }catch(e){} }
+function mockStartLoad(){
+  if(mPhase === 'download' || mPhase === 'ready') return;
+  mPhase = 'download'; mCount = 0; mPct = 0;
+  const total = demoAll.length, step = Math.max(1, Math.ceil(total / 12));
+  const timer = setInterval(function(){
+    mCount = Math.min(total, mCount + step);
+    mPct = Math.round(mCount / total * 100);
+    mDetail = (mCount * 0.12).toFixed(1) + ' MB / 2.1 MB  \u00b7  ' + (mCount * 250) + ' apps';
+    mockPush('apps'); mockPush('state');
+    if(mCount >= total){
+      clearInterval(timer);
+      mPhase = 'ready'; mPct = 100; mDetail = total + ' apps';
+      mockPush('state'); mockPush('ready');
+    }
+  }, 160);
+}
+const mockVisible = function(){ return demoAll.slice(0, mCount); };
+
+const MockBridge = {
+  state:()=>({phase:mPhase, pct:mPct, detail:mDetail, error:'', count:mCount,
+              partial:mPhase !== 'ready', repo:'F-Droid (demo)', address:'', timestamp:Date.now()}),
+  load:()=>{ mockStartLoad(); },
+  stats:()=>{ const v = mockVisible(); return {
+      apps:v.filter(a=>a.cat!=='Games').length, games:v.filter(a=>a.cat==='Games').length,
+      categories:new Set(v.map(a=>a.cat)).size, total:v.length}; },
+  categories:()=>{ const v = mockVisible(), m = {};
+    v.forEach(a=>m[a.cat]=(m[a.cat]||0)+1);
+    return Object.keys(m).map(k=>({name:k,count:m[k]})).sort((a,b)=>b.count-a.count); },
+  list:(q,cat,sort,off,lim)=>{ let h = mockVisible().filter(a=>(!cat||a.cat===cat)&&(!q||(a.name+a.pkg+a.sum).toLowerCase().includes(q.toLowerCase())));
+    if(sort==='updated') h = h.slice().sort((a,b)=>b.updated-a.updated);
+    else h = h.slice().sort((a,b)=>a.name.localeCompare(b.name));
+    return {total:h.length, apps:h.slice(off,off+lim)}; },
+  detail:(pkg)=>demoAll.find(a=>a.pkg===pkg)||{},
+  install:()=>({ok:false, error:'Installing only works inside the Android app.'}),
+  progress:()=>({pkg:'',phase:'idle',pct:0,got:0,total:0,text:'',error:''}),
+  canInstall:()=>({ok:false,message:'Not running on Android.'}),
+  requestInstallPermission:()=>{},
+  open:()=>{}, uninstall:()=>{}, cancel:()=>{},
+  fetchImage:()=>{}, imageData:()=>'',
+  cancelLoad:()=>{},
+  sources:()=>({custom:'', current:'https://f-droid.org/repo', list:[
+    {url:'https://f-droid.org/repo', host:'f-droid.org'},
+    {url:'https://mirror.hyd.albony.in/fdroid/repo', host:'mirror.hyd.albony.in'},
+    {url:'https://cloudflare.f-droid.org/repo', host:'cloudflare.f-droid.org'}]}),
+  setSource:()=>{}
+};
+const B = hasNative ? {
+  state:()=>JSON.parse(Android.state()), load:(f)=>Android.load(!!f),
+  stats:()=>JSON.parse(Android.stats()), categories:()=>JSON.parse(Android.categories()),
+  list:(q,c,s,o,l)=>JSON.parse(Android.list(q,c,s,o,l)),
+  detail:(p)=>JSON.parse(Android.detail(p)),
+  install:(p)=>JSON.parse(Android.install(p)),
+  progress:()=>JSON.parse(Android.progress()),
+  canInstall:()=>JSON.parse(Android.canInstall()),
+  requestInstallPermission:()=>Android.requestInstallPermission(),
+  open:(p)=>Android.open(p), uninstall:(p)=>Android.uninstall(p), cancel:()=>Android.cancel(),
+  cancelLoad:()=>Android.cancelLoad(),
+  sources:()=>JSON.parse(Android.sources()),
+  setSource:(u)=>Android.setSource(u)
+} : MockBridge;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PALETTE = [['#2bb6c9','#1b5e7a'],['#e2a03f','#8a5a1a'],['#e05a72','#8a2340'],['#7fb069','#2f6b52'],
+                 ['#5aa9e6','#245a86'],['#c06b4f','#6b2f1c'],['#a86bd1','#5a2f80'],['#3fb6a8','#1c6b62']];
+function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
+function pair(pkg){return PALETTE[hash(pkg)%PALETTE.length]}
+function iconEl(a, cls){
+  const c = pair(a.pkg);
+  const letter = esc((a.name||a.pkg||'?').trim().charAt(0).toUpperCase());
+  return `<div class="ic ${cls||''}" style="background:linear-gradient(145deg,${c[0]},${c[1]})"><span class="ltr">${letter}</span>${imgTag(a)}</div>`;
+}
+/* Images: walk the candidate URLs, then ask the native side for the bytes,
+   and only fall back to the generated letter tile when all of that fails. */
+const IMG_WAIT = {};      /* url -> elements waiting for bytes */
+const IMG_DONE = {};      /* url -> data uri we already have */
+
+function imgCandidates(a){
+  if(a.iconCand && a.iconCand.length) return a.iconCand.filter(Boolean);
+  return a.icon ? [a.icon, a.iconAlt || ''].filter(Boolean) : [];
+}
+function imgTagFor(cands, cls){
+  if(!cands || !cands.length) return '';
+  const cached = IMG_DONE[cands[0]];
+  return '<img' + (cls ? ' class="' + cls + '"' : '') +
+    ' data-cand="' + esc(cands.join('|')) + '" data-i="0"' +
+    ' src="' + esc(cached || cands[0]) + '" alt="" decoding="async"' +
+    ' onload="this.style.opacity=1;this.parentNode.classList.add(\'has\')"' +
+    ' onerror="imgFail(this)">';
+}
+function imgTag(a){ return imgTagFor(imgCandidates(a), ''); }
+
+function imgFail(el){
+  if(el.getAttribute('data-native') === '2'){ el.remove(); return; }
+  const cands = (el.getAttribute('data-cand') || '').split('|').filter(Boolean);
+  const i = parseInt(el.getAttribute('data-i') || '0', 10);
+  if(i + 1 < cands.length){
+    el.setAttribute('data-i', String(i + 1));
+    el.src = cands[i + 1];
+    return;
+  }
+  const url = cands[0] || el.src;
+  if(url && el.getAttribute('data-native') !== '1' && hasNative){
+    el.setAttribute('data-native', '1');
+    (IMG_WAIT[url] = IMG_WAIT[url] || []).push(el);
+    try { Android.fetchImage(url); } catch(e){}
+    return;                       /* keep the letter tile until bytes arrive */
+  }
+  el.remove();
+}
+
+/* Native finished fetching an image - swap the bytes in. */
+function applyImages(){
+  for(const url in IMG_WAIT){
+    let d = IMG_DONE[url];
+    if(!d){
+      try { d = Android.imageData(url); } catch(e){ d = ''; }
+      if(!d) continue;
+      IMG_DONE[url] = d;
+    }
+    const els = IMG_WAIT[url];
+    for(let k = 0; k < els.length; k++){
+      const el = els[k];
+      el.setAttribute('data-native', '2');
+      el.style.opacity = 1;
+      if(el.parentNode) el.parentNode.classList.add('has');
+      el.src = d;
+    }
+    delete IMG_WAIT[url];
+  }
+}
+
+function dateText(ms){
+  if(!ms) return '';
+  const d = new Date(ms);
+  const p = n => String(n).padStart(2,'0');
+  return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;
+}
+let toastT;
+function toast(msg){ const n=$('#toast'); n.textContent=msg; n.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>n.classList.remove('on'),2600); }
+
+/* ---------- app state ---------- */
+const S = { ready:false, partial:false, refreshing:false, lastPhase:'', view:'today', category:'', query:'', pages:{}, stats:{apps:0,games:0,categories:0,total:0}, installing:{}, sheetPkg:null };
+const TITLES = {today:'Today', games:'Games', apps:'Apps', search:'Search'};
+
+function getBtnHtml(a){
+  if(S.installing[a.pkg]){
+    const p = S.installing[a.pkg];
+    return `<button class="get" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${p.pct}%"></span><span>${p.pct}%</span></button>`;
+  }
+  if(S.partial && !a.installed) return `<button class="get" data-busy="1" style="opacity:.45">&hellip;</button>`;
+  if(a.installed && a.hasUpdate) return `<button class="get" data-install="${esc(a.pkg)}">Update</button>`;
+  if(a.installed) return `<button class="get open" data-open="${esc(a.pkg)}">Open</button>`;
+  return `<button class="get" data-install="${esc(a.pkg)}">Get</button>`;
+}
+function rowHtml(a, rank){
+  const b = a.installed ? (a.hasUpdate ? '<span class="badge up">Update</span>' : '<span class="badge">Installed</span>') : '';
+  return `<div class="row" data-detail="${esc(a.pkg)}">
+    ${rank?`<div class="rank">${rank}</div>`:''}
+    ${iconEl(a)}
+    <div class="meta"><b>${esc(a.name)}${b}</b><small>${esc(a.cat)}${a.sizeText?' &middot; '+esc(a.sizeText):''}</small></div>
+    ${getBtnHtml(a)}
+  </div>`;
+}
+function renderInto(sel, html){ const el=$(sel); if(el) el.innerHTML = html; }
+
+/* ---------- views ---------- */
+function renderToday(){
+  const st = S.stats;
+  const feat = S.featured;
+  let h = '';
+  if(feat){
+    h += `<div class="hero g">
+      <div class="orb"></div>
+      <div class="tag">App of the day</div>
+      <h3>${esc(feat.name)}</h3>
+      <p>${esc(feat.sum)}</p>
+      <div class="hero-foot">
+        ${iconEl(feat,'sm')}
+        <div class="meta"><b>${esc(feat.name)}</b><small>${esc(feat.cat)}</small></div>
+        ${getBtnHtml(feat)}
+      </div>
+    </div>`;
+  }
+  h += `<div class="sec-head"><h2>Browse categories</h2></div><div class="chips" id="todayChips"></div>`;
+  h += `<div class="sec-head"><h2>Recently updated</h2></div><div id="todayUpdated"></div>`;
+  h += `<div class="sec-head"><h2>New arrivals</h2></div><div id="todayNew"></div>`;
+  h += `<div class="nofooter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/></svg>
+    No ads &middot; No account &middot; ${st.total} apps from F-Droid</div>`;
+  renderInto('#view-today', h);
+
+  const cats = B.categories().slice(0, 10);
+  const chips = $('#todayChips');
+  chips.innerHTML = cats.map(c=>`<button class="chip g" data-cat="${esc(c.name)}">${esc(c.name)} <span style="color:var(--dimmer)">${c.count}</span></button>`).join('');
+  const upd = B.list('', '', 'updated', 0, 6);
+  $('#todayUpdated').innerHTML = upd.apps.map(a=>rowHtml(a)).join('') || emptyRow();
+  const nw = B.list('', '', 'new', 0, 6);
+  $('#todayNew').innerHTML = nw.apps.map(a=>rowHtml(a)).join('') || emptyRow();
+}
+function emptyRow(){ return '<div class="empty">Nothing here yet.</div>'; }
+
+function renderCategoryView(view, fixedCat){
+  const key = view + ':' + fixedCat;
+  const page = S.pages[key] || (S.pages[key] = {offset:0, done:false});
+  let h = '';
+  if(view === 'apps'){
+    const cats = B.categories();
+    h += `<div class="eyebrow">Categories</div>
+      <div class="chips" id="appChips">
+        <button class="chip g ${S.category===''?'act':''}" data-cat="">All <span style="color:var(--dimmer)">${S.stats.total}</span></button>
+        ${cats.map(c=>`<button class="chip g ${S.category===c.name?'act':''}" data-cat="${esc(c.name)}">${esc(c.name)} <span style="color:var(--dimmer)">${c.count}</span></button>`).join('')}
+      </div>`;
+  }
+  const cat = view === 'games' ? 'Games' : S.category;
+  h += `<div class="sec-head"><h2>${view==='games'?'Top games':(S.category?esc(S.category):'All apps')}</h2>
+        <span data-count></span></div><div data-listbox></div>`;
+  const viewEl = $('#view-'+view);
+  viewEl.innerHTML = h;
+  const box = viewEl.querySelector('[data-listbox]');
+  const label = viewEl.querySelector('[data-count]');
+  page.offset = 0; page.done = false;
+  loadMore(view, cat, box, label, page, true);
+}
+
+function loadMore(view, cat, box, label, page, replace){
+  if(!box || page.done) return;
+  const r = B.list('', cat, 'name', page.offset, 40);
+  if(label) label.textContent = r.total + (r.total===1?' app':' apps');
+  if(replace) box.innerHTML = '';
+  if(r.apps.length === 0 && page.offset === 0){
+    box.innerHTML = '<div class="empty">No apps in this category.</div>';
+  } else {
+    box.insertAdjacentHTML('beforeend', r.apps.map((a,i)=>rowHtml(a, page.offset+i+1)).join(''));
+  }
+  page.offset += r.apps.length;
+  if(page.offset >= r.total || r.apps.length === 0) page.done = true;
+}
+
+function renderSearch(){
+  const h = `<div class="searchbar g">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <input id="searchInput" placeholder="Search ${S.stats.total} apps" autocomplete="off" spellcheck="false" value="${esc(S.query)}">
+    </div><div id="searchOut"></div>`;
+  renderInto('#view-search', h);
+  const input = $('#searchInput');
+  input.addEventListener('input', ()=>{ S.query = input.value; runSearch(); });
+  runSearch();
+  if(S.focusSearch){ setTimeout(()=>input.focus(), 60); S.focusSearch = false; }
+}
+function runSearch(){
+  const out = $('#searchOut'); if(!out) return;
+  const q = S.query.trim();
+  if(!q){
+    const upd = B.list('', '', 'updated', 0, 8);
+    out.innerHTML = `<div class="eyebrow">Popular right now</div>` + upd.apps.map(a=>rowHtml(a)).join('');
+    return;
+  }
+  const r = B.list(q, '', 'relevance', 0, 60);
+  if(r.apps.length === 0){
+    out.innerHTML = `<div class="empty">No results for &ldquo;${esc(q)}&rdquo;.<br>Try &ldquo;player&rdquo;, &ldquo;keyboard&rdquo; or &ldquo;reader&rdquo;.</div>`;
+    return;
+  }
+  out.innerHTML = `<div class="eyebrow">${r.total} result${r.total===1?'':'s'}</div>` + r.apps.map(a=>rowHtml(a)).join('');
+}
+
+/* ---------- detail sheet ---------- */
+function openSheet(pkg){
+  let a = null;
+  try {
+    a = B.detail(pkg);
+  } catch(err) {
+    toast('Could not open that app \u2014 ' + (err && err.message ? err.message : 'unknown error'));
+    return;
+  }
+  if(!a || !a.pkg) return;
+  S.sheetPkg = pkg;
+  const links = [];
+  if(a.source) links.push(`<a href="${esc(a.source)}" target="_blank" rel="noopener">Source code</a>`);
+  if(a.issues) links.push(`<a href="${esc(a.issues)}" target="_blank" rel="noopener">Report a bug</a>`);
+  if(a.web) links.push(`<a href="${esc(a.web)}" target="_blank" rel="noopener">Website</a>`);
+
+  $('#sheetBody').innerHTML = `
+    <div class="sheet-head">
+      ${iconEl(a,'xl')}
+      <div style="flex:1;min-width:0">
+        <h2>${esc(a.name)}</h2>
+        ${a.author?`<div class="dev">${esc(a.author)}</div>`:''}
+        <div class="cat">${esc(a.category)}${a.license?' &middot; '+esc(a.license):''}</div>
+      </div>
+    </div>
+    <div class="installrow" id="sheetActions"></div>
+    ${(a.shots && a.shots.length) ? `<div class="eyebrow">Screenshots</div><div class="shots">${a.shots.map(function(c,i){
+        return '<div class="shot">' + imgTagFor(c, '') + '<div class="ph"></div><span>' + (i+1) + '</span></div>';
+      }).join('')}</div>` : ''}
+    <div class="stats">
+      <div class="stat"><small>Size</small><b>${esc(a.sizeText||'-')}</b></div>
+      <div class="stat"><small>Version</small><b>${esc(a.version||'-')}</b></div>
+      <div class="stat"><small>Android</small><b>${a.minSdk?('&ge; '+a.minSdk):'-'}</b></div>
+      <div class="stat"><small>Updated</small><b style="font-size:13px">${esc(dateText(a.updated)||'-')}</b></div>
+    </div>
+    <div class="desc">${esc(a.description || a.summary || a.sum || '')}</div>
+    ${links.length?`<div class="linkrow">${links.join('')}</div>`:''}
+    <div class="meta-list">
+      <b>Package</b> ${esc(a.pkg)}<br>
+      ${a.summary?`<b>Summary</b> ${esc(a.summary)}<br>`:''}
+    </div>
+    <div class="nofooter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/></svg>
+      No ads &middot; No account &middot; No tracking</div>`;
+  renderSheetActions(a);
+  $('#scrim').classList.add('on');
+  $('#sheet').classList.add('on');
+}
+function renderSheetActions(a){
+  const box = $('#sheetActions'); if(!box) return;
+  let h = getBtnHtml(a).replace('class="get','class="bigget').replace(/<button class="bigget" data-/, '<button class="bigget" data-');
+  if(a.installed){
+    h += `<button class="ghost g" data-open="${esc(a.pkg)}">Open</button>
+          <button class="ghost g" data-uninstall="${esc(a.pkg)}">Uninstall</button>`;
+  } else {
+    h += `<button class="ghost g" data-open="${esc(a.pkg)}" style="display:none"></button>`;
+  }
+  box.innerHTML = h;
+}
+function closeSheet(){
+  $('#scrim').classList.remove('on');
+  $('#sheet').classList.remove('on');
+  S.sheetPkg = null;
+}
+
+/* ---------- install ---------- */
+function beginInstall(pkg){
+  const r = B.install(pkg);
+  if(r && r.ok){ S.installing[pkg] = {pct:0}; refreshVisible(); return; }
+  const msg = (r && r.error) || 'Could not start the install.';
+  if(msg === 'permission'){
+    showPermission();
+  } else {
+    toast(msg);
+  }
+}
+function showPermission(){
+  const c = B.canInstall();
+  $('#sheetBody').innerHTML = `
+    <div class="sheet-head"><div style="flex:1">
+      <h2>One permission needed</h2>
+      <div class="cat">Install unknown apps</div>
+    </div></div>
+    <div class="desc">${esc(c.message || 'Android needs your permission before Liquid Store can install apps. This is a one-time switch - after that installs start straight from the store.')}</div>
+    <div class="installrow">
+      <button class="bigget g" id="grantBtn"><span>Open settings</span></button>
+    </div>
+    <div class="meta-list">Nothing else is requested: no account, no sign-in, no advertising identifier.</div>`;
+  const b = $('#grantBtn');
+  if(b) b.addEventListener('click', ()=>{ B.requestInstallPermission(); toast('Turn on "Allow from this source", then press Get again.'); });
+  $('#scrim').classList.add('on');
+  $('#sheet').classList.add('on');
+}
+function pollInstall(){
+  if(!hasNative) return;
+  const p = B.progress();
+  if(!p.pkg){ return; }
+  if(p.phase === 'download' || p.phase === 'installing'){
+    S.installing[p.pkg] = {pct: p.pct};
+    refreshVisible();
+  } else if(p.phase === 'success'){
+    delete S.installing[p.pkg];
+    toast('Installed - open it any time');
+    refreshVisible();
+    if(S.sheetPkg === p.pkg) openSheet(p.pkg);
+    pollStop();
+  } else if(p.phase === 'failed'){
+    delete S.installing[p.pkg];
+    toast(p.error || 'Install failed');
+    refreshVisible();
+    if(S.sheetPkg === p.pkg) openSheet(p.pkg);
+    pollStop();
+  }
+}
+let pollTimer = null;
+function pollStart(){ if(pollTimer || !hasNative) return; pollTimer = setInterval(pollInstall, 500); }
+function pollStop(){ if(pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+
+function refreshVisible(){
+  if(!S.ready) return;
+  if(S.view === 'today') renderToday();
+  else if(S.view === 'search') runSearch();
+  else renderCategoryView(S.view, '');
+  if(S.sheetPkg) renderSheetActions(B.detail(S.sheetPkg));
+}
+
+/* ---------- loader ---------- */
+function showLoader(on, title, text, pct, action){
+  const l = $('#loader');
+  l.classList.toggle('on', !!on);
+  if(title) $('#loadTitle').textContent = title;
+  if(text !== undefined) $('#loadText').textContent = text;
+  if(pct !== undefined) $('#loadBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  const b = $('#loadAction');
+  if(action){ b.style.display='grid'; b.querySelector('span').textContent = action; }
+  else b.style.display = 'none';
+  $('#spin').style.display = action ? 'none' : 'block';
+}
+
+function boot(){
+  const st = B.state();
+  if(st.phase === 'ready' && st.count > 0){ onReady(); return; }
+  if(st.phase === 'error'){ showError(st); return; }
+  if(st.count > 0) applyPartial(st);
+  else showLoader(true, 'Loading catalogue', 'Contacting the app repository\u2026', st.pct || 0);
+  $('#loadAction').onclick = null;
+  B.load(false);
+  pollStart();
+}
+
+function showError(st){
+  showLoader(true, 'Could not load', st.error || 'The catalogue could not be reached.', 0, 'Retry');
+  $('#loadAction').onclick = function(){
+    showLoader(true, 'Loading catalogue', 'Contacting the app repository\u2026', 0);
+    $('#strip').classList.add('on');
+    B.load(true);
+  };
+}
+
+/* Show whatever has arrived so far instead of blocking on the whole index. */
+function applyPartial(st){
+  S.partial = !!st.partial;
+  S.stats = B.stats();
+  showLoader(false);
+  $('#strip').classList.add('on');
+  updateStrip(st);
+  paintNow(false);
+}
+
+function updateStrip(st){
+  const label = st.phase === 'probe' ? 'Finding the fastest source'
+              : (st.phase === 'parse' || st.phase === 'apps') ? 'Reading catalogue'
+              : (st.phase === 'cache' ? 'Opening saved catalogue' : 'Downloading catalogue');
+  $('#stripBar').style.width = Math.max(0, Math.min(100, st.pct || 0)) + '%';
+  $('#stripText').textContent = label + (st.detail ? '  \u00b7  ' + st.detail : '');
+}
+
+let lastPaint = 0;
+function paintNow(force){
+  const now = Date.now();
+  if(!force && now - lastPaint < 400) return;
+  lastPaint = now;
+  if(S.view === 'search') return;                 /* never fight the keyboard */
+  const v = document.querySelector('.view.on');
+  const top = v ? v.scrollTop : 0;
+  if(S.view === 'today') renderToday();
+  else renderCategoryView(S.view, '');
+  const v2 = document.querySelector('.view.on');
+  if(v2) v2.scrollTop = top;
+}
+
+let readyAt = 0;
+function onReady(){
+  const st = B.state();
+  if(st.phase !== 'ready') return;
+  const now = Date.now();
+  if(now - readyAt < 300) return;                 /* native announces ready twice */
+  readyAt = now;
+  const first = !S.ready;
+  S.ready = true;
+  S.partial = false;
+  pollStop();
+  showLoader(false);
+  $('#strip').classList.remove('on');
+  S.stats = B.stats();
+  const upd = B.list('', '', 'updated', 0, 30);
+  if(upd.apps.length){
+    const day = Math.floor(Date.now()/86400000);
+    S.featured = upd.apps[day % upd.apps.length];
+  }
+  renderToday();
+  renderCategoryView('games','');
+  renderCategoryView('apps','');
+  renderSearch();
+  if(!first && S.refreshing){
+    S.refreshing = false;
+    toast(S.lastPhase === 'cache' ? 'Already up to date' : 'Catalogue updated');
+  }
+}
+
+/* called from native on every progress/state change */
+window.__store = function(type){
+  const st = B.state();
+  S.lastPhase = st.phase;
+  if(type === 'state'){
+    if(st.phase === 'ready'){ onReady(); return; }
+    if(st.phase === 'error'){ showError(st); return; }
+    if(st.count > 0) applyPartial(st);
+    else if(!S.ready) showLoader(true, st.phase === 'parse' ? 'Reading the catalogue' : 'Downloading the catalogue', st.detail || '', st.pct || 0);
+  } else if(type === 'apps'){
+    if(!S.ready && st.count > 0) applyPartial(st);
+  } else if(type === 'ready'){
+    onReady();
+  } else if(type === 'progress'){
+    pollInstall();
+  } else if(type === 'installed'){
+    refreshVisible();
+  } else if(type === 'image'){
+    applyImages();
+  }
+};
+window.__onBack = function(){
+  if($('#sheet').classList.contains('on')){ closeSheet(); return true; }
+  if(S.view !== 'today'){ switchTab('today'); return true; }
+  return false;
+};
+
+/* ---------- tabs ---------- */
+function switchTab(v){
+  S.view = v;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.view===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='view-'+v));
+  $('#pageTitle').textContent = TITLES[v];
+  if(v === 'search'){ S.focusSearch = true; renderSearch(); }
+  if(v === 'games') renderCategoryView('games','');
+  if(v === 'apps') renderCategoryView('apps','');
+  if(v === 'today' && S.ready) renderToday();
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', function(e){
+  const t = e.target;
+
+  const catBtn = t.closest('[data-cat]');
+  if(catBtn && S.ready){
+    const c = catBtn.getAttribute('data-cat');
+    if(S.view === 'today'){ S.category = c; switchTab('apps'); }
+    else { S.category = c; renderCategoryView('apps',''); }
+    return;
+  }
+  const useSrc = t.closest('[data-usesrc]');
+  if(useSrc){
+    e.stopPropagation();
+    B.setSource(useSrc.getAttribute('data-usesrc'));
+    closeSheet();
+    toast('Source set \u00b7 reloading');
+    doRefresh();
+    return;
+  }
+  const inst = t.closest('[data-install]');
+  if(inst){ e.stopPropagation(); beginInstall(inst.getAttribute('data-install')); return; }
+  const busy = t.closest('[data-busy]');
+  if(busy){ e.stopPropagation(); return; }
+  const op = t.closest('[data-open]');
+  if(op){ e.stopPropagation(); B.open(op.getAttribute('data-open')); return; }
+  const un = t.closest('[data-uninstall]');
+  if(un){ e.stopPropagation(); B.uninstall(un.getAttribute('data-uninstall')); return; }
+  const row = t.closest('[data-detail]');
+  if(row){ openSheet(row.getAttribute('data-detail')); return; }
+  const tab = t.closest('.tab');
+  if(tab){ switchTab(tab.dataset.view); return; }
+});
+
+$('#sheetClose').addEventListener('click', closeSheet);
+$('#scrim').addEventListener('click', closeSheet);
+function doRefresh(){
+  S.refreshing = true;
+  $('#strip').classList.add('on');
+  updateStrip({phase:'probe', pct:2, detail:'checking sources\u2026'});
+  pollStart();
+  B.load(true);
+}
+$('#refreshBtn').addEventListener('click', doRefresh);
+
+/* ---- sources sheet ---- */
+function openSources(){
+  const s = B.sources();
+  const rows = s.list.map(function(m){
+    const inUse = s.current === m.url;
+    return '<div class="row"><div class="meta"><b>' + esc(m.host) + '</b><small>' + esc(m.url) + '</small></div>' +
+      (inUse ? '<span class="badge">In use</span>' : '<button class="get" data-usesrc="' + esc(m.url) + '">Use</button>') +
+      '</div>';
+  }).join('');
+  $('#sheetBody').innerHTML =
+    '<div class="sheet-head"><div style="flex:1"><h2>Sources</h2>' +
+      '<div class="cat">Where the catalogue and apps come from</div></div></div>' +
+    '<div class="desc">Prism asks every source at once and downloads from whichever answers fastest. ' +
+      'If loading keeps failing, pick one below, or enter your own repository address.</div>' +
+    '<div class="searchbar g" style="margin:6px 0 14px">' +
+      '<input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="' + esc(s.custom || '') + '">' +
+    '</div>' +
+    '<div class="installrow"><button class="bigget g" id="srcSave"><span>Save and reload</span></button></div>' +
+    '<div class="eyebrow">Official mirrors</div>' + rows +
+    '<div class="nofooter">No ads &middot; No account &middot; No tracking</div>';
+  $('#scrim').classList.add('on');
+  $('#sheet').classList.add('on');
+  const save = $('#srcSave');
+  if(save) save.addEventListener('click', function(){
+    const v = $('#srcInput').value.trim();
+    B.setSource(v);
+    closeSheet();
+    toast(v ? 'Source set to ' + v : 'Using the fastest source');
+    doRefresh();
+  });
+}
+$('#sourceBtn').addEventListener('click', openSources);
+
+/* paginate on scroll */
+document.querySelectorAll('.view').forEach(function(v){
+  v.addEventListener('scroll', function(){
+    if(!S.ready) return;
+    if(v.scrollTop + v.clientHeight < v.scrollHeight - 400) return;
+    const view = v.id.replace('view-','');
+    if(view !== 'games' && view !== 'apps') return;
+    const cat = view === 'games' ? 'Games' : S.category;
+    const key = view + ':';
+    const page = S.pages[key];
+    const box = v.querySelector('[data-listbox]');
+    const label = v.querySelector('[data-count]');
+    if(page && box) loadMore(view, cat, box, label, page, false);
+  }, {passive:true});
+});
+
+/* Silent failures have bitten this app before - say something instead. */
+window.addEventListener('error', function(ev){
+  try { toast('Something went wrong: ' + (ev.message || 'unknown')); } catch(e){}
+});
+
+function tickClock(){
+  const d = new Date();
+  let h = d.getHours() % 12 || 12;
+  $('#clock').textContent = h + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+tickClock(); setInterval(tickClock, 20000);
+
+/* deep links for testing: #games #apps #search #app/<pkg> */
+(function(){
+  const h = (location.hash||'').replace(/^#/,'');
+  if(!h) return;
+  if(h.indexOf('app/') === 0){ setTimeout(()=>openSheet(h.slice(4)), 200); return; }
+  if(h === 'sources'){ setTimeout(openSources, 250); return; }
+  if(TITLES[h]) setTimeout(()=>switchTab(h), 200);
+})();
+
+boot();
+</script>
+</body>
+</html>
