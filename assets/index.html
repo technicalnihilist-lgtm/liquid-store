@@ -133,13 +133,25 @@ input{font-family:inherit}
 .shot .ph{position:absolute;inset:14px;border-radius:12px;border:1px dashed rgba(255,255,255,.16);transition:opacity .25s}
 .shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px;text-transform:uppercase;transition:opacity .25s}
 .shot.has .ph,.shot.has span{opacity:0}
-.tabbar{position:absolute;left:12px;right:12px;bottom:calc(10px + var(--safe-b));height:64px;border-radius:24px;
-  display:flex;align-items:center;justify-content:space-around;z-index:40}
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--dim);
-  padding:8px 12px;border-radius:16px;transition:color .2s;flex:1}
-.tab svg{width:23px;height:23px}
-.tab.on{color:var(--ink)}
-.tab.on svg{filter:drop-shadow(0 0 8px rgba(43,182,201,.7))}
+/* floating capsule with a glass "lens" that slides between tabs */
+.tabbar{position:absolute;left:14px;right:14px;bottom:calc(12px + var(--safe-b));height:68px;border-radius:30px;
+  display:flex;align-items:center;padding:0 7px;z-index:40;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 14px 34px rgba(0,0,0,.5)}
+.lens{position:absolute;top:7px;bottom:7px;left:7px;width:64px;border-radius:24px;z-index:0;pointer-events:none;
+  background:linear-gradient(165deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 58%,rgba(255,255,255,.16));
+  border:1px solid rgba(255,255,255,.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px rgba(255,255,255,.07),
+             0 6px 18px rgba(0,0,0,.4),0 0 24px rgba(43,182,201,.25);
+  backdrop-filter:blur(12px) saturate(190%);-webkit-backdrop-filter:blur(12px) saturate(190%);
+  transition:left .44s cubic-bezier(.34,1.46,.5,1),width .44s cubic-bezier(.34,1.46,.5,1)}
+.tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:24px;
+  transition:color .25s}
+.tab svg{width:22px;height:22px;transition:transform .32s cubic-bezier(.34,1.4,.5,1)}
+.tab .lbl{opacity:.7;transition:opacity .25s}
+.tab.on{color:#e2f8fc}
+.tab.on .lbl{opacity:1}
+.tab.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 10px rgba(43,182,201,.8))}
 
 .scrim{position:absolute;inset:0;background:rgba(3,6,10,.55);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:.3s;z-index:60}
 .scrim.on{opacity:1;visibility:visible}
@@ -230,15 +242,20 @@ input{font-family:inherit}
     <section class="view" id="view-search"></section>
   </div>
 
-  <nav class="tabbar g">
+  <nav class="tabbar g" id="tabbar">
+    <span class="lens" id="tabLens" aria-hidden="true"></span>
     <button class="tab on" data-view="today">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2.5V5M16 2.5V5M3 9h18"/></svg>Today</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2.5V5M16 2.5V5M3 9h18"/></svg>
+      <span class="lbl">Today</span></button>
     <button class="tab" data-view="games">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3M7.5 6.5v3M16 9h.01M18.5 11.5h.01"/><rect x="2.5" y="5.5" width="19" height="13" rx="5.5"/></svg>Games</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3M7.5 6.5v3M16 9h.01M18.5 11.5h.01"/><rect x="2.5" y="5.5" width="19" height="13" rx="5.5"/></svg>
+      <span class="lbl">Games</span></button>
     <button class="tab" data-view="apps">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>Apps</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>
+      <span class="lbl">Apps</span></button>
     <button class="tab" data-view="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>Search</button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <span class="lbl">Search</span></button>
   </nav>
 
   <div class="toast g" id="toast"></div>
@@ -829,7 +846,24 @@ function switchTab(v){
   if(v === 'games') renderCategoryView('games','');
   if(v === 'apps') renderCategoryView('apps','');
   if(v === 'today' && S.ready) renderToday();
+  moveLens(false);
 }
+
+/* Slide the glass lens to sit under whichever tab is active. */
+function moveLens(instant){
+  const bar = document.getElementById('tabbar');
+  const lens = document.getElementById('tabLens');
+  if(!bar || !lens) return;
+  const active = bar.querySelector('.tab.on');
+  if(!active) return;
+  if(instant) lens.style.transition = 'none';
+  lens.style.left = (active.offsetLeft + 3) + 'px';
+  lens.style.width = Math.max(0, active.offsetWidth - 6) + 'px';
+  if(instant){
+    requestAnimationFrame(function(){ lens.style.transition = ''; });
+  }
+}
+window.addEventListener('resize', function(){ moveLens(true); });
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
@@ -947,6 +981,7 @@ tickClock(); setInterval(tickClock, 20000);
 })();
 
 boot();
+requestAnimationFrame(function(){ moveLens(true); });
 </script>
 </body>
 </html>
