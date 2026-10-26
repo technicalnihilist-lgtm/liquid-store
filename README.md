@@ -6,7 +6,7 @@ repository index. No account, no sign-in, no ads, no tracking.
 <p align="center">
   <img src="screenshots/01-today.png" width="240" alt="Today">
   <img src="screenshots/03-app-detail.png" width="240" alt="App detail">
-  <img src="screenshots/04-sources.png" width="240" alt="Sources">
+  <img src="screenshots/05-dark.png" width="240" alt="Dark theme">
 </p>
 
 ## Download
@@ -37,6 +37,9 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 - **Saved catalogue.** Later launches open instantly from a local copy, and
   refreshes send `If-Modified-Since` / `ETag` so an unchanged index costs one
   round trip instead of a full download.
+- **Light and dark.** Light glass by default, following the system preference, with a
+  toggle in the toolbar. Both are driven from the same set of colour tokens.
+- **Arcade.** A curated games page — newest first, then the full list.
 - **Sources screen.** Pin a specific mirror, or enter your own repository address.
 - **No account, no login, no ads.** There is nothing to sign into.
 
@@ -45,6 +48,10 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 | Today | Apps | App detail |
 | --- | --- | --- |
 | ![Today](screenshots/01-today.png) | ![Apps](screenshots/02-apps.png) | ![Detail](screenshots/03-app-detail.png) |
+
+| Arcade | Dark theme |
+| --- | --- |
+| ![Arcade](screenshots/04-arcade.png) | ![Dark](screenshots/05-dark.png) |
 
 > The screenshots above were captured from the bundled UI running against a
 > small demo catalogue, so the app names are placeholders. The interface, layout

@@ -8,35 +8,83 @@
 <style>
 @font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url("fonts/pjs.woff2") format("woff2")}
 :root{
-  --ink:#eef4f8; --dim:rgba(238,244,248,.60); --dimmer:rgba(238,244,248,.38);
-  --glass:rgba(255,255,255,.075); --glass-2:rgba(255,255,255,.11); --glass-3:rgba(255,255,255,.16);
-  --edge:rgba(255,255,255,.16); --edge-hi:rgba(255,255,255,.42);
-  --teal:#2bb6c9; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
+  color-scheme:light;
+  --bg:#eef1fb; --ink:#0b0c14; --dim:#5b5f73; --dimmer:#8b90a4;
+  --glass:rgba(255,255,255,.44); --glass-2:rgba(255,255,255,.62); --glass-3:rgba(255,255,255,.78);
+  --edge:rgba(255,255,255,.80); --edge-hi:rgba(255,255,255,.98);
+  --hair:rgba(12,22,60,.09); --sh:rgba(40,50,110,.20);
+  --accent:#0a7f92; --accent-soft:rgba(10,127,146,.14); --accent-ink:#ffffff;
+  --teal:#0a7f92; --amber:#9a6412; --rose:#a53b5b; --sage:#3f7a4a;
+  --b1:#8fb3ff; --b2:#ffa3d6; --b3:#8ff0da;
+  --stage:radial-gradient(70% 50% at 10% 0%, #dfe8ff 0%, transparent 60%),
+          radial-gradient(60% 45% at 95% 18%, #ffe3f3 0%, transparent 60%),
+          radial-gradient(70% 50% at 30% 100%, #dcfff6 0%, transparent 62%),
+          linear-gradient(180deg,#f4f6ff 0%,#eef1fb 60%,#e8ecf8 100%);
+  --phone:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.25));
+  --hero:linear-gradient(200deg,rgba(9,116,134,.66),rgba(158,52,86,.54) 55%,rgba(146,94,14,.56));
+  --hero-tag:#ffe0ad;
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0a0b14; --ink:#f4f5fb; --dim:#a3a7bd; --dimmer:#6f7488;
+    --glass:rgba(40,44,70,.44); --glass-2:rgba(60,66,100,.62); --glass-3:rgba(78,86,126,.72);
+    --edge:rgba(255,255,255,.28); --edge-hi:rgba(255,255,255,.55);
+    --hair:rgba(255,255,255,.09); --sh:rgba(0,0,0,.50);
+    --accent:#3ec6d8; --accent-soft:rgba(43,182,201,.22); --accent-ink:#03161b;
+    --teal:#3ec6d8; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
+    --b1:#3d5bd9; --b2:#a3278a; --b3:#16907a;
+    --stage:radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
+            radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
+            radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
+            linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%);
+    --phone:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54));
+    --hero:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24));
+    --hero-tag:#e2a03f;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a0b14; --ink:#f4f5fb; --dim:#a3a7bd; --dimmer:#6f7488;
+  --glass:rgba(40,44,70,.44); --glass-2:rgba(60,66,100,.62); --glass-3:rgba(78,86,126,.72);
+  --edge:rgba(255,255,255,.28); --edge-hi:rgba(255,255,255,.55);
+  --hair:rgba(255,255,255,.09); --sh:rgba(0,0,0,.50);
+  --accent:#3ec6d8; --accent-soft:rgba(43,182,201,.22); --accent-ink:#03161b;
+  --teal:#3ec6d8; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
+  --b1:#3d5bd9; --b2:#a3278a; --b3:#16907a;
+  --stage:radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
+          radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
+          radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
+          linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%);
+  --phone:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54));
+  --hero:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24));
+  --hero-tag:#e2a03f;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:#070c14;color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+  background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
 button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font-family:inherit}
 
-.stage{position:fixed;inset:0;overflow:hidden;background:
-  radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
-  radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
-  radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
-  radial-gradient(46% 34% at 88% 88%, rgba(58,132,100,.52) 0%, transparent 70%),
-  radial-gradient(120% 80% at 15% 0%, #123043 0%, transparent 55%),
-  radial-gradient(110% 70% at 90% 12%, #2a2033 0%, transparent 52%),
-  radial-gradient(120% 90% at 50% 108%, #0d2a2c 0%, transparent 60%),
-  linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%)}
+.stage{position:fixed;inset:0;overflow:hidden;background:var(--stage)}
 /* The four 78px-blurred, screen-blended, endlessly animated blobs that used to
    live here were the single largest cost while scrolling. The wash above is the
    same look painted once. */
-.blob{display:none}
+/* colour behind the glass. Transform-only animation on a promoted layer, and
+   no mix-blend-mode - that combination is what made scrolling stutter before. */
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;
+  will-change:transform;animation:fl 20s ease-in-out infinite alternate}
+.b1{width:62vw;max-width:340px;height:62vw;max-height:340px;background:var(--b1);top:-10%;left:-16%}
+.b2{width:56vw;max-width:300px;height:56vw;max-height:300px;background:var(--b2);top:32%;right:-18%;animation-delay:-7s}
+.b3{width:60vw;max-width:330px;height:60vw;max-height:330px;background:var(--b3);bottom:-12%;left:-10%;animation-delay:-13s}
+.b4{display:none}
+@keyframes fl{to{transform:translate(38px,-44px) scale(1.14)}}
+@media (prefers-reduced-motion:reduce){.blob{animation:none}}
 
 .phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;
-  background:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54))}
+  background:var(--phone)}
 @media (min-width:640px){body{display:grid;place-items:center}
   .phone{height:min(900px,94dvh);border-radius:46px;border:1px solid var(--edge);
     box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}}
@@ -78,21 +126,21 @@ input{font-family:inherit}
 .sec-head span{font-size:13px;color:var(--teal);font-weight:700;white-space:nowrap}
 
 .hero{position:relative;border-radius:30px;padding:22px;min-height:236px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate}
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24))}
-.hero .tag{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--amber)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--hero)}
+.hero .tag{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--hero-tag)}
 .hero h3{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.14;margin:6px 0 8px}
-.hero p{font-size:14px;color:rgba(255,255,255,.82);line-height:1.45;
+.hero p{font-size:14px;color:rgba(255,255,255,.90);line-height:1.45;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .hero .orb{position:absolute;top:-30px;right:-30px;width:190px;height:190px;border-radius:50%;z-index:-1;
   background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),rgba(255,255,255,.05) 60%,transparent 72%);
   border:1px solid rgba(255,255,255,.32)}
 .hero-foot{display:flex;gap:12px;align-items:center;margin-top:14px}
 
-.row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid rgba(255,255,255,.06)}
+.row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid var(--hair)}
 .row{content-visibility:auto;contain-intrinsic-size:68px}
 .row:first-child{border-top:none}
 .ic{width:60px;height:60px;border-radius:15px;flex:0 0 auto;position:relative;overflow:hidden;display:grid;place-items:center;
-  border:1px solid rgba(255,255,255,.2);box-shadow:0 6px 14px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.28)}
+  border:1px solid var(--edge);box-shadow:0 6px 14px var(--sh),inset 0 1px 0 var(--edge-hi)}
 .ic .ltr{font-size:24px;font-weight:800;color:rgba(255,255,255,.92)}
 .ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
 /* once the real icon is in, drop the generated tile so the icon sits on nothing */
@@ -104,7 +152,7 @@ input{font-family:inherit}
 .meta b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta small{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:800;
-  background:rgba(43,182,201,.24);color:#bdeef5;vertical-align:1px}
+  background:var(--accent-soft);color:var(--accent);vertical-align:1px}
 .badge.up{background:rgba(226,160,63,.24);color:#f3d59a}
 .get{padding:7px 19px;border-radius:20px;font-size:14px;font-weight:800;background:var(--glass-3);
   border:1px solid var(--edge-hi);transition:transform .15s;min-width:74px;text-align:center;position:relative;overflow:hidden}
@@ -119,9 +167,22 @@ input{font-family:inherit}
 .chip{flex:0 0 auto;padding:9px 15px;border-radius:18px;font-size:13px;font-weight:700;white-space:nowrap}
 /* a backdrop blur per row button / chip is what made scrolling stutter */
 .g.chip,.g.get{backdrop-filter:none;-webkit-backdrop-filter:none}
-.g.chip{background:rgba(255,255,255,.10)}
-.g.get{background:rgba(255,255,255,.14)}
-.chip.act{background:rgba(43,182,201,.22);border-color:rgba(43,182,201,.55);color:#bdeef5}
+.g.chip{background:var(--glass-2)}
+.g.get{background:var(--glass-3)}
+.chip.act{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip span{opacity:.55;margin-left:7px;font-weight:800}
+
+/* Arcade */
+.arc{border-radius:26px;padding:20px;margin:4px 0 2px}
+.arc b{font-size:20px;display:block;margin-bottom:5px;letter-spacing:-.4px}
+.arc span{color:var(--dim);font-size:13.5px;line-height:1.5}
+.hcards{display:flex;gap:12px;overflow-x:auto;margin:0 -18px;padding:4px 18px 8px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.hcards::-webkit-scrollbar{display:none}
+.hcard{flex:0 0 auto;width:154px;border-radius:24px;padding:14px;text-align:left;scroll-snap-align:start;
+  display:flex;flex-direction:column;gap:8px}
+.hcard b{font-size:14.5px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcard>span{font-size:12px;color:var(--dim);line-height:1.35;height:32px;overflow:hidden}
+.ic.lg{width:74px;height:74px;border-radius:19px}.ic.lg .ltr{font-size:30px}
 
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .tile{border-radius:20px;padding:14px;min-height:100px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;text-align:left}
@@ -137,15 +198,15 @@ input{font-family:inherit}
 
 .strip{display:none;padding:0 18px 10px}
 .strip.on{display:block}
-.strip-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.strip-bar{height:4px;border-radius:3px;background:var(--hair);overflow:hidden}
 .strip-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
 .strip-text{font-size:11.5px;color:var(--dim);margin-top:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shots{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
 .shots::-webkit-scrollbar{display:none}
 .shot{flex:0 0 auto;width:150px;height:266px;border-radius:18px;border:1px solid var(--edge);
-  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.02));position:relative;overflow:hidden}
+  background:var(--glass-2);position:relative;overflow:hidden}
 .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
-.shot .ph{position:absolute;inset:14px;border-radius:12px;border:1px dashed rgba(255,255,255,.16);transition:opacity .25s}
+.shot .ph{position:absolute;inset:14px;border-radius:12px;border:1px dashed var(--edge);transition:opacity .25s}
 .shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px;text-transform:uppercase;transition:opacity .25s}
 .shot.has .ph,.shot.has span{opacity:0}
 /* floating capsule with a glass "lens" that slides between tabs */
@@ -163,7 +224,7 @@ input{font-family:inherit}
   transition:color .25s}
 .tab svg{width:22px;height:22px;transition:transform .32s cubic-bezier(.34,1.4,.5,1)}
 .tab .lbl{opacity:.7;transition:opacity .25s}
-.tab.on{color:#e2f8fc}
+.tab.on{color:var(--accent)}
 .tab.on .lbl{opacity:1}
 .tab.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 10px rgba(43,182,201,.8))}
 
@@ -171,7 +232,7 @@ input{font-family:inherit}
 .scrim{display:none}
 .sheet{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
   transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.9,.3,1);
-  background:rgba(11,17,25,.94);
+  background:var(--bg);
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border-left:1px solid rgba(255,255,255,.1)}
 .sheet.on{transform:none}
@@ -185,8 +246,8 @@ input{font-family:inherit}
 .pill,.pill2{flex:1;height:44px;border-radius:22px;font-size:15px;font-weight:800;
   display:grid;place-items:center;position:relative;overflow:hidden;transition:transform .15s}
 .pill:active,.pill2:active{transform:scale(.97)}
-.pill{background:linear-gradient(180deg,#3ec6d8,#1f93a5);color:#03161b;
-  border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 20px rgba(43,182,201,.32)}
+.pill{background:var(--accent);color:var(--accent-ink);
+  border:1px solid var(--edge);box-shadow:0 8px 20px var(--sh)}
 .pill2{background:var(--glass-2);border:1px solid var(--edge);color:var(--ink)}
 .pill .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.18);transition:width .15s linear}
 .pill span{position:relative;z-index:2}
@@ -201,15 +262,15 @@ input{font-family:inherit}
 .bigget .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(43,182,201,.5),rgba(43,182,201,.28));transition:width .15s linear}
 .bigget span{position:relative;z-index:2}
 .ghost{height:48px;padding:0 18px;border-radius:24px;font-size:14px;font-weight:700}
-.stats{display:flex;margin:22px 0 6px;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09)}
+.stats{display:flex;margin:22px 0 6px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
 .stat{flex:1;text-align:center;padding:14px 6px;position:relative;min-width:0}
-.stat + .stat::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:1px;background:rgba(255,255,255,.1)}
+.stat + .stat::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:1px;background:var(--hair)}
 .stat b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat small{font-size:10px;color:var(--dimmer);text-transform:uppercase;letter-spacing:1px}
-.desc{font-size:14.5px;line-height:1.6;color:rgba(238,244,248,.86);margin:16px 0;white-space:pre-wrap}
+.desc{font-size:14.5px;line-height:1.6;color:var(--ink);opacity:.86;margin:16px 0;white-space:pre-wrap}
 .linkrow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-.linkrow a{padding:8px 14px;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;color:#bdeef5;
-  background:rgba(43,182,201,.14);border:1px solid rgba(43,182,201,.3)}
+.linkrow a{padding:8px 14px;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;color:var(--accent);
+  background:var(--accent-soft);border:1px solid var(--accent)}
 .meta-list{margin:14px 0;font-size:13.5px;color:var(--dim);line-height:1.9}
 .meta-list b{color:var(--ink);font-weight:700}
 .x{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
@@ -222,12 +283,12 @@ input{font-family:inherit}
 .nofooter svg{width:14px;height:14px}
 
 .loader{position:absolute;inset:0;z-index:95;display:none;place-items:center;padding:32px;
-  background:linear-gradient(180deg,rgba(7,12,20,.72),rgba(7,12,20,.9));backdrop-filter:blur(10px)}
+  background:var(--bg);opacity:.96;backdrop-filter:blur(10px)}
 .loader.on{display:grid}
 .loadcard{border-radius:26px;padding:26px 24px;text-align:center;width:100%;max-width:340px}
 .loadcard h3{font-size:19px;font-weight:800;margin-bottom:8px}
 .loadcard p{font-size:13.5px;color:var(--dim);line-height:1.5;min-height:40px}
-.bar{height:7px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin:18px 0 10px}
+.bar{height:7px;border-radius:4px;background:var(--hair);overflow:hidden;margin:18px 0 10px}
 .bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
 .spin{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--teal);animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -249,8 +310,11 @@ input{font-family:inherit}
 
   <div class="topbar g">
     <h1 id="pageTitle">Today</h1>
+    <button class="iconbtn g" id="themeBtn" title="Light / dark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"/></svg>
+    </button>
     <button class="iconbtn g" id="sourceBtn" title="Sources">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4 3.6 7.7 12 12l8.4-4.3z"/><path d="M3.6 12.2 12 16.5l8.4-4.3"/><path d="M3.6 16.7 12 21l8.4-4.3"/></svg>
     </button>
     <button class="iconbtn g" id="refreshBtn" title="Refresh catalogue">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>
@@ -266,6 +330,7 @@ input{font-family:inherit}
     <section class="view on" id="view-today"></section>
     <section class="view" id="view-games"></section>
     <section class="view" id="view-apps"></section>
+    <section class="view" id="view-arcade"></section>
     <section class="view" id="view-search"></section>
   </div>
 
@@ -280,6 +345,9 @@ input{font-family:inherit}
     <button class="tab" data-view="apps">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>
       <span class="lbl">Apps</span></button>
+    <button class="tab" data-view="arcade">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4l2.3 5 5.4.7-4 3.7 1.1 5.3L12 15.5l-4.8 2.6 1.1-5.3-4-3.7 5.4-.7z"/></svg>
+      <span class="lbl">Arcade</span></button>
     <button class="tab" data-view="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
       <span class="lbl">Search</span></button>
@@ -500,7 +568,7 @@ function toast(msg){ const n=$('#toast'); n.textContent=msg; n.classList.add('on
 
 /* ---------- app state ---------- */
 const S = { ready:false, partial:false, refreshing:false, lastPhase:'', view:'today', category:'', query:'', pages:{}, stats:{apps:0,games:0,categories:0,total:0}, installing:{}, sheetPkg:null };
-const TITLES = {today:'Today', games:'Games', apps:'Apps', search:'Search'};
+const TITLES = {today:'Today', games:'Games', apps:'Apps', arcade:'Arcade', search:'Search'};
 
 function getBtnHtml(a){
   if(S.installing[a.pkg]){
@@ -524,6 +592,27 @@ function rowHtml(a, rank){
 function renderInto(sel, html){ const el=$(sel); if(el) el.innerHTML = html; }
 
 /* ---------- views ---------- */
+/* Arcade: the reference's curated games page, filled from the real catalogue.
+   There is no paid tier here, so the promise is the honest one - it is all free. */
+function renderArcade(){
+  const box = $('#view-arcade');
+  const fresh = B.list('', 'Games', 'updated', 0, 8);
+  const all = B.list('', 'Games', 'name', 0, 40);
+  let h = `<div class="arc g"><b>Everything here is free</b>
+    <span>No ads, no in-app purchases, no account. Every app is open source and installs straight from the repository.</span></div>`;
+  if(fresh.apps.length){
+    h += `<div class="sec-head"><h2>New this week</h2><span>${fresh.total} games</span></div>
+          <div class="hcards">${fresh.apps.map(hcard).join('')}</div>`;
+  }
+  h += `<div class="sec-head"><h2>All games</h2><span>${all.total}</span></div>`;
+  h += all.apps.length ? all.apps.map((a,i)=>rowHtml(a,i+1)).join('') : emptyRow();
+  box.innerHTML = h;
+}
+function hcard(a){
+  return `<button class="hcard g" data-detail="${esc(a.pkg)}">
+    ${iconEl(a,'lg')}<b>${esc(a.name)}</b><span>${esc(a.sum||'')}</span>${getBtnHtml(a)}</button>`;
+}
+
 function renderToday(){
   const st = S.stats;
   const feat = S.featured;
@@ -843,6 +932,7 @@ function onReady(){
   renderToday();
   renderCategoryView('games','');
   renderCategoryView('apps','');
+  renderArcade();
   renderSearch();
   /* if a detail page is open, its buttons must stop saying "..." now that
      installs are actually possible */
@@ -891,6 +981,7 @@ function switchTab(v){
   if(v === 'search'){ S.focusSearch = true; renderSearch(); }
   if(v === 'games') renderCategoryView('games','');
   if(v === 'apps') renderCategoryView('apps','');
+  if(v === 'arcade') renderArcade();
   if(v === 'today' && S.ready) renderToday();
   moveLens(false);
 }
@@ -995,6 +1086,13 @@ document.addEventListener('click', function(e){
   if(tab){ switchTab(tab.dataset.view); return; }
 });
 
+$('#themeBtn').addEventListener('click', function(){
+  const r = document.documentElement;
+  const dark = r.dataset.theme ? r.dataset.theme === 'dark'
+             : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.theme = dark ? 'light' : 'dark';
+  toast(dark ? 'Light mode' : 'Dark mode');
+});
 $('#sheetClose').addEventListener('click', closeSheet);
 $('#sheetMore').addEventListener('click', function(){
   if(!S.sheetPkg) return;
