@@ -6,7 +6,7 @@ repository index. No account, no sign-in, no ads, no tracking.
 <p align="center">
   <img src="screenshots/01-today.png" width="240" alt="Today">
   <img src="screenshots/03-app-detail.png" width="240" alt="App detail">
-  <img src="screenshots/05-dark.png" width="240" alt="Dark theme">
+  <img src="screenshots/06-dark.png" width="240" alt="Dark theme">
 </p>
 
 ## Download
@@ -49,9 +49,9 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 | --- | --- | --- |
 | ![Today](screenshots/01-today.png) | ![Apps](screenshots/02-apps.png) | ![Detail](screenshots/03-app-detail.png) |
 
-| Arcade | Dark theme |
-| --- | --- |
-| ![Arcade](screenshots/04-arcade.png) | ![Dark](screenshots/05-dark.png) |
+| Arcade | Search | Dark theme |
+| --- | --- | --- |
+| ![Arcade](screenshots/04-arcade.png) | ![Search](screenshots/05-search.png) | ![Dark](screenshots/06-dark.png) |
 
 > The screenshots above were captured from the bundled UI running against a
 > small demo catalogue, so the app names are placeholders. The interface, layout

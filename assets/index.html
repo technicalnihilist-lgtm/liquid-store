@@ -3,300 +3,268 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#070c14">
+<meta name="theme-color" content="#f2f2f7">
 <title>Liquid Store</title>
 <style>
-@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url("fonts/pjs.woff2") format("woff2")}
 :root{
   color-scheme:light;
-  --bg:#eef1fb; --ink:#0b0c14; --dim:#5b5f73; --dimmer:#8b90a4;
-  --glass:rgba(255,255,255,.44); --glass-2:rgba(255,255,255,.62); --glass-3:rgba(255,255,255,.78);
-  --edge:rgba(255,255,255,.80); --edge-hi:rgba(255,255,255,.98);
-  --hair:rgba(12,22,60,.09); --sh:rgba(40,50,110,.20);
-  --accent:#0a7f92; --accent-soft:rgba(10,127,146,.14); --accent-ink:#ffffff;
-  --teal:#0a7f92; --amber:#9a6412; --rose:#a53b5b; --sage:#3f7a4a;
-  --b1:#8fb3ff; --b2:#ffa3d6; --b3:#8ff0da;
-  --stage:radial-gradient(70% 50% at 10% 0%, #dfe8ff 0%, transparent 60%),
-          radial-gradient(60% 45% at 95% 18%, #ffe3f3 0%, transparent 60%),
-          radial-gradient(70% 50% at 30% 100%, #dcfff6 0%, transparent 62%),
-          linear-gradient(180deg,#f4f6ff 0%,#eef1fb 60%,#e8ecf8 100%);
-  --phone:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.25));
-  --hero:linear-gradient(200deg,rgba(9,116,134,.66),rgba(158,52,86,.54) 55%,rgba(146,94,14,.56));
-  --hero-tag:#ffe0ad;
+  --bg:#f2f2f7; --card:#ffffff; --ink:#000; --dim:#6c6c70; --dimmer:#aeaeb2;
+  --sep:rgba(60,60,67,.16); --blue:#007aff; --fill:rgba(120,120,128,.12); --getbg:rgba(120,120,128,.14);
+  --glass:rgba(255,255,255,.46); --glass-hi:rgba(255,255,255,.70);
+  --rim:rgba(255,255,255,.85); --rim-lo:rgba(255,255,255,.25); --shadow:rgba(20,30,70,.16);
+  --stage:radial-gradient(60% 40% at 0% 0%,#dfe9ff 0%,transparent 70%),radial-gradient(55% 40% at 100% 20%,#ffe4f1 0%,transparent 70%),radial-gradient(60% 40% at 20% 100%,#dcfff4 0%,transparent 70%),#f2f2f7;
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0a0b14; --ink:#f4f5fb; --dim:#a3a7bd; --dimmer:#6f7488;
-    --glass:rgba(40,44,70,.44); --glass-2:rgba(60,66,100,.62); --glass-3:rgba(78,86,126,.72);
-    --edge:rgba(255,255,255,.28); --edge-hi:rgba(255,255,255,.55);
-    --hair:rgba(255,255,255,.09); --sh:rgba(0,0,0,.50);
-    --accent:#3ec6d8; --accent-soft:rgba(43,182,201,.22); --accent-ink:#03161b;
-    --teal:#3ec6d8; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
-    --b1:#3d5bd9; --b2:#a3278a; --b3:#16907a;
-    --stage:radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
-            radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
-            radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
-            linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%);
-    --phone:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54));
-    --hero:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24));
-    --hero-tag:#e2a03f;
+    --bg:#000; --card:#1c1c1e; --ink:#fff; --dim:#98989f; --dimmer:#636366;
+    --sep:rgba(84,84,88,.55); --blue:#0a84ff; --fill:rgba(120,120,128,.24); --getbg:rgba(120,120,128,.30);
+    --glass:rgba(44,44,50,.46); --glass-hi:rgba(70,70,80,.62);
+    --rim:rgba(255,255,255,.30); --rim-lo:rgba(255,255,255,.06); --shadow:rgba(0,0,0,.55);
+    --stage:radial-gradient(60% 40% at 0% 0%,rgba(40,70,160,.45) 0%,transparent 70%),radial-gradient(55% 40% at 100% 20%,rgba(150,50,120,.35) 0%,transparent 70%),radial-gradient(60% 40% at 20% 100%,rgba(20,130,110,.35) 0%,transparent 70%),#000;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0a0b14; --ink:#f4f5fb; --dim:#a3a7bd; --dimmer:#6f7488;
-  --glass:rgba(40,44,70,.44); --glass-2:rgba(60,66,100,.62); --glass-3:rgba(78,86,126,.72);
-  --edge:rgba(255,255,255,.28); --edge-hi:rgba(255,255,255,.55);
-  --hair:rgba(255,255,255,.09); --sh:rgba(0,0,0,.50);
-  --accent:#3ec6d8; --accent-soft:rgba(43,182,201,.22); --accent-ink:#03161b;
-  --teal:#3ec6d8; --amber:#e2a03f; --rose:#e05a72; --sage:#7fb069;
-  --b1:#3d5bd9; --b2:#a3278a; --b3:#16907a;
-  --stage:radial-gradient(58% 42% at 12% 4%, rgba(38,158,182,.78) 0%, transparent 70%),
-          radial-gradient(52% 38% at 92% 16%, rgba(176,116,52,.60) 0%, transparent 70%),
-          radial-gradient(64% 46% at 26% 96%, rgba(150,58,86,.58) 0%, transparent 72%),
-          linear-gradient(180deg,#0a1420 0%,#070c14 60%,#05080d 100%);
-  --phone:linear-gradient(180deg,rgba(10,18,28,.30),rgba(6,10,16,.54));
-  --hero:linear-gradient(200deg,rgba(43,182,201,.30),rgba(224,90,114,.22) 55%,rgba(226,160,63,.24));
-  --hero-tag:#e2a03f;
+  --bg:#000; --card:#1c1c1e; --ink:#fff; --dim:#98989f; --dimmer:#636366;
+  --sep:rgba(84,84,88,.55); --blue:#0a84ff; --fill:rgba(120,120,128,.24); --getbg:rgba(120,120,128,.30);
+  --glass:rgba(44,44,50,.46); --glass-hi:rgba(70,70,80,.62);
+  --rim:rgba(255,255,255,.30); --rim-lo:rgba(255,255,255,.06); --shadow:rgba(0,0,0,.55);
+  --stage:radial-gradient(60% 40% at 0% 0%,rgba(40,70,160,.45) 0%,transparent 70%),radial-gradient(55% 40% at 100% 20%,rgba(150,50,120,.35) 0%,transparent 70%),radial-gradient(60% 40% at 20% 100%,rgba(20,130,110,.35) 0%,transparent 70%),#000;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
 button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font-family:inherit}
+.stage{position:fixed;inset:0;background:var(--stage)}
 
-.stage{position:fixed;inset:0;overflow:hidden;background:var(--stage)}
-/* The four 78px-blurred, screen-blended, endlessly animated blobs that used to
-   live here were the single largest cost while scrolling. The wash above is the
-   same look painted once. */
-/* colour behind the glass. Transform-only animation on a promoted layer, and
-   no mix-blend-mode - that combination is what made scrolling stutter before. */
-.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;
-  will-change:transform;animation:fl 20s ease-in-out infinite alternate}
-.b1{width:62vw;max-width:340px;height:62vw;max-height:340px;background:var(--b1);top:-10%;left:-16%}
-.b2{width:56vw;max-width:300px;height:56vw;max-height:300px;background:var(--b2);top:32%;right:-18%;animation-delay:-7s}
-.b3{width:60vw;max-width:330px;height:60vw;max-height:330px;background:var(--b3);bottom:-12%;left:-10%;animation-delay:-13s}
-.b4{display:none}
-@keyframes fl{to{transform:translate(38px,-44px) scale(1.14)}}
-@media (prefers-reduced-motion:reduce){.blob{animation:none}}
+.phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;overflow:hidden;background:transparent}
+@media (min-width:640px){
+  body{display:grid;place-items:center}
+  .phone{height:min(900px,94dvh);border-radius:48px;background:var(--bg);border:1px solid var(--sep);box-shadow:0 40px 90px rgba(0,0,0,.35)}
+}
 
-.phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;
-  background:var(--phone)}
-@media (min-width:640px){body{display:grid;place-items:center}
-  .phone{height:min(900px,94dvh);border-radius:46px;border:1px solid var(--edge);
-    box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18)}}
+/* ================= Liquid Glass ================= */
+.g{position:relative;isolation:isolate;
+  background:var(--glass);
+  backdrop-filter:blur(22px) saturate(190%) brightness(1.04);-webkit-backdrop-filter:blur(22px) saturate(190%) brightness(1.04);
+  border:.5px solid var(--rim);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim-lo),inset 0 0 16px rgba(255,255,255,.10),0 1px 2px rgba(0,0,0,.08),0 10px 30px var(--shadow)}
+.g::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.40) 0%,rgba(255,255,255,0) 38%,rgba(255,255,255,0) 62%,rgba(255,255,255,.18) 100%)}
+.press{transition:transform .22s cubic-bezier(.3,1.4,.5,1)}
+.press:active{transform:scale(.94)}
 
-/* Liquid Glass: a translucent body, a specular rim brightest along the top,
-   a faint bounce along the bottom, then a tight contact shadow plus a wide
-   ambient one. Two shadows is what stops it looking like a flat translucent box. */
-.g{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07) 52%,rgba(255,255,255,.11));
-   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-   border:1px solid rgba(255,255,255,.17);
-   box-shadow:inset 0 1px 0 rgba(255,255,255,.55),
-              inset 0 -1px 0 rgba(255,255,255,.09),
-              0 1px 1px rgba(0,0,0,.30),
-              0 12px 30px rgba(0,0,0,.42)}
+/* ================= Top chrome ================= */
+.statusbar{position:absolute;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(10px + var(--safe-t)) 28px 0;height:calc(44px + var(--safe-t));font-size:15px;font-weight:600;pointer-events:none}
+.statusbar .icons{display:flex;gap:6px;align-items:center}
+.sb-bat{width:24px;height:12px;border:1.4px solid currentColor;border-radius:4px;position:relative;opacity:.9}
+.sb-bat::after{content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0}
+.sb-bat i{position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:2px;display:block}
+.navbar{position:absolute;top:0;left:0;right:0;z-index:55;height:calc(48px + var(--safe-t));
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;
+  background:var(--glass);backdrop-filter:blur(26px) saturate(190%);-webkit-backdrop-filter:blur(26px) saturate(190%);
+  border-bottom:.5px solid var(--sep);opacity:0;transition:opacity .2s;pointer-events:none}
+.navbar.show{opacity:1}
+.navbar b{font-size:17px;font-weight:600}
 
-.statusbar{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + var(--safe-t)) 26px 4px;font-size:14px;font-weight:700}
-.statusbar .icons{display:flex;gap:6px;align-items:center;opacity:.9}
-.sb-bat{width:22px;height:11px;border:1.4px solid currentColor;border-radius:3px;position:relative;opacity:.85}
-.sb-bat::after{content:"";position:absolute;right:-3px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0}
-.sb-bat i{position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:1px;display:block}
-
-/* the toolbar is its own floating capsule, inset from the screen edge */
-.topbar{position:relative;z-index:45;margin:2px 14px 10px;border-radius:24px;
-  display:flex;align-items:center;gap:8px;padding:7px 8px 7px 18px}
-.topbar h1{font-size:23px;font-weight:800;letter-spacing:-.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.iconbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
-.iconbtn svg{width:18px;height:18px}
-
-.views{flex:1;position:relative;min-height:0}
-.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 18px 140px;
-  -webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(8px);
-  transition:opacity .26s ease,transform .26s ease,visibility .26s}
+.views{position:absolute;inset:0}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(44px + var(--safe-t)) 20px 150px;
+  -webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(10px) scale(.995);
+  transition:opacity .28s ease,transform .28s ease,visibility .28s}
 .view.on{opacity:1;visibility:visible;transform:none}
 .view::-webkit-scrollbar{display:none}
 
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin:18px 2px 10px}
-.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:24px 2px 10px;gap:10px}
-.sec-head h2{font-size:21px;font-weight:800;letter-spacing:-.5px}
-.sec-head span{font-size:13px;color:var(--teal);font-weight:700;white-space:nowrap}
+.lt{display:flex;justify-content:space-between;align-items:flex-end;padding:10px 0 12px;gap:12px}
+.lt h1{font-size:34px;font-weight:800;letter-spacing:-.8px;line-height:1.1}
+.lt .eb{font-size:13px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.avatar svg{width:20px;height:20px}
 
-.hero{position:relative;border-radius:30px;padding:22px;min-height:236px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate}
-.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--hero)}
-.hero .tag{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--hero-tag)}
-.hero h3{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.14;margin:6px 0 8px}
-.hero p{font-size:14px;color:rgba(255,255,255,.90);line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.hero .orb{position:absolute;top:-30px;right:-30px;width:190px;height:190px;border-radius:50%;z-index:-1;
-  background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),rgba(255,255,255,.05) 60%,transparent 72%);
-  border:1px solid rgba(255,255,255,.32)}
-.hero-foot{display:flex;gap:12px;align-items:center;margin-top:14px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 10px;gap:10px;padding-top:14px;border-top:.5px solid var(--sep)}
+.sec h2{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.sec span{font-size:15px;color:var(--blue);font-weight:500;white-space:nowrap}
+.sec.first{border-top:none;margin-top:6px;padding-top:0}
 
-.row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-top:1px solid var(--hair)}
-.row{content-visibility:auto;contain-intrinsic-size:68px}
-.row:first-child{border-top:none}
-.ic{width:60px;height:60px;border-radius:15px;flex:0 0 auto;position:relative;overflow:hidden;display:grid;place-items:center;
-  border:1px solid var(--edge);box-shadow:0 6px 14px var(--sh),inset 0 1px 0 var(--edge-hi)}
-.ic .ltr{font-size:24px;font-weight:800;color:rgba(255,255,255,.92)}
+/* ================= Big Today cards ================= */
+.bigcard{position:relative;display:block;width:100%;aspect-ratio:.86;max-height:480px;border-radius:30px;overflow:hidden;margin-bottom:18px;
+  color:#fff;cursor:pointer;text-align:left;isolation:isolate;
+  background:linear-gradient(160deg,var(--c1),var(--c2));
+  box-shadow:0 18px 40px var(--shadow),0 2px 6px rgba(0,0,0,.12);transition:transform .3s cubic-bezier(.3,1.3,.5,1)}
+.bigcard:active{transform:scale(.97)}
+.bc-art{position:absolute;inset:0;z-index:-1;overflow:hidden}
+.bc-art::before{content:"";position:absolute;width:150%;aspect-ratio:1;left:-25%;top:-35%;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),rgba(255,255,255,.08) 45%,transparent 68%)}
+.bc-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22),transparent 30%,transparent 55%,rgba(0,0,0,.26))}
+.bc-ltr{position:absolute;right:-6%;top:12%;font-size:260px;font-weight:900;line-height:1;color:rgba(255,255,255,.16);letter-spacing:-10px}
+.bc-top{padding:22px 22px 0}
+.bc-tag{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.9}
+.bc-top h3{font-size:32px;font-weight:800;letter-spacing:-.8px;line-height:1.1;margin:6px 0 8px;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.bc-top p{font-size:15px;line-height:1.4;opacity:.92;max-width:88%;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+.bc-foot{position:absolute;left:10px;right:10px;bottom:10px;border-radius:22px;padding:10px 12px;display:flex;align-items:center;gap:12px;color:#fff;
+  background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.45)}
+.bc-foot .meta b{color:#fff}.bc-foot .meta small{color:rgba(255,255,255,.82)}
+.bc-foot .get{background:rgba(255,255,255,.92);color:#007aff}
+.bc-foot .get.ring{background:rgba(255,255,255,.25)}
+
+/* ================= Rows ================= */
+.row{position:relative;display:flex;align-items:center;gap:14px;padding:11px 0;content-visibility:auto;contain-intrinsic-size:84px}
+.row::after{content:"";position:absolute;left:76px;right:0;bottom:0;height:.5px;background:var(--sep)}
+.row:last-child::after{display:none}
+.ic{width:62px;height:62px;border-radius:22.5%;flex:0 0 auto;position:relative;overflow:hidden;display:grid;place-items:center;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 4px 10px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.4)}
+.ic .ltr{font-size:26px;font-weight:700;color:rgba(255,255,255,.95)}
 .ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
-/* once the real icon is in, drop the generated tile so the icon sits on nothing */
-.ic.has{background:none !important;border-color:transparent;box-shadow:none}
-.ic.has .ltr{display:none}
-.ic.sm{width:46px;height:46px;border-radius:12px}.ic.sm .ltr{font-size:19px}
-.ic.xl{width:92px;height:92px;border-radius:22px}.ic.xl .ltr{font-size:38px}
+.ic.has{background:none !important}.ic.has .ltr{display:none}
+.ic.sm{width:48px;height:48px}.ic.sm .ltr{font-size:20px}
+.ic.lg{width:76px;height:76px}.ic.lg .ltr{font-size:31px}
+.ic.xl{width:118px;height:118px;box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 10px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.45)}.ic.xl .ltr{font-size:50px}
 .meta{flex:1;min-width:0}
-.meta b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.meta small{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:800;
-  background:var(--accent-soft);color:var(--accent);vertical-align:1px}
-.badge.up{background:rgba(226,160,63,.24);color:#f3d59a}
-.get{padding:7px 19px;border-radius:20px;font-size:14px;font-weight:800;background:var(--glass-3);
-  border:1px solid var(--edge-hi);transition:transform .15s;min-width:74px;text-align:center;position:relative;overflow:hidden}
-.get:active{transform:scale(.93)}
-.get.open{background:transparent;border-color:var(--edge);color:var(--dim);font-weight:700}
-.get .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(43,182,201,.35);transition:width .15s linear}
-.get span{position:relative;z-index:2}
-.rank{width:18px;text-align:center;font-size:15px;font-weight:800;color:var(--dimmer);flex:0 0 auto}
+.meta b{display:block;font-size:16px;font-weight:600;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta small{display:block;font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;background:var(--fill);color:var(--dim);vertical-align:1px}
+.badge.up{background:rgba(255,149,0,.18);color:#ff9500}
+.rank{width:20px;text-align:center;font-size:17px;font-weight:700;flex:0 0 auto}
 
-.chips{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+/* GET button + progress ring */
+.get{min-width:74px;height:30px;padding:0 16px;border-radius:15px;background:var(--getbg);color:var(--blue);
+  font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;display:inline-grid;place-items:center;flex:0 0 auto;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+.get:active{transform:scale(.92)}
+.get.open{font-weight:700}
+.get.ring{min-width:30px;width:30px;padding:0;background:none;position:relative}
+.get.ring svg{position:absolute;inset:0;width:30px;height:30px;transform:rotate(-90deg)}
+.get.ring circle{fill:none;stroke-width:2.6}
+.get.ring .trk{stroke:var(--getbg)}
+.get.ring .prg{stroke:var(--blue);stroke-linecap:round;stroke-dasharray:69.115;transition:stroke-dashoffset .3s}
+.get.ring i{width:10px;height:10px;border-radius:2.5px;background:var(--blue);display:block}
+.bc-foot .get.ring .prg{stroke:#fff}.bc-foot .get.ring .trk{stroke:rgba(255,255,255,.3)}.bc-foot .get.ring i{background:#fff}
+
+/* paged columns of 3 */
+.cols{display:flex;gap:14px;overflow-x:auto;margin:0 -20px;padding:0 20px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.cols::-webkit-scrollbar{display:none}
+.col{flex:0 0 88%;scroll-snap-align:start;min-width:0}
+
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -20px;padding:2px 20px 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;padding:9px 15px;border-radius:18px;font-size:13px;font-weight:700;white-space:nowrap}
-/* a backdrop blur per row button / chip is what made scrolling stutter */
-.g.chip,.g.get{backdrop-filter:none;-webkit-backdrop-filter:none}
-.g.chip{background:var(--glass-2)}
-.g.get{background:var(--glass-3)}
-.chip.act{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.chip span{opacity:.55;margin-left:7px;font-weight:800}
+.chip{flex:0 0 auto;padding:8px 16px;border-radius:18px;font-size:14px;font-weight:600;white-space:nowrap;background:var(--card);color:var(--ink);
+  box-shadow:0 0 0 .5px var(--sep)}
+.chip span{color:var(--dim);margin-left:6px;font-weight:500}
+.chip.act{background:var(--blue);color:#fff;box-shadow:none}.chip.act span{color:rgba(255,255,255,.8)}
 
-/* Arcade */
-.arc{border-radius:26px;padding:20px;margin:4px 0 2px}
-.arc b{font-size:20px;display:block;margin-bottom:5px;letter-spacing:-.4px}
-.arc span{color:var(--dim);font-size:13.5px;line-height:1.5}
-.hcards{display:flex;gap:12px;overflow-x:auto;margin:0 -18px;padding:4px 18px 8px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.hcards{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:4px 20px 8px;scrollbar-width:none;scroll-snap-type:x mandatory}
 .hcards::-webkit-scrollbar{display:none}
-.hcard{flex:0 0 auto;width:154px;border-radius:24px;padding:14px;text-align:left;scroll-snap-align:start;
-  display:flex;flex-direction:column;gap:8px}
-.hcard b{font-size:14.5px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hcard>span{font-size:12px;color:var(--dim);line-height:1.35;height:32px;overflow:hidden}
-.ic.lg{width:74px;height:74px;border-radius:19px}.ic.lg .ltr{font-size:30px}
+.hcard{flex:0 0 auto;width:158px;border-radius:26px;padding:14px;text-align:left;scroll-snap-align:start;display:flex;flex-direction:column;gap:8px;background:var(--card);box-shadow:0 0 0 .5px var(--sep),0 8px 20px var(--shadow)}
+.hcard b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcard>span{font-size:12.5px;color:var(--dim);line-height:1.35;height:34px;overflow:hidden}
+.hcard .get{align-self:flex-start}
+.arc{border-radius:28px;padding:22px;margin:4px 0 2px}
+.arc b{font-size:22px;font-weight:800;display:block;margin-bottom:6px;letter-spacing:-.4px}
+.arc span{color:var(--dim);font-size:15px;line-height:1.45}
 
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tile{border-radius:20px;padding:14px;min-height:100px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;text-align:left}
-.tile b{font-size:15px;font-weight:800;letter-spacing:-.3px}
-.tile small{font-size:12px;color:var(--dim)}
-.tile .tg{position:absolute;right:-6px;bottom:-10px;font-size:54px;opacity:.14;font-weight:800}
-
-.searchbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;margin-top:6px}
+.searchbar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;margin:2px 0 6px}
 .searchbar svg{width:18px;height:18px;color:var(--dim);flex:0 0 auto}
-.searchbar input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-size:16px}
-.searchbar input::placeholder{color:var(--dimmer)}
-.empty{text-align:center;color:var(--dimmer);padding:56px 20px;font-size:15px;line-height:1.6}
-
-.strip{display:none;padding:0 18px 10px}
-.strip.on{display:block}
-.strip-bar{height:4px;border-radius:3px;background:var(--hair);overflow:hidden}
-.strip-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
-.strip-text{font-size:11.5px;color:var(--dim);margin-top:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.shots{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
-.shots::-webkit-scrollbar{display:none}
-.shot{flex:0 0 auto;width:150px;height:266px;border-radius:18px;border:1px solid var(--edge);
-  background:var(--glass-2);position:relative;overflow:hidden}
-.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
-.shot .ph{position:absolute;inset:14px;border-radius:12px;border:1px dashed var(--edge);transition:opacity .25s}
-.shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px;text-transform:uppercase;transition:opacity .25s}
-.shot.has .ph,.shot.has span{opacity:0}
-/* floating capsule with a glass "lens" that slides between tabs */
-.tabbar{position:absolute;left:14px;right:14px;bottom:calc(12px + var(--safe-b));height:68px;border-radius:30px;
-  display:flex;align-items:center;padding:0 7px;z-index:40;overflow:hidden;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 14px 34px rgba(0,0,0,.5)}
-.lens{position:absolute;top:7px;bottom:7px;left:7px;width:64px;border-radius:23px;z-index:0;pointer-events:none;
-  background:linear-gradient(165deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 58%,rgba(255,255,255,.16));
-  border:1px solid rgba(255,255,255,.42);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px rgba(255,255,255,.07),
-             0 6px 18px rgba(0,0,0,.4),0 0 24px rgba(43,182,201,.25);
-  }
-.tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--dim);flex:1;height:100%;border-radius:23px;
-  transition:color .25s}
-.tab svg{width:22px;height:22px;transition:transform .32s cubic-bezier(.34,1.4,.5,1)}
-.tab .lbl{opacity:.7;transition:opacity .25s}
-.tab.on{color:var(--accent)}
-.tab.on .lbl{opacity:1}
-.tab.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 10px rgba(43,182,201,.8))}
-
-/* detail is a full-screen page that slides in from the right */
-.scrim{display:none}
-.sheet{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
-  transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.9,.3,1);
-  background:var(--bg);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border-left:1px solid rgba(255,255,255,.1)}
-.sheet.on{transform:none}
-.pagebar{display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 6px}
-.pagebar .spacer{flex:1}
-.pagebar .iconbtn{width:38px;height:38px}
-.sheet-body{flex:1;overflow-y:auto;padding:4px 22px 44px;scrollbar-width:none}
-.sheet-body::-webkit-scrollbar{display:none}
-/* paired actions: outlined secondary + filled primary, as in the reference */
-.acts{display:flex;gap:10px;margin:18px 0 4px}
-.pill,.pill2{flex:1;height:44px;border-radius:22px;font-size:15px;font-weight:800;
-  display:grid;place-items:center;position:relative;overflow:hidden;transition:transform .15s}
-.pill:active,.pill2:active{transform:scale(.97)}
-.pill{background:var(--accent);color:var(--accent-ink);
-  border:1px solid var(--edge);box-shadow:0 8px 20px var(--sh)}
-.pill2{background:var(--glass-2);border:1px solid var(--edge);color:var(--ink)}
-.pill .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.18);transition:width .15s linear}
-.pill span{position:relative;z-index:2}
-.sheet-head{display:flex;gap:16px;align-items:flex-start}
-.sheet-head h2{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
-.sheet-head .dev{font-size:14px;color:var(--teal);font-weight:700;margin-top:3px}
-.sheet-head .cat{font-size:12px;color:var(--dim);margin-top:4px;text-transform:uppercase;letter-spacing:.6px}
-.installrow{display:flex;align-items:center;gap:12px;margin:18px 0 4px}
-.bigget{flex:1;height:48px;border-radius:24px;font-size:17px;font-weight:800;background:var(--glass-3);
-  border:1px solid var(--edge-hi);position:relative;overflow:hidden;display:grid;place-items:center;transition:transform .15s}
-.bigget:active{transform:scale(.97)}
-.bigget .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(43,182,201,.5),rgba(43,182,201,.28));transition:width .15s linear}
-.bigget span{position:relative;z-index:2}
-.ghost{height:48px;padding:0 18px;border-radius:24px;font-size:14px;font-weight:700}
-.stats{display:flex;margin:22px 0 6px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
-.stat{flex:1;text-align:center;padding:14px 6px;position:relative;min-width:0}
-.stat + .stat::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:1px;background:var(--hair)}
-.stat b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat small{font-size:10px;color:var(--dimmer);text-transform:uppercase;letter-spacing:1px}
-.desc{font-size:14.5px;line-height:1.6;color:var(--ink);opacity:.86;margin:16px 0;white-space:pre-wrap}
-.linkrow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-.linkrow a{padding:8px 14px;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;color:var(--accent);
-  background:var(--accent-soft);border:1px solid var(--accent)}
-.meta-list{margin:14px 0;font-size:13.5px;color:var(--dim);line-height:1.9}
-.meta-list b{color:var(--ink);font-weight:700}
-.x{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
-  background:var(--glass-2);border:1px solid var(--edge);z-index:5}
-.x svg{width:15px;height:15px}
-.toast{position:absolute;left:50%;bottom:96px;transform:translate(-50%,20px);padding:11px 20px;border-radius:18px;
-  font-size:13.5px;font-weight:700;opacity:0;transition:.3s;z-index:90;pointer-events:none;max-width:88%;text-align:center}
-.toast.on{opacity:1;transform:translate(-50%,0)}
-.nofooter{display:flex;align-items:center;justify-content:center;gap:8px;padding:26px 0 10px;color:var(--dimmer);font-size:12px}
+.searchbar input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-size:17px}
+.searchbar input::placeholder{color:var(--dim)}
+.empty{text-align:center;color:var(--dim);padding:56px 20px;font-size:16px;line-height:1.55}
+.nofooter{display:flex;align-items:center;justify-content:center;gap:8px;padding:28px 0 8px;color:var(--dim);font-size:12.5px}
 .nofooter svg{width:14px;height:14px}
 
-.loader{position:absolute;inset:0;z-index:95;display:none;place-items:center;padding:32px;
-  background:var(--bg);opacity:.96;backdrop-filter:blur(10px)}
+.strip{position:absolute;left:16px;right:16px;top:calc(52px + var(--safe-t));z-index:52;border-radius:16px;padding:8px 14px;display:none}
+.strip.on{display:block}
+.strip-bar{height:3px;border-radius:3px;background:var(--fill);overflow:hidden}
+.strip-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--blue);transition:width .3s}
+.strip-text{font-size:11.5px;color:var(--dim);margin-top:5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ================= Dock: floating tab bar + search orb ================= */
+.dock{position:absolute;left:16px;right:16px;bottom:calc(10px + var(--safe-b));display:flex;gap:10px;z-index:40}
+#tabbar{touch-action:pan-y;user-select:none;-webkit-user-select:none;flex:1;height:66px;border-radius:33px;display:flex;align-items:center;padding:0 6px;overflow:hidden}
+.lens{position:absolute;top:6px;bottom:6px;left:0;width:60px;border-radius:27px;z-index:0;pointer-events:none;opacity:1;transition:opacity .25s;will-change:transform;transform-origin:50% 50%;
+  background:linear-gradient(165deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 60%,rgba(255,255,255,.30));
+  border:.5px solid var(--rim);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -6px 12px rgba(255,255,255,.12),0 4px 14px var(--shadow)}
+:root[data-theme="dark"] .lens{background:linear-gradient(165deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 60%,rgba(255,255,255,.14))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lens{background:linear-gradient(165deg,rgba(255,255,255,.28),rgba(255,255,255,.05) 60%,rgba(255,255,255,.14))}}
+.tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;height:100%;border-radius:27px;
+  font-size:10px;font-weight:600;color:var(--dim);transition:color .25s}
+.tab svg{width:24px;height:24px;transition:transform .35s cubic-bezier(.34,1.5,.5,1)}
+.tab.on{color:var(--blue)}.tab.on svg{transform:translateY(-1px) scale(1.08)}
+.fab{flex:0 0 66px;width:66px;height:66px;border-radius:50%}
+.fab svg{width:25px;height:25px}
+.fab.on{color:var(--blue);background:var(--glass-hi)}
+
+/* ================= Detail page ================= */
+.sheet{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;background:var(--bg);
+  transform:translateX(104%);transition:transform .38s cubic-bezier(.32,.9,.3,1);box-shadow:-20px 0 50px rgba(0,0,0,.18)}
+.sheet.on{transform:none}
+.pagebar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 16px 6px;pointer-events:none}
+.pagebar .spacer{flex:1}
+.pagebar .iconbtn{pointer-events:auto}
+.iconbtn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.iconbtn svg{width:19px;height:19px}
+.sheet-body{flex:1;overflow-y:auto;padding:calc(66px + var(--safe-t)) 20px 50px;scrollbar-width:none}
+.sheet-body::-webkit-scrollbar{display:none}
+.sheet-head{display:flex;gap:18px;align-items:flex-start}
+.sheet-head h2{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.sheet-head .dev{font-size:15px;color:var(--blue);margin-top:4px}
+.sheet-head .cat{font-size:13px;color:var(--dim);margin-top:5px}
+.acts{display:flex;gap:10px;align-items:center;margin:18px 0 6px}
+.pill{height:34px;min-width:96px;padding:0 24px;border-radius:17px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;text-transform:uppercase;
+  display:grid;place-items:center;position:relative;overflow:hidden}
+.pill .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.22);transition:width .2s linear}
+.pill span{position:relative;z-index:2}
+.pill2{height:34px;padding:0 18px;border-radius:17px;background:var(--getbg);color:var(--blue);font-size:15px;font-weight:600}
+.stats{display:flex;margin:22px 0 4px;border-top:.5px solid var(--sep);border-bottom:.5px solid var(--sep)}
+.stat{flex:1;text-align:center;padding:14px 4px;position:relative;min-width:0}
+.stat+.stat::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:.5px;background:var(--sep)}
+.stat small{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:600}
+.stat b{display:block;font-size:17px;font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shots{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:4px 20px 10px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.shots::-webkit-scrollbar{display:none}
+.shot{flex:0 0 auto;width:158px;height:342px;border-radius:24px;box-shadow:0 0 0 .5px var(--sep);background:var(--card);position:relative;overflow:hidden;scroll-snap-align:start}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.shot .ph{position:absolute;inset:14px;border-radius:14px;border:1px dashed var(--sep)}
+.shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px}
+.shot.has .ph,.shot.has span{opacity:0}
+.eyebrow{font-size:22px;font-weight:800;letter-spacing:-.4px;margin:22px 0 8px}
+.desc{font-size:15.5px;line-height:1.5;margin:14px 0;white-space:pre-wrap}
+.linkrow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.linkrow a{padding:9px 16px;border-radius:18px;font-size:14px;font-weight:600;text-decoration:none;color:var(--blue);background:var(--card);box-shadow:0 0 0 .5px var(--sep)}
+.meta-list{margin:12px 0;font-size:14px;color:var(--dim);line-height:1.9;word-break:break-all}
+.meta-list b{color:var(--ink);font-weight:600}
+.bigget{height:50px;width:100%;border-radius:25px;font-size:17px;font-weight:700;color:var(--blue);display:grid;place-items:center;margin-top:8px}
+.ghost{height:44px;padding:0 18px;border-radius:22px;font-size:15px;font-weight:600}
+.installrow{display:flex;align-items:center;gap:12px;margin:18px 0 4px}
+
+/* ================= Menu / toast / loader ================= */
+.menuwrap{position:absolute;inset:0;z-index:80;display:none}
+.menuwrap.on{display:block}
+.menu{position:absolute;top:calc(62px + var(--safe-t));right:16px;width:250px;border-radius:24px;padding:6px;transform-origin:top right;animation:pop .25s cubic-bezier(.3,1.4,.5,1)}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.mi{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-radius:18px;font-size:16px;font-weight:500;text-align:left}
+.mi svg{width:20px;height:20px;color:var(--blue);flex:0 0 auto}
+.mi:active{background:var(--fill)}
+.mi+.mi{border-top:.5px solid var(--sep);border-radius:0}
+.toast{position:absolute;left:50%;bottom:calc(98px + var(--safe-b));transform:translate(-50%,20px) scale(.95);padding:12px 22px;border-radius:22px;font-size:14px;font-weight:600;
+  opacity:0;transition:.32s cubic-bezier(.3,1.3,.5,1);z-index:90;pointer-events:none;max-width:88%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.loader{position:absolute;inset:0;z-index:95;display:none;place-items:center;padding:32px;background:var(--stage),var(--bg)}
 .loader.on{display:grid}
-.loadcard{border-radius:26px;padding:26px 24px;text-align:center;width:100%;max-width:340px}
-.loadcard h3{font-size:19px;font-weight:800;margin-bottom:8px}
-.loadcard p{font-size:13.5px;color:var(--dim);line-height:1.5;min-height:40px}
-.bar{height:7px;border-radius:4px;background:var(--hair);overflow:hidden;margin:18px 0 10px}
-.bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--teal),#7fd8e4);transition:width .3s}
-.spin{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--teal);animation:sp 1s linear infinite}
+.loadcard{border-radius:32px;padding:30px 26px;text-align:center;width:100%;max-width:340px}
+.loadcard h3{font-size:20px;font-weight:800;margin-bottom:8px}
+.loadcard p{font-size:14px;color:var(--dim);line-height:1.5;min-height:40px}
+.bar{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin:18px 0 10px}
+.bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--blue);transition:width .3s}
+.spin{width:36px;height:36px;margin:0 auto 14px;border-radius:50%;border:3px solid var(--fill);border-top-color:var(--blue);animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.loadcard .bigget{margin-top:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
 <body>
-<div class="stage"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+<div class="stage"></div>
 
 <div class="phone">
   <div class="statusbar">
@@ -307,21 +275,9 @@ input{font-family:inherit}
       <span class="sb-bat"><i></i></span>
     </span>
   </div>
+  <div class="navbar" id="navbar"><b id="navTitle">Today</b></div>
 
-  <div class="topbar g">
-    <h1 id="pageTitle">Today</h1>
-    <button class="iconbtn g" id="themeBtn" title="Light / dark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"/></svg>
-    </button>
-    <button class="iconbtn g" id="sourceBtn" title="Sources">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4 3.6 7.7 12 12l8.4-4.3z"/><path d="M3.6 12.2 12 16.5l8.4-4.3"/><path d="M3.6 16.7 12 21l8.4-4.3"/></svg>
-    </button>
-    <button class="iconbtn g" id="refreshBtn" title="Refresh catalogue">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>
-    </button>
-  </div>
-
-  <div class="strip" id="strip">
+  <div class="strip g" id="strip">
     <div class="strip-bar"><i id="stripBar"></i></div>
     <div class="strip-text" id="stripText"></div>
   </div>
@@ -334,37 +290,42 @@ input{font-family:inherit}
     <section class="view" id="view-search"></section>
   </div>
 
-  <nav class="tabbar g" id="tabbar">
-    <span class="lens" id="tabLens" aria-hidden="true"></span>
-    <button class="tab on" data-view="today">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2.5V5M16 2.5V5M3 9h18"/></svg>
-      <span class="lbl">Today</span></button>
-    <button class="tab" data-view="games">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3M7.5 6.5v3M16 9h.01M18.5 11.5h.01"/><rect x="2.5" y="5.5" width="19" height="13" rx="5.5"/></svg>
-      <span class="lbl">Games</span></button>
-    <button class="tab" data-view="apps">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>
-      <span class="lbl">Apps</span></button>
-    <button class="tab" data-view="arcade">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4l2.3 5 5.4.7-4 3.7 1.1 5.3L12 15.5l-4.8 2.6 1.1-5.3-4-3.7 5.4-.7z"/></svg>
-      <span class="lbl">Arcade</span></button>
-    <button class="tab" data-view="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-      <span class="lbl">Search</span></button>
-  </nav>
+  <div class="dock">
+    <nav class="g" id="tabbar">
+      <span class="lens" id="tabLens" aria-hidden="true"></span>
+      <button class="tab on" data-view="today">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 2.5V5M16 2.5V5M3 9h18"/></svg>
+        <span>Today</span></button>
+      <button class="tab" data-view="games">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3M7.5 6.5v3M16 9h.01M18.5 11.5h.01"/><rect x="2.5" y="5.5" width="19" height="13" rx="5.5"/></svg>
+        <span>Games</span></button>
+      <button class="tab" data-view="apps">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2.2"/></svg>
+        <span>Apps</span></button>
+      <button class="tab" data-view="arcade">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4l2.3 5 5.4.7-4 3.7 1.1 5.3L12 15.5l-4.8 2.6 1.1-5.3-4-3.7 5.4-.7z"/></svg>
+        <span>Arcade</span></button>
+    </nav>
+    <button class="tab fab g press" data-view="search" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+    </button>
+  </div>
+
+  <div class="menuwrap" id="menuwrap">
+    <div class="menu g">
+      <button class="mi" data-m="theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"/></svg>Appearance</button>
+      <button class="mi" data-m="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4 3.6 7.7 12 12l8.4-4.3z"/><path d="M3.6 12.2 12 16.5l8.4-4.3"/><path d="M3.6 16.7 12 21l8.4-4.3"/></svg>Sources</button>
+      <button class="mi" data-m="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>Refresh catalogue</button>
+    </div>
+  </div>
 
   <div class="toast g" id="toast"></div>
-  <div class="scrim" id="scrim"></div>
 
   <div class="sheet" id="sheet">
     <div class="pagebar">
-      <button class="iconbtn g" id="sheetClose" title="Back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
+      <button class="iconbtn g press" id="sheetClose" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <span class="spacer"></span>
-      <button class="iconbtn g" id="sheetMore" title="More">
-        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>
-      </button>
+      <button class="iconbtn g press" id="sheetMore" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg></button>
     </div>
     <div class="sheet-body" id="sheetBody"></div>
   </div>
@@ -375,19 +336,16 @@ input{font-family:inherit}
       <h3 id="loadTitle">Loading catalogue</h3>
       <p id="loadText">Contacting the app repository&hellip;</p>
       <div class="bar"><i id="loadBar"></i></div>
-      <button class="bigget g" id="loadAction" style="display:none"><span>Retry</span></button>
+      <button class="bigget g press" id="loadAction" style="display:none"><span>Retry</span></button>
     </div>
   </div>
 </div>
 
 <script>
 /* ============================================================
-   Liquid Store - a real app store.
-   On Android every call below is served by the native bridge
-   (window.Android). In a plain browser the same interface is
-   served by an offline demo catalogue so the UI still runs.
+   Liquid Store - bridge + logic unchanged; UI redesigned in the
+   style of the iOS App Store with iOS 26 Liquid Glass.
    ============================================================ */
-
 const hasNative = (typeof Android !== 'undefined') && Android && typeof Android.state === 'function';
 
 /* ---------- offline demo bridge (browser only) ---------- */
@@ -409,783 +367,568 @@ const DEMO = [
  ['org.telegram.messenger','Telegram FOSS','A libre build of Telegram, without the proprietary libraries.','Internet','46 MB','GPL-2.0-only'],
  ['com.gianlu.music','Metro','A music player with a clean material design and no nagging.','Multimedia','8 MB','GPL-3.0-only'],
  ['org.breezyweather','Breezy Weather','A fast, beautiful weather app with multiple sources.','Weather','16 MB','LGPL-3.0-only'],
- ['com.junkfood.seal','Seal','Download videos and audio with a friendly interface.','Multimedia','10 MB','GPL-3.0-only']
+ ['com.junkfood.seal','Seal','Download videos and audio with a friendly interface.','Multimedia','10 MB','GPL-3.0-only'],
+ ['org.sudoku.free','Open Sudoku','Classic sudoku with hints, notes and endless puzzles.','Games','5 MB','GPL-3.0-only'],
+ ['org.chess.stockfish','Chess Engine','Play against a strong open-source engine.','Games','9 MB','GPL-3.0-only']
 ];
 function demoApp(a){
-  const slug = a[0];
-  return {pkg:slug, name:a[1], sum:a[2], cat:a[3], ver:'1.0', sizeText:a[4], icon:'',
+  return {pkg:a[0], name:a[1], sum:a[2], cat:a[3], ver:'1.0', sizeText:a[4], icon:'',
           installed:false, installedVer:0, hasUpdate:false, iconAlt:'', iconCand:[], shots:[],
           description:a[2]+'\n\nThis is demo content shown because the store is running outside Android. Inside the app this page is filled from the live repository index.',
           license:a[5], author:'', source:'', issues:'', web:'', version:'1.0', versionCode:1,
           size:0, minSdk:24, updated:Date.now(), apkUrl:''};
 }
 const demoAll = DEMO.map(demoApp);
-
-/* The demo bridge fakes the streaming load so this page behaves like the app. */
-let mPhase = 'idle', mCount = 0, mPct = 0, mDetail = 'contacting the repository';
+let mPhase='idle', mCount=0, mPct=0, mDetail='contacting the repository';
 function mockPush(t){ try{ if(window.__store) window.__store(t); }catch(e){} }
 function mockStartLoad(){
-  if(mPhase === 'download' || mPhase === 'ready') return;
-  mPhase = 'download'; mCount = 0; mPct = 0;
-  const total = demoAll.length, step = Math.max(1, Math.ceil(total / 12));
-  const timer = setInterval(function(){
-    mCount = Math.min(total, mCount + step);
-    mPct = Math.round(mCount / total * 100);
-    mDetail = (mCount * 0.12).toFixed(1) + ' MB / 2.1 MB  \u00b7  ' + (mCount * 250) + ' apps';
+  if(mPhase==='download'||mPhase==='ready') return;
+  mPhase='download'; mCount=0; mPct=0;
+  const total=demoAll.length, step=Math.max(1,Math.ceil(total/10));
+  const timer=setInterval(function(){
+    mCount=Math.min(total,mCount+step); mPct=Math.round(mCount/total*100);
+    mDetail=(mCount*0.1).toFixed(1)+' MB / 2.1 MB  \u00b7  '+(mCount*250)+' apps';
     mockPush('apps'); mockPush('state');
-    if(mCount >= total){
-      clearInterval(timer);
-      mPhase = 'ready'; mPct = 100; mDetail = total + ' apps';
-      mockPush('state'); mockPush('ready');
-    }
-  }, 160);
+    if(mCount>=total){ clearInterval(timer); mPhase='ready'; mPct=100; mDetail=total+' apps'; mockPush('state'); mockPush('ready'); }
+  },160);
 }
-const mockVisible = function(){ return demoAll.slice(0, mCount); };
-
-const MockBridge = {
-  state:()=>({phase:mPhase, pct:mPct, detail:mDetail, error:'', count:mCount,
-              partial:mPhase !== 'ready', repo:'F-Droid (demo)', address:'', timestamp:Date.now()}),
-  load:()=>{ mockStartLoad(); },
-  stats:()=>{ const v = mockVisible(); return {
-      apps:v.filter(a=>a.cat!=='Games').length, games:v.filter(a=>a.cat==='Games').length,
-      categories:new Set(v.map(a=>a.cat)).size, total:v.length}; },
-  categories:()=>{ const v = mockVisible(), m = {};
-    v.forEach(a=>m[a.cat]=(m[a.cat]||0)+1);
-    return Object.keys(m).map(k=>({name:k,count:m[k]})).sort((a,b)=>b.count-a.count); },
-  list:(q,cat,sort,off,lim)=>{ let h = mockVisible().filter(a=>(!cat||a.cat===cat)&&(!q||(a.name+a.pkg+a.sum).toLowerCase().includes(q.toLowerCase())));
-    if(sort==='updated') h = h.slice().sort((a,b)=>b.updated-a.updated);
-    else h = h.slice().sort((a,b)=>a.name.localeCompare(b.name));
-    return {total:h.length, apps:h.slice(off,off+lim)}; },
-  detail:(pkg)=>demoAll.find(a=>a.pkg===pkg)||{},
-  install:()=>({ok:false, error:'Installing only works inside the Android app.'}),
+const mockVisible=()=>demoAll.slice(0,mCount);
+const MockBridge={
+  state:()=>({phase:mPhase,pct:mPct,detail:mDetail,error:'',count:mCount,partial:mPhase!=='ready',repo:'F-Droid (demo)',address:'',timestamp:Date.now()}),
+  load:()=>{mockStartLoad()},
+  stats:()=>{const v=mockVisible();return{apps:v.filter(a=>a.cat!=='Games').length,games:v.filter(a=>a.cat==='Games').length,categories:new Set(v.map(a=>a.cat)).size,total:v.length}},
+  categories:()=>{const v=mockVisible(),m={};v.forEach(a=>m[a.cat]=(m[a.cat]||0)+1);return Object.keys(m).map(k=>({name:k,count:m[k]})).sort((a,b)=>b.count-a.count)},
+  list:(q,cat,sort,off,lim)=>{let h=mockVisible().filter(a=>(!cat||a.cat===cat)&&(!q||(a.name+a.pkg+a.sum).toLowerCase().includes(q.toLowerCase())));
+    h=sort==='updated'?h.slice().sort((a,b)=>b.updated-a.updated):h.slice().sort((a,b)=>a.name.localeCompare(b.name));
+    return{total:h.length,apps:h.slice(off,off+lim)}},
+  detail:p=>demoAll.find(a=>a.pkg===p)||{},
+  install:()=>({ok:false,error:'Installing only works inside the Android app.'}),
   progress:()=>({pkg:'',phase:'idle',pct:0,got:0,total:0,text:'',error:''}),
   canInstall:()=>({ok:false,message:'Not running on Android.'}),
-  requestInstallPermission:()=>{},
-  open:()=>{}, uninstall:()=>{}, cancel:()=>{},
-  fetchImage:()=>{}, imageData:()=>'',
-  cancelLoad:()=>{},
-  sources:()=>({custom:'', current:'https://f-droid.org/repo', list:[
-    {url:'https://f-droid.org/repo', host:'f-droid.org'},
-    {url:'https://mirror.hyd.albony.in/fdroid/repo', host:'mirror.hyd.albony.in'},
-    {url:'https://cloudflare.f-droid.org/repo', host:'cloudflare.f-droid.org'}]}),
+  requestInstallPermission:()=>{},open:()=>{},uninstall:()=>{},cancel:()=>{},fetchImage:()=>{},imageData:()=>'',cancelLoad:()=>{},
+  sources:()=>({custom:'',current:'https://f-droid.org/repo',list:[
+    {url:'https://f-droid.org/repo',host:'f-droid.org'},
+    {url:'https://mirror.hyd.albony.in/fdroid/repo',host:'mirror.hyd.albony.in'},
+    {url:'https://cloudflare.f-droid.org/repo',host:'cloudflare.f-droid.org'}]}),
   setSource:()=>{}
 };
 const B = hasNative ? {
-  state:()=>JSON.parse(Android.state()), load:(f)=>Android.load(!!f),
+  state:()=>JSON.parse(Android.state()), load:f=>Android.load(!!f),
   stats:()=>JSON.parse(Android.stats()), categories:()=>JSON.parse(Android.categories()),
   list:(q,c,s,o,l)=>JSON.parse(Android.list(q,c,s,o,l)),
-  detail:(p)=>JSON.parse(Android.detail(p)),
-  install:(p)=>JSON.parse(Android.install(p)),
-  progress:()=>JSON.parse(Android.progress()),
-  canInstall:()=>JSON.parse(Android.canInstall()),
+  detail:p=>JSON.parse(Android.detail(p)), install:p=>JSON.parse(Android.install(p)),
+  progress:()=>JSON.parse(Android.progress()), canInstall:()=>JSON.parse(Android.canInstall()),
   requestInstallPermission:()=>Android.requestInstallPermission(),
-  open:(p)=>Android.open(p), uninstall:(p)=>Android.uninstall(p), cancel:()=>Android.cancel(),
-  cancelLoad:()=>Android.cancelLoad(),
-  sources:()=>JSON.parse(Android.sources()),
-  setSource:(u)=>Android.setSource(u)
+  open:p=>Android.open(p), uninstall:p=>Android.uninstall(p), cancel:()=>Android.cancel(),
+  cancelLoad:()=>Android.cancelLoad(), sources:()=>JSON.parse(Android.sources()), setSource:u=>Android.setSource(u)
 } : MockBridge;
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
-const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const PALETTE = [['#2bb6c9','#1b5e7a'],['#e2a03f','#8a5a1a'],['#e05a72','#8a2340'],['#7fb069','#2f6b52'],
-                 ['#5aa9e6','#245a86'],['#c06b4f','#6b2f1c'],['#a86bd1','#5a2f80'],['#3fb6a8','#1c6b62']];
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PALETTE=[['#4facfe','#1b4fd6'],['#ff9a44','#d6336c'],['#f857a6','#7b2ff7'],['#43c59e','#0a7d6b'],
+               ['#5aa9e6','#2a3fa8'],['#ff7e5f','#b02a5b'],['#a86bd1','#3b2a99'],['#38d6c4','#1a6bb0']];
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
 function pair(pkg){return PALETTE[hash(pkg)%PALETTE.length]}
-function iconEl(a, cls){
-  const c = pair(a.pkg);
-  const letter = esc((a.name||a.pkg||'?').trim().charAt(0).toUpperCase());
+function iconEl(a,cls){
+  const c=pair(a.pkg), letter=esc((a.name||a.pkg||'?').trim().charAt(0).toUpperCase());
   return `<div class="ic ${cls||''}" style="background:linear-gradient(145deg,${c[0]},${c[1]})"><span class="ltr">${letter}</span>${imgTag(a)}</div>`;
 }
-/* Images: walk the candidate URLs, then ask the native side for the bytes,
-   and only fall back to the generated letter tile when all of that fails. */
-const IMG_WAIT = {};      /* url -> elements waiting for bytes */
-const IMG_DONE = {};      /* url -> data uri we already have */
-
+const IMG_WAIT={}, IMG_DONE={};
 function imgCandidates(a){
-  if(a.iconCand && a.iconCand.length) return a.iconCand.filter(Boolean);
-  return a.icon ? [a.icon, a.iconAlt || ''].filter(Boolean) : [];
+  if(a.iconCand&&a.iconCand.length) return a.iconCand.filter(Boolean);
+  return a.icon?[a.icon,a.iconAlt||''].filter(Boolean):[];
 }
-function imgTagFor(cands, cls){
-  if(!cands || !cands.length) return '';
-  const cached = IMG_DONE[cands[0]];
-  return '<img' + (cls ? ' class="' + cls + '"' : '') +
-    ' data-cand="' + esc(cands.join('|')) + '" data-i="0"' +
-    ' src="' + esc(cached || cands[0]) + '" alt="" decoding="async"' +
-    ' onload="this.style.opacity=1;this.parentNode.classList.add(\'has\')"' +
-    ' onerror="imgFail(this)">';
+function imgTagFor(cands,cls){
+  if(!cands||!cands.length) return '';
+  const cached=IMG_DONE[cands[0]];
+  return '<img'+(cls?' class="'+cls+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
+    ' onload="this.style.opacity=1;this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
 }
-function imgTag(a){ return imgTagFor(imgCandidates(a), ''); }
-
+function imgTag(a){return imgTagFor(imgCandidates(a),'')}
 function imgFail(el){
-  if(el.getAttribute('data-native') === '2'){ el.remove(); return; }
-  const cands = (el.getAttribute('data-cand') || '').split('|').filter(Boolean);
-  const i = parseInt(el.getAttribute('data-i') || '0', 10);
-  if(i + 1 < cands.length){
-    el.setAttribute('data-i', String(i + 1));
-    el.src = cands[i + 1];
+  if(el.getAttribute('data-native')==='2'){el.remove();return}
+  const cands=(el.getAttribute('data-cand')||'').split('|').filter(Boolean);
+  const i=parseInt(el.getAttribute('data-i')||'0',10);
+  if(i+1<cands.length){el.setAttribute('data-i',String(i+1));el.src=cands[i+1];return}
+  const url=cands[0]||el.src;
+  if(url&&el.getAttribute('data-native')!=='1'&&hasNative){
+    el.setAttribute('data-native','1');(IMG_WAIT[url]=IMG_WAIT[url]||[]).push(el);
+    try{Android.fetchImage(url)}catch(e){}
     return;
-  }
-  const url = cands[0] || el.src;
-  if(url && el.getAttribute('data-native') !== '1' && hasNative){
-    el.setAttribute('data-native', '1');
-    (IMG_WAIT[url] = IMG_WAIT[url] || []).push(el);
-    try { Android.fetchImage(url); } catch(e){}
-    return;                       /* keep the letter tile until bytes arrive */
   }
   el.remove();
 }
-
-/* Native finished fetching an image - swap the bytes in. */
 function applyImages(){
   for(const url in IMG_WAIT){
-    let d = IMG_DONE[url];
-    if(!d){
-      try { d = Android.imageData(url); } catch(e){ d = ''; }
-      if(!d) continue;
-      IMG_DONE[url] = d;
-    }
-    const els = IMG_WAIT[url];
-    for(let k = 0; k < els.length; k++){
-      const el = els[k];
-      el.setAttribute('data-native', '2');
-      el.style.opacity = 1;
-      if(el.parentNode) el.parentNode.classList.add('has');
-      el.src = d;
+    let d=IMG_DONE[url];
+    if(!d){try{d=Android.imageData(url)}catch(e){d=''} if(!d) continue; IMG_DONE[url]=d}
+    const els=IMG_WAIT[url];
+    for(let k=0;k<els.length;k++){
+      const el=els[k]; el.setAttribute('data-native','2'); el.style.opacity=1;
+      if(el.parentNode) el.parentNode.classList.add('has'); el.src=d;
     }
     delete IMG_WAIT[url];
   }
 }
-
-function dateText(ms){
-  if(!ms) return '';
-  const d = new Date(ms);
-  const p = n => String(n).padStart(2,'0');
-  return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;
-}
+function dateText(ms){if(!ms)return'';const d=new Date(ms),p=n=>String(n).padStart(2,'0');return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`}
 let toastT;
-function toast(msg){ const n=$('#toast'); n.textContent=msg; n.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>n.classList.remove('on'),2600); }
+function toast(msg){const n=$('#toast');n.textContent=msg;n.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>n.classList.remove('on'),2600)}
 
 /* ---------- app state ---------- */
-const S = { ready:false, partial:false, refreshing:false, lastPhase:'', view:'today', category:'', query:'', pages:{}, stats:{apps:0,games:0,categories:0,total:0}, installing:{}, sheetPkg:null };
-const TITLES = {today:'Today', games:'Games', apps:'Apps', arcade:'Arcade', search:'Search'};
+const S={ready:false,partial:false,refreshing:false,lastPhase:'',view:'today',category:'',query:'',pages:{},stats:{apps:0,games:0,categories:0,total:0},installing:{},sheetPkg:null};
+const TITLES={today:'Today',games:'Games',apps:'Apps',arcade:'Arcade',search:'Search'};
+const RING=69.115;
 
+function head(title,eyebrow){
+  return `<div class="lt"><div>${eyebrow?`<div class="eb">${esc(eyebrow)}</div>`:''}<h1>${esc(title)}</h1></div>
+    <button class="avatar g press" data-menu aria-label="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg></button></div>`;
+}
 function getBtnHtml(a){
   if(S.installing[a.pkg]){
-    const p = S.installing[a.pkg];
-    return `<button class="get" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${p.pct}%"></span><span>${p.pct}%</span></button>`;
+    const p=S.installing[a.pkg].pct||0;
+    return `<button class="get ring" data-busy="${esc(a.pkg)}" aria-label="Installing ${p}%"><svg viewBox="0 0 30 30"><circle class="trk" cx="15" cy="15" r="11"/><circle class="prg" cx="15" cy="15" r="11" style="stroke-dashoffset:${(RING*(1-p/100)).toFixed(1)}"/></svg><i></i></button>`;
   }
-  if(S.partial && !a.installed) return `<button class="get" data-busy="1" style="opacity:.45">&hellip;</button>`;
-  if(a.installed && a.hasUpdate) return `<button class="get" data-install="${esc(a.pkg)}">Update</button>`;
+  if(S.partial&&!a.installed) return `<button class="get" data-busy="1" style="opacity:.45">&hellip;</button>`;
+  if(a.installed&&a.hasUpdate) return `<button class="get" data-install="${esc(a.pkg)}">Update</button>`;
   if(a.installed) return `<button class="get open" data-open="${esc(a.pkg)}">Open</button>`;
   return `<button class="get" data-install="${esc(a.pkg)}">Get</button>`;
 }
-function rowHtml(a, rank){
-  const b = a.installed ? (a.hasUpdate ? '<span class="badge up">Update</span>' : '<span class="badge">Installed</span>') : '';
+function rowHtml(a,rank){
+  const b=a.installed?(a.hasUpdate?'<span class="badge up">Update</span>':'<span class="badge">Installed</span>'):'';
   return `<div class="row" data-detail="${esc(a.pkg)}">
-    ${rank?`<div class="rank">${rank}</div>`:''}
-    ${iconEl(a)}
+    ${rank?`<div class="rank">${rank}</div>`:''}${iconEl(a)}
     <div class="meta"><b>${esc(a.name)}${b}</b><small>${esc(a.cat)}${a.sizeText?' &middot; '+esc(a.sizeText):''}</small></div>
-    ${getBtnHtml(a)}
-  </div>`;
+    ${getBtnHtml(a)}</div>`;
 }
-function renderInto(sel, html){ const el=$(sel); if(el) el.innerHTML = html; }
-
-/* ---------- views ---------- */
-/* Arcade: the reference's curated games page, filled from the real catalogue.
-   There is no paid tier here, so the promise is the honest one - it is all free. */
-function renderArcade(){
-  const box = $('#view-arcade');
-  const fresh = B.list('', 'Games', 'updated', 0, 8);
-  const all = B.list('', 'Games', 'name', 0, 40);
-  let h = `<div class="arc g"><b>Everything here is free</b>
-    <span>No ads, no in-app purchases, no account. Every app is open source and installs straight from the repository.</span></div>`;
-  if(fresh.apps.length){
-    h += `<div class="sec-head"><h2>New this week</h2><span>${fresh.total} games</span></div>
-          <div class="hcards">${fresh.apps.map(hcard).join('')}</div>`;
-  }
-  h += `<div class="sec-head"><h2>All games</h2><span>${all.total}</span></div>`;
-  h += all.apps.length ? all.apps.map((a,i)=>rowHtml(a,i+1)).join('') : emptyRow();
-  box.innerHTML = h;
+function bigCard(a,tag){
+  const c=pair(a.pkg), letter=esc((a.name||'?').trim().charAt(0).toUpperCase());
+  return `<div class="bigcard press" data-detail="${esc(a.pkg)}" style="--c1:${c[0]};--c2:${c[1]}">
+    <div class="bc-art"><span class="bc-ltr">${letter}</span></div>
+    <div class="bc-top"><div class="bc-tag">${esc(tag)}</div><h3>${esc(a.name)}</h3><p>${esc(a.sum||'')}</p></div>
+    <div class="bc-foot g">${iconEl(a,'sm')}<div class="meta"><b>${esc(a.name)}</b><small>${esc(a.cat)}</small></div>${getBtnHtml(a)}</div></div>`;
+}
+function colScroll(apps){
+  if(!apps.length) return emptyRow();
+  const cols=[];for(let i=0;i<apps.length;i+=3) cols.push(apps.slice(i,i+3));
+  return `<div class="cols">${cols.map(c=>`<div class="col">${c.map(a=>rowHtml(a)).join('')}</div>`).join('')}</div>`;
 }
 function hcard(a){
-  return `<button class="hcard g" data-detail="${esc(a.pkg)}">
-    ${iconEl(a,'lg')}<b>${esc(a.name)}</b><span>${esc(a.sum||'')}</span>${getBtnHtml(a)}</button>`;
+  /* a div, not a button: the card contains a Get button and a button inside a
+     button is invalid, so the parser hoisted it out into the gutter */
+  return `<div class="hcard press" data-detail="${esc(a.pkg)}" role="button" tabindex="0">${iconEl(a,'lg')}<b>${esc(a.name)}</b><span>${esc(a.sum||'')}</span>${getBtnHtml(a)}</div>`;
 }
+function emptyRow(){return '<div class="empty">Nothing here yet.</div>'}
+const footer=n=>`<div class="nofooter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/></svg>No ads &middot; No account &middot; No tracking${n?' &middot; '+n+' apps':''}</div>`;
 
+/* ---------- views ---------- */
 function renderToday(){
-  const st = S.stats;
-  const feat = S.featured;
-  let h = '';
-  if(feat){
-    h += `<div class="hero g">
-      <div class="orb"></div>
-      <div class="tag">App of the day</div>
-      <h3>${esc(feat.name)}</h3>
-      <p>${esc(feat.sum)}</p>
-      <div class="hero-foot">
-        ${iconEl(feat,'sm')}
-        <div class="meta"><b>${esc(feat.name)}</b><small>${esc(feat.cat)}</small></div>
-        ${getBtnHtml(feat)}
-      </div>
-    </div>`;
-  }
-  h += `<div class="sec-head"><h2>Browse categories</h2></div><div class="chips" id="todayChips"></div>`;
-  h += `<div class="sec-head"><h2>Recently updated</h2></div><div id="todayUpdated"></div>`;
-  h += `<div class="sec-head"><h2>New arrivals</h2></div><div id="todayNew"></div>`;
-  h += `<div class="nofooter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/></svg>
-    No ads &middot; No account &middot; ${st.total} apps from F-Droid</div>`;
-  renderInto('#view-today', h);
-
-  const cats = B.categories().slice(0, 10);
-  const chips = $('#todayChips');
-  chips.innerHTML = cats.map(c=>`<button class="chip g" data-cat="${esc(c.name)}">${esc(c.name)} <span style="color:var(--dimmer)">${c.count}</span></button>`).join('');
-  const upd = B.list('', '', 'updated', 0, 6);
-  $('#todayUpdated').innerHTML = upd.apps.map(a=>rowHtml(a)).join('') || emptyRow();
-  const nw = B.list('', '', 'new', 0, 6);
-  $('#todayNew').innerHTML = nw.apps.map(a=>rowHtml(a)).join('') || emptyRow();
+  const dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  let h=head('Today',dateStr);
+  if(S.featured) h+=bigCard(S.featured,'App of the Day');
+  let game=null;
+  try{const g=B.list('','Games','updated',0,6).apps;game=g.find(x=>!S.featured||x.pkg!==S.featured.pkg)||null}catch(e){}
+  if(game) h+=bigCard(game,'Game of the Day');
+  h+=`<div class="sec first"><h2>Browse Categories</h2></div><div class="chips" id="todayChips"></div>`;
+  h+=`<div class="sec"><h2>Recently Updated</h2></div><div id="todayUpdated"></div>`;
+  h+=`<div class="sec"><h2>New Arrivals</h2></div><div id="todayNew"></div>`;
+  h+=footer(S.stats.total);
+  $('#view-today').innerHTML=h;
+  const cats=B.categories().slice(0,10);
+  $('#todayChips').innerHTML=cats.map(c=>`<button class="chip press" data-cat="${esc(c.name)}">${esc(c.name)}<span>${c.count}</span></button>`).join('');
+  $('#todayUpdated').innerHTML=colScroll(B.list('','','updated',0,9).apps);
+  $('#todayNew').innerHTML=colScroll(B.list('','','new',0,9).apps);
 }
-function emptyRow(){ return '<div class="empty">Nothing here yet.</div>'; }
-
-function renderCategoryView(view, fixedCat){
-  const key = view + ':' + fixedCat;
-  const page = S.pages[key] || (S.pages[key] = {offset:0, done:false});
-  let h = '';
-  if(view === 'apps'){
-    const cats = B.categories();
-    h += `<div class="eyebrow">Categories</div>
-      <div class="chips" id="appChips">
-        <button class="chip g ${S.category===''?'act':''}" data-cat="">All <span style="color:var(--dimmer)">${S.stats.total}</span></button>
-        ${cats.map(c=>`<button class="chip g ${S.category===c.name?'act':''}" data-cat="${esc(c.name)}">${esc(c.name)} <span style="color:var(--dimmer)">${c.count}</span></button>`).join('')}
-      </div>`;
-  }
-  const cat = view === 'games' ? 'Games' : S.category;
-  h += `<div class="sec-head"><h2>${view==='games'?'Top games':(S.category?esc(S.category):'All apps')}</h2>
-        <span data-count></span></div><div data-listbox></div>`;
-  const viewEl = $('#view-'+view);
-  viewEl.innerHTML = h;
-  const box = viewEl.querySelector('[data-listbox]');
-  const label = viewEl.querySelector('[data-count]');
-  page.offset = 0; page.done = false;
-  loadMore(view, cat, box, label, page, true);
+function renderArcade(){
+  const fresh=B.list('','Games','updated',0,8), all=B.list('','Games','name',0,40);
+  let h=head('Arcade','Play freely');
+  h+=`<div class="arc g"><b>Everything here is free</b><span>No ads, no in-app purchases, no account. Every app is open source and installs straight from the repository.</span></div>`;
+  if(fresh.apps.length) h+=`<div class="sec"><h2>New This Week</h2><span>${fresh.total} games</span></div><div class="hcards">${fresh.apps.map(hcard).join('')}</div>`;
+  h+=`<div class="sec"><h2>All Games</h2><span>${all.total}</span></div>`;
+  h+=all.apps.length?all.apps.map((a,i)=>rowHtml(a,i+1)).join(''):emptyRow();
+  $('#view-arcade').innerHTML=h;
 }
-
-function loadMore(view, cat, box, label, page, replace){
-  if(!box || page.done) return;
-  const r = B.list('', cat, 'name', page.offset, 40);
-  if(label) label.textContent = r.total + (r.total===1?' app':' apps');
-  if(replace) box.innerHTML = '';
-  if(r.apps.length === 0 && page.offset === 0){
-    box.innerHTML = '<div class="empty">No apps in this category.</div>';
-  } else {
-    box.insertAdjacentHTML('beforeend', r.apps.map((a,i)=>rowHtml(a, page.offset+i+1)).join(''));
+function renderCategoryView(view){
+  const page=S.pages[view+':']||(S.pages[view+':']={offset:0,done:false});
+  let h=head(view==='games'?'Games':'Apps');
+  if(view==='apps'){
+    const cats=B.categories();
+    h+=`<div class="chips"><button class="chip press ${S.category===''?'act':''}" data-cat="">All<span>${S.stats.total}</span></button>
+      ${cats.map(c=>`<button class="chip press ${S.category===c.name?'act':''}" data-cat="${esc(c.name)}">${esc(c.name)}<span>${c.count}</span></button>`).join('')}</div>`;
   }
-  page.offset += r.apps.length;
-  if(page.offset >= r.total || r.apps.length === 0) page.done = true;
+  const cat=view==='games'?'Games':S.category;
+  h+=`<div class="sec ${view==='apps'?'':'first'}"><h2>${view==='games'?'Top Games':(S.category?esc(S.category):'All Apps')}</h2><span data-count></span></div><div data-listbox></div>`;
+  const el=$('#view-'+view); el.innerHTML=h;
+  page.offset=0;page.done=false;
+  loadMore(view,cat,el.querySelector('[data-listbox]'),el.querySelector('[data-count]'),page,true);
 }
-
+function loadMore(view,cat,box,label,page,replace){
+  if(!box||page.done) return;
+  const r=B.list('',cat,'name',page.offset,40);
+  if(label) label.textContent=r.total+(r.total===1?' app':' apps');
+  if(replace) box.innerHTML='';
+  if(r.apps.length===0&&page.offset===0) box.innerHTML='<div class="empty">No apps in this category.</div>';
+  else box.insertAdjacentHTML('beforeend',r.apps.map((a,i)=>rowHtml(a,page.offset+i+1)).join(''));
+  page.offset+=r.apps.length;
+  if(page.offset>=r.total||r.apps.length===0) page.done=true;
+}
 function renderSearch(){
-  const h = `<div class="searchbar g">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-      <input id="searchInput" placeholder="Search ${S.stats.total} apps" autocomplete="off" spellcheck="false" value="${esc(S.query)}">
-    </div><div id="searchOut"></div>`;
-  renderInto('#view-search', h);
-  const input = $('#searchInput');
-  input.addEventListener('input', ()=>{ S.query = input.value; runSearch(); });
+  $('#view-search').innerHTML=head('Search')+`<div class="searchbar g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+    <input id="searchInput" placeholder="Apps, games and more" autocomplete="off" spellcheck="false" value="${esc(S.query)}"></div><div id="searchOut"></div>`;
+  const input=$('#searchInput');
+  input.addEventListener('input',()=>{S.query=input.value;runSearch()});
   runSearch();
-  if(S.focusSearch){ setTimeout(()=>input.focus(), 60); S.focusSearch = false; }
+  if(S.focusSearch){setTimeout(()=>input.focus(),80);S.focusSearch=false}
 }
 function runSearch(){
-  const out = $('#searchOut'); if(!out) return;
-  const q = S.query.trim();
-  if(!q){
-    const upd = B.list('', '', 'updated', 0, 8);
-    out.innerHTML = `<div class="eyebrow">Popular right now</div>` + upd.apps.map(a=>rowHtml(a)).join('');
-    return;
-  }
-  const r = B.list(q, '', 'relevance', 0, 60);
-  if(r.apps.length === 0){
-    out.innerHTML = `<div class="empty">No results for &ldquo;${esc(q)}&rdquo;.<br>Try &ldquo;player&rdquo;, &ldquo;keyboard&rdquo; or &ldquo;reader&rdquo;.</div>`;
-    return;
-  }
-  out.innerHTML = `<div class="eyebrow">${r.total} result${r.total===1?'':'s'}</div>` + r.apps.map(a=>rowHtml(a)).join('');
+  const out=$('#searchOut'); if(!out) return;
+  const q=S.query.trim();
+  if(!q){out.innerHTML=`<div class="sec first"><h2>Popular Right Now</h2></div>`+B.list('','','updated',0,8).apps.map(a=>rowHtml(a)).join('');return}
+  const r=B.list(q,'','relevance',0,60);
+  if(!r.apps.length){out.innerHTML=`<div class="empty">No results for &ldquo;${esc(q)}&rdquo;.<br>Try &ldquo;player&rdquo;, &ldquo;keyboard&rdquo; or &ldquo;reader&rdquo;.</div>`;return}
+  out.innerHTML=`<div class="sec first"><h2>${r.total} Result${r.total===1?'':'s'}</h2></div>`+r.apps.map(a=>rowHtml(a)).join('');
 }
 
-/* ---------- detail sheet ---------- */
+/* ---------- detail page ---------- */
 function openSheet(pkg){
-  let a = null;
-  try {
-    a = B.detail(pkg);
-  } catch(err) {
-    toast('Could not open that app \u2014 ' + (err && err.message ? err.message : 'unknown error'));
-    return;
-  }
-  if(!a || !a.pkg) return;
-  S.sheetPkg = pkg;
-  const links = [];
+  let a=null;
+  try{a=B.detail(pkg)}catch(err){toast('Could not open that app \u2014 '+(err&&err.message?err.message:'unknown error'));return}
+  if(!a||!a.pkg) return;
+  S.sheetPkg=pkg;
+  const links=[];
   if(a.source) links.push(`<a href="${esc(a.source)}" target="_blank" rel="noopener">Source code</a>`);
   if(a.issues) links.push(`<a href="${esc(a.issues)}" target="_blank" rel="noopener">Report a bug</a>`);
   if(a.web) links.push(`<a href="${esc(a.web)}" target="_blank" rel="noopener">Website</a>`);
-
-  $('#sheetBody').innerHTML = `
-    <div class="sheet-head">
-      ${iconEl(a,'xl')}
-      <div style="flex:1;min-width:0">
-        <h2>${esc(a.name)}</h2>
+  $('#sheetBody').innerHTML=`
+    <div class="sheet-head">${iconEl(a,'xl')}
+      <div style="flex:1;min-width:0"><h2>${esc(a.name)}</h2>
         ${a.author?`<div class="dev">${esc(a.author)}</div>`:''}
-        <div class="cat">${esc([a.category, a.license].filter(Boolean).join(' \u00b7 '))}</div>
-      </div>
-    </div>
-    <div class="acts" id="sheetActions"></div>
-    ${(a.shots && a.shots.length) ? `<div class="eyebrow">Screenshots</div><div class="shots">${a.shots.map(function(c,i){
-        return '<div class="shot">' + imgTagFor(c, '') + '<div class="ph"></div><span>' + (i+1) + '</span></div>';
-      }).join('')}</div>` : ''}
+        <div class="cat">${esc([a.category,a.license].filter(Boolean).join(' \u00b7 '))}</div>
+        <div class="acts" id="sheetActions"></div></div></div>
     <div class="stats">
       <div class="stat"><small>Size</small><b>${esc(a.sizeText||'-')}</b></div>
       <div class="stat"><small>Version</small><b>${esc(a.version||'-')}</b></div>
       <div class="stat"><small>Android</small><b>${a.minSdk?('&ge; '+a.minSdk):'-'}</b></div>
-      <div class="stat"><small>Updated</small><b style="font-size:13px">${esc(dateText(a.updated)||'-')}</b></div>
-    </div>
-    <div class="desc">${esc(a.description || a.summary || a.sum || '')}</div>
+      <div class="stat"><small>Updated</small><b style="font-size:14px">${esc(dateText(a.updated)||'-')}</b></div></div>
+    ${(a.shots&&a.shots.length)?`<div class="eyebrow">Preview</div><div class="shots">${a.shots.map((c,i)=>'<div class="shot">'+imgTagFor(c,'')+'<div class="ph"></div><span>'+(i+1)+'</span></div>').join('')}</div>`:''}
+    <div class="desc">${esc(a.description||a.summary||a.sum||'')}</div>
     ${links.length?`<div class="linkrow">${links.join('')}</div>`:''}
-    <div class="meta-list">
-      <b>Package</b> ${esc(a.pkg)}<br>
-      ${a.summary?`<b>Summary</b> ${esc(a.summary)}<br>`:''}
-    </div>
-    <div class="nofooter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/></svg>
-      No ads &middot; No account &middot; No tracking</div>`;
+    <div class="meta-list"><b>Package</b> ${esc(a.pkg)}<br>${a.summary?`<b>Summary</b> ${esc(a.summary)}<br>`:''}</div>
+    ${footer()}`;
   renderSheetActions(a);
-  $('#scrim').classList.add('on');
   $('#sheet').classList.add('on');
 }
 function renderSheetActions(a){
-  const box = $('#sheetActions'); if(!box) return;
-  const inst = S.installing[a.pkg];
+  const box=$('#sheetActions'); if(!box) return;
+  const inst=S.installing[a.pkg];
   let primary;
-  if(inst){
-    primary = `<button class="pill" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${inst.pct}%"></span><span>${inst.pct}%</span></button>`;
-  } else if(S.partial && !a.installed){
-    primary = `<button class="pill" data-busy="1" style="opacity:.55">&hellip;</button>`;
-  } else if(a.installed && a.hasUpdate){
-    primary = `<button class="pill" data-install="${esc(a.pkg)}">Update</button>`;
-  } else if(a.installed){
-    primary = `<button class="pill" data-open="${esc(a.pkg)}">Open</button>`;
-  } else {
-    primary = `<button class="pill" data-install="${esc(a.pkg)}">Get</button>`;
-  }
-  const secondary = a.installed
-    ? `<button class="pill2" data-uninstall="${esc(a.pkg)}">Uninstall</button>`
-    : `<button class="pill2" data-share="1">Share</button>`;
-  box.innerHTML = secondary + primary;
+  if(inst) primary=`<button class="pill" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${inst.pct}%"></span><span>${inst.pct}%</span></button>`;
+  else if(S.partial&&!a.installed) primary=`<button class="pill" data-busy="1" style="opacity:.55">&hellip;</button>`;
+  else if(a.installed&&a.hasUpdate) primary=`<button class="pill" data-install="${esc(a.pkg)}">Update</button>`;
+  else if(a.installed) primary=`<button class="pill" data-open="${esc(a.pkg)}">Open</button>`;
+  else primary=`<button class="pill" data-install="${esc(a.pkg)}">Get</button>`;
+  const secondary=a.installed?`<button class="pill2" data-uninstall="${esc(a.pkg)}">Uninstall</button>`:'';
+  box.innerHTML=primary+secondary;
 }
-function closeSheet(){
-  $('#scrim').classList.remove('on');
-  $('#sheet').classList.remove('on');
-  S.sheetPkg = null;
-}
+function closeSheet(){$('#sheet').classList.remove('on');S.sheetPkg=null}
 
 /* ---------- install ---------- */
 function beginInstall(pkg){
-  const r = B.install(pkg);
-  if(r && r.ok){ S.installing[pkg] = {pct:0}; refreshVisible(); return; }
-  const msg = (r && r.error) || 'Could not start the install.';
-  if(msg === 'permission'){
-    showPermission();
-  } else {
-    toast(msg);
-  }
+  const r=B.install(pkg);
+  if(r&&r.ok){S.installing[pkg]={pct:0};refreshVisible();pollStart();return}
+  const msg=(r&&r.error)||'Could not start the install.';
+  if(msg==='permission') showPermission(); else toast(msg);
 }
 function showPermission(){
-  const c = B.canInstall();
-  $('#sheetBody').innerHTML = `
-    <div class="sheet-head"><div style="flex:1">
-      <h2>One permission needed</h2>
-      <div class="cat">Install unknown apps</div>
-    </div></div>
-    <div class="desc">${esc(c.message || 'Android needs your permission before Liquid Store can install apps. This is a one-time switch - after that installs start straight from the store.')}</div>
-    <div class="installrow">
-      <button class="bigget g" id="grantBtn"><span>Open settings</span></button>
-    </div>
+  const c=B.canInstall();
+  $('#sheetBody').innerHTML=`<div class="sheet-head"><div style="flex:1"><h2>One permission needed</h2><div class="cat">Install unknown apps</div></div></div>
+    <div class="desc">${esc(c.message||'Android needs your permission before Liquid Store can install apps. This is a one-time switch - after that installs start straight from the store.')}</div>
+    <div class="installrow"><button class="bigget g press" id="grantBtn"><span>Open settings</span></button></div>
     <div class="meta-list">Nothing else is requested: no account, no sign-in, no advertising identifier.</div>`;
-  const b = $('#grantBtn');
-  if(b) b.addEventListener('click', ()=>{ B.requestInstallPermission(); toast('Turn on "Allow from this source", then press Get again.'); });
-  $('#scrim').classList.add('on');
+  const b=$('#grantBtn');
+  if(b) b.addEventListener('click',()=>{B.requestInstallPermission();toast('Turn on "Allow from this source", then press Get again.')});
   $('#sheet').classList.add('on');
 }
 function pollInstall(){
   if(!hasNative) return;
-  const p = B.progress();
-  if(!p.pkg){ return; }
-  if(p.phase === 'download' || p.phase === 'installing'){
-    S.installing[p.pkg] = {pct: p.pct};
-    refreshVisible();
-  } else if(p.phase === 'success'){
-    delete S.installing[p.pkg];
-    toast('Installed - open it any time');
-    refreshVisible();
-    if(S.sheetPkg === p.pkg) openSheet(p.pkg);
-    pollStop();
-  } else if(p.phase === 'failed'){
-    delete S.installing[p.pkg];
-    toast(p.error || 'Install failed');
-    refreshVisible();
-    if(S.sheetPkg === p.pkg) openSheet(p.pkg);
-    pollStop();
-  }
+  const p=B.progress(); if(!p.pkg) return;
+  if(p.phase==='download'||p.phase==='installing'){S.installing[p.pkg]={pct:p.pct};refreshVisible()}
+  else if(p.phase==='success'){delete S.installing[p.pkg];toast('Installed - open it any time');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
+  else if(p.phase==='failed'){delete S.installing[p.pkg];toast(p.error||'Install failed');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
 }
-let pollTimer = null;
-function pollStart(){ if(pollTimer || !hasNative) return; pollTimer = setInterval(pollInstall, 500); }
-function pollStop(){ if(pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
-
+let pollTimer=null;
+function pollStart(){if(pollTimer||!hasNative)return;pollTimer=setInterval(pollInstall,500)}
+function pollStop(){if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
 function refreshVisible(){
   if(!S.ready) return;
-  if(S.view === 'today') renderToday();
-  else if(S.view === 'search') runSearch();
-  else renderCategoryView(S.view, '');
+  const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
+  if(S.view==='today') renderToday();
+  else if(S.view==='search') runSearch();
+  else if(S.view==='arcade') renderArcade();
+  else renderCategoryView(S.view);
+  const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
   if(S.sheetPkg) renderSheetActions(B.detail(S.sheetPkg));
 }
 
 /* ---------- loader ---------- */
-function showLoader(on, title, text, pct, action){
-  const l = $('#loader');
-  l.classList.toggle('on', !!on);
-  if(title) $('#loadTitle').textContent = title;
-  if(text !== undefined) $('#loadText').textContent = text;
-  if(pct !== undefined) $('#loadBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
-  const b = $('#loadAction');
-  if(action){ b.style.display='grid'; b.querySelector('span').textContent = action; }
-  else b.style.display = 'none';
-  $('#spin').style.display = action ? 'none' : 'block';
+function showLoader(on,title,text,pct,action){
+  $('#loader').classList.toggle('on',!!on);
+  if(title) $('#loadTitle').textContent=title;
+  if(text!==undefined) $('#loadText').textContent=text;
+  if(pct!==undefined) $('#loadBar').style.width=Math.max(0,Math.min(100,pct))+'%';
+  const b=$('#loadAction');
+  if(action){b.style.display='grid';b.querySelector('span').textContent=action}else b.style.display='none';
+  $('#spin').style.display=action?'none':'block';
 }
-
 function boot(){
-  const st = B.state();
-  if(st.phase === 'ready' && st.count > 0){ onReady(); return; }
-  if(st.phase === 'error'){ showError(st); return; }
-  if(st.count > 0) applyPartial(st);
-  else showLoader(true, 'Loading catalogue', 'Contacting the app repository\u2026', st.pct || 0);
-  $('#loadAction').onclick = null;
-  B.load(false);
-  pollStart();
+  const st=B.state();
+  if(st.phase==='ready'&&st.count>0){onReady();return}
+  if(st.phase==='error'){showError(st);return}
+  if(st.count>0) applyPartial(st); else showLoader(true,'Loading catalogue','Contacting the app repository\u2026',st.pct||0);
+  $('#loadAction').onclick=null;
+  B.load(false);pollStart();
 }
-
 function showError(st){
-  showLoader(true, 'Could not load', st.error || 'The catalogue could not be reached.', 0, 'Retry');
-  $('#loadAction').onclick = function(){
-    showLoader(true, 'Loading catalogue', 'Contacting the app repository\u2026', 0);
-    $('#strip').classList.add('on');
-    B.load(true);
-  };
+  showLoader(true,'Could not load',st.error||'The catalogue could not be reached.',0,'Retry');
+  $('#loadAction').onclick=function(){showLoader(true,'Loading catalogue','Contacting the app repository\u2026',0);$('#strip').classList.add('on');B.load(true)};
 }
-
-/* Show whatever has arrived so far instead of blocking on the whole index. */
 function applyPartial(st){
-  S.partial = !!st.partial;
-  S.stats = B.stats();
-  showLoader(false);
-  $('#strip').classList.add('on');
-  updateStrip(st);
-  paintNow(false);
+  S.partial=!!st.partial;S.stats=B.stats();showLoader(false);
+  $('#strip').classList.add('on');updateStrip(st);paintNow(false);
 }
-
 function updateStrip(st){
-  const label = st.phase === 'probe' ? 'Finding the fastest source'
-              : (st.phase === 'parse' || st.phase === 'apps') ? 'Reading catalogue'
-              : (st.phase === 'cache' ? 'Opening saved catalogue' : 'Downloading catalogue');
-  $('#stripBar').style.width = Math.max(0, Math.min(100, st.pct || 0)) + '%';
-  $('#stripText').textContent = label + (st.detail ? '  \u00b7  ' + st.detail : '');
+  const label=st.phase==='probe'?'Finding the fastest source':(st.phase==='parse'||st.phase==='apps')?'Reading catalogue':(st.phase==='cache'?'Opening saved catalogue':'Downloading catalogue');
+  $('#stripBar').style.width=Math.max(0,Math.min(100,st.pct||0))+'%';
+  $('#stripText').textContent=label+(st.detail?'  \u00b7  '+st.detail:'');
 }
-
-let lastPaint = 0;
+let lastPaint=0;
 function paintNow(force){
-  const now = Date.now();
-  if(!force && now - lastPaint < 400) return;
-  lastPaint = now;
-  if(S.view === 'search') return;                 /* never fight the keyboard */
-  const v = document.querySelector('.view.on');
-  const top = v ? v.scrollTop : 0;
-  if(S.view === 'today') renderToday();
-  else renderCategoryView(S.view, '');
-  const v2 = document.querySelector('.view.on');
-  if(v2) v2.scrollTop = top;
+  const now=Date.now(); if(!force&&now-lastPaint<400) return; lastPaint=now;
+  if(S.view==='search') return;
+  const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
+  if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(); else renderCategoryView(S.view);
+  const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
 }
-
-let readyAt = 0;
+let readyAt=0;
 function onReady(){
-  const st = B.state();
-  if(st.phase !== 'ready') return;
-  const now = Date.now();
-  if(now - readyAt < 300) return;                 /* native announces ready twice */
-  readyAt = now;
-  const first = !S.ready;
-  S.ready = true;
-  S.partial = false;
-  pollStop();
-  showLoader(false);
-  $('#strip').classList.remove('on');
-  S.stats = B.stats();
-  const upd = B.list('', '', 'updated', 0, 30);
-  if(upd.apps.length){
-    const day = Math.floor(Date.now()/86400000);
-    S.featured = upd.apps[day % upd.apps.length];
-  }
-  renderToday();
-  renderCategoryView('games','');
-  renderCategoryView('apps','');
-  renderArcade();
-  renderSearch();
-  /* if a detail page is open, its buttons must stop saying "..." now that
-     installs are actually possible */
-  if(S.sheetPkg){
-    try { renderSheetActions(B.detail(S.sheetPkg)); } catch(e){}
-  }
-  if(!first && S.refreshing){
-    S.refreshing = false;
-    toast(S.lastPhase === 'cache' ? 'Already up to date' : 'Catalogue updated');
-  }
+  const st=B.state(); if(st.phase!=='ready') return;
+  const now=Date.now(); if(now-readyAt<300) return; readyAt=now;
+  const first=!S.ready; S.ready=true;S.partial=false;pollStop();showLoader(false);
+  $('#strip').classList.remove('on');S.stats=B.stats();
+  const upd=B.list('','','updated',0,30);
+  if(upd.apps.length){const day=Math.floor(Date.now()/86400000);S.featured=upd.apps[day%upd.apps.length]}
+  renderToday();renderCategoryView('games');renderCategoryView('apps');renderArcade();renderSearch();
+  if(S.sheetPkg){try{renderSheetActions(B.detail(S.sheetPkg))}catch(e){}}
+  if(!first&&S.refreshing){S.refreshing=false;toast(S.lastPhase==='cache'?'Already up to date':'Catalogue updated')}
 }
-
-/* called from native on every progress/state change */
-window.__store = function(type){
-  const st = B.state();
-  S.lastPhase = st.phase;
-  if(type === 'state'){
-    if(st.phase === 'ready'){ onReady(); return; }
-    if(st.phase === 'error'){ showError(st); return; }
-    if(st.count > 0) applyPartial(st);
-    else if(!S.ready) showLoader(true, st.phase === 'parse' ? 'Reading the catalogue' : 'Downloading the catalogue', st.detail || '', st.pct || 0);
-  } else if(type === 'apps'){
-    if(!S.ready && st.count > 0) applyPartial(st);
-  } else if(type === 'ready'){
-    onReady();
-  } else if(type === 'progress'){
-    pollInstall();
-  } else if(type === 'installed'){
-    refreshVisible();
-  } else if(type === 'image'){
-    applyImages();
-  }
+window.__store=function(type){
+  const st=B.state(); S.lastPhase=st.phase;
+  if(type==='state'){
+    if(st.phase==='ready'){onReady();return}
+    if(st.phase==='error'){showError(st);return}
+    if(st.count>0) applyPartial(st);
+    else if(!S.ready) showLoader(true,st.phase==='parse'?'Reading the catalogue':'Downloading the catalogue',st.detail||'',st.pct||0);
+  }else if(type==='apps'){ if(!S.ready&&st.count>0) applyPartial(st) }
+  else if(type==='ready') onReady();
+  else if(type==='progress') pollInstall();
+  else if(type==='installed') refreshVisible();
+  else if(type==='image') applyImages();
 };
-window.__onBack = function(){
-  if($('#sheet').classList.contains('on')){ closeSheet(); return true; }
-  if(S.view !== 'today'){ switchTab('today'); return true; }
+window.__onBack=function(){
+  if($('#menuwrap').classList.contains('on')){closeMenu();return true}
+  if($('#sheet').classList.contains('on')){closeSheet();return true}
+  if(S.view!=='today'){switchTab('today');return true}
   return false;
 };
 
-/* ---------- tabs ---------- */
+/* ---------- tabs + liquid lens ---------- */
 function switchTab(v){
-  S.view = v;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.view===v));
-  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='view-'+v));
-  $('#pageTitle').textContent = TITLES[v];
-  if(v === 'search'){ S.focusSearch = true; renderSearch(); }
-  if(v === 'games') renderCategoryView('games','');
-  if(v === 'apps') renderCategoryView('apps','');
-  if(v === 'arcade') renderArcade();
-  if(v === 'today' && S.ready) renderToday();
-  moveLens(false);
+  S.view=v;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='view-'+v));
+  $('#navTitle').textContent=TITLES[v];
+  const cur=document.querySelector('.view.on');
+  $('#navbar').classList.toggle('show',!!cur&&cur.scrollTop>50);
+  moveLens(false);                      /* lens first, so the slide never waits on rendering */
+  requestAnimationFrame(function(){setTimeout(function(){
+    if(S.view!==v) return;
+    if(v==='search'){S.focusSearch=true;renderSearch()}
+    if(v==='games') renderCategoryView('games');
+    if(v==='apps') renderCategoryView('apps');
+    if(v==='arcade') renderArcade();
+    if(v==='today'&&S.ready) renderToday();
+  },40)});
 }
-
-/* The glass lens. At rest it is simply a glass pill; on a tab change it
-   stretches across the gap like a drop of liquid, then contracts onto the
-   target. Driven frame by frame because the stretch is not a plain tween. */
-let lensAnim = null;
-
+let lensX=null,lensAnim=null,tabDragged=false;
+const REDUCED=matchMedia('(prefers-reduced-motion:reduce)');
+function tabGeom(){
+  return [...$('#tabbar').querySelectorAll('.tab')].map(t=>({view:t.dataset.view,x:t.offsetLeft+3,w:Math.max(0,t.offsetWidth-6)}));
+}
+/* The lens is one element moved with transform only (GPU, no layout). On a tab
+   change it is animated with the Web Animations API: it glides, stretches out
+   like a drop of liquid at mid-flight, then settles with a soft overshoot. */
 function moveLens(instant){
-  const bar = document.getElementById('tabbar');
-  const lens = document.getElementById('tabLens');
-  if(!bar || !lens) return;
-  const active = bar.querySelector('.tab.on');
-  if(!active) return;
-
-  const tx = active.offsetLeft + 3;
-  const tw = Math.max(0, active.offsetWidth - 6);
-
-  if(instant){
-    if(lensAnim){ cancelAnimationFrame(lensAnim); lensAnim = null; }
-    lens.style.left = tx + 'px';
-    lens.style.width = tw + 'px';
-    return;
-  }
-
-  const x0 = parseFloat(lens.style.left);
-  const w0 = parseFloat(lens.style.width);
-  if(isNaN(x0) || isNaN(w0)){                 /* first placement */
-    lens.style.left = tx + 'px';
-    lens.style.width = tw + 'px';
-    return;
-  }
-
-  const c0 = x0 + w0 / 2;
-  const c1 = tx + tw / 2;
-  const travel = Math.abs(c1 - c0);
-  const bulgeMax = Math.min(52, travel * 0.46);   /* how far it stretches */
-  const DUR = 430;
-  const start = performance.now();
-
-  /* gentle overshoot so it settles like a liquid rather than stopping dead */
-  const ease = function(t){
-    const c = 1.05;
-    return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
-  };
-
-  if(lensAnim) cancelAnimationFrame(lensAnim);
-
-  const step = function(now){
-    const t = Math.min(1, (now - start) / DUR);
-    const e = ease(t);
-    const centre = c0 + (c1 - c0) * e;
-    const baseW = w0 + (tw - w0) * e;
-    const bulge = bulgeMax * Math.sin(Math.PI * t);   /* peaks mid-flight */
-    const w = Math.max(20, baseW + bulge);
-    lens.style.width = w + 'px';
-    lens.style.left = (centre - w / 2) + 'px';
-    if(t < 1){
-      lensAnim = requestAnimationFrame(step);
-    } else {
-      lens.style.left = tx + 'px';                    /* land exactly */
-      lens.style.width = tw + 'px';
-      lensAnim = null;
-    }
-  };
-  lensAnim = requestAnimationFrame(step);
+  const bar=$('#tabbar'), lens=$('#tabLens'); if(!bar||!lens) return;
+  const active=bar.querySelector('.tab.on');
+  if(!active){lens.style.opacity=0;return}
+  lens.style.opacity=1;
+  const tx=active.offsetLeft+3, tw=Math.max(0,active.offsetWidth-6);
+  lens.style.width=tw+'px';
+  if(lensAnim){lensAnim.cancel();lensAnim=null}
+  const from=lensX==null?tx:lensX;
+  lens.style.transform='translateX('+tx+'px)';       /* commit the end state first */
+  lensX=tx;
+  if(instant||Math.abs(from-tx)<1||REDUCED.matches||!lens.animate) return;
+  const travel=Math.abs(tx-from);
+  const stretch=1+Math.min(.6,travel/Math.max(1,tw)*.34);
+  const mid=(from+tx)/2;
+  lensAnim=lens.animate([
+    {transform:'translateX('+from+'px) scale(1,1)'},
+    {transform:'translateX('+mid+'px) scale('+stretch+',.93)',offset:.42},
+    {transform:'translateX('+tx+'px) scale(1,1)'}
+  ],{duration:540,easing:'cubic-bezier(.22,1.12,.36,1)'});
+  lensAnim.onfinish=function(){lensAnim=null};
 }
-window.addEventListener('resize', function(){ moveLens(true); });
+/* drag the lens across the bar, release to snap to the nearest tab */
+(function(){
+  const bar=$('#tabbar'), lens=$('#tabLens');
+  let down=false, drag=false, sx=0, sl=0;
+  bar.addEventListener('pointerdown',function(e){
+    down=true;drag=false;sx=e.clientX;
+    const act=bar.querySelector('.tab.on');
+    sl=lensX!=null?lensX:(act?act.offsetLeft+3:0);
+  });
+  bar.addEventListener('pointermove',function(e){
+    if(!down) return;
+    const dx=e.clientX-sx;
+    if(!drag&&Math.abs(dx)>8){
+      drag=true;
+      if(lensAnim){lensAnim.cancel();lensAnim=null}
+      try{bar.setPointerCapture(e.pointerId)}catch(_){}
+      lens.style.opacity=1;
+    }
+    if(!drag) return;
+    const g=tabGeom();
+    const x=Math.max(g[0].x,Math.min(g[g.length-1].x,sl+dx));
+    lens.style.transform='translateX('+x+'px) scale(1.1,.96)';
+    lensX=x;
+    const c=x+g[0].w/2;
+    let best=g[0],bd=1e9;
+    g.forEach(function(t){const d=Math.abs(t.x+t.w/2-c);if(d<bd){bd=d;best=t}});
+    bar.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.view===best.view)});
+  });
+  function end(){
+    if(!down) return;
+    down=false;
+    if(!drag) return;
+    drag=false;tabDragged=true;setTimeout(function(){tabDragged=false},120);
+    const act=bar.querySelector('.tab.on');
+    if(act&&act.dataset.view!==S.view) switchTab(act.dataset.view);
+    else moveLens(false);
+  }
+  bar.addEventListener('pointerup',end);
+  bar.addEventListener('pointercancel',end);
+})();
+window.addEventListener('resize',function(){lensX=null;moveLens(true)});
+
+/* ---------- menu ---------- */
+function openMenu(){$('#menuwrap').classList.add('on')}
+function closeMenu(){$('#menuwrap').classList.remove('on')}
+$('#menuwrap').addEventListener('click',function(e){
+  if(e.target===this){closeMenu();return}
+  const m=e.target.closest('[data-m]'); if(!m) return;
+  const k=m.getAttribute('data-m'); closeMenu();
+  if(k==='theme'){
+    const r=document.documentElement;
+    const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    r.dataset.theme=dark?'light':'dark';toast(dark?'Light appearance':'Dark appearance');
+  }else if(k==='src') openSources();
+  else if(k==='refresh') doRefresh();
+});
 
 /* ---------- events ---------- */
-document.addEventListener('click', function(e){
-  const t = e.target;
-
-  const catBtn = t.closest('[data-cat]');
-  if(catBtn && S.ready){
-    const c = catBtn.getAttribute('data-cat');
-    if(S.view === 'today'){ S.category = c; switchTab('apps'); }
-    else { S.category = c; renderCategoryView('apps',''); }
+document.addEventListener('click',function(e){
+  const t=e.target;
+  if(t.closest('[data-menu]')){openMenu();return}
+  const catBtn=t.closest('[data-cat]');
+  if(catBtn&&S.ready){
+    const c=catBtn.getAttribute('data-cat');
+    S.category=c;
+    if(S.view==='today') switchTab('apps'); else renderCategoryView('apps');
     return;
   }
-  const useSrc = t.closest('[data-usesrc]');
-  if(useSrc){
-    e.stopPropagation();
-    B.setSource(useSrc.getAttribute('data-usesrc'));
-    closeSheet();
-    toast('Source set \u00b7 reloading');
-    doRefresh();
-    return;
-  }
-  const inst = t.closest('[data-install]');
-  if(inst){ e.stopPropagation(); beginInstall(inst.getAttribute('data-install')); return; }
-  const busy = t.closest('[data-busy]');
-  if(busy){ e.stopPropagation(); return; }
-  const op = t.closest('[data-open]');
-  if(op){ e.stopPropagation(); B.open(op.getAttribute('data-open')); return; }
-  const un = t.closest('[data-uninstall]');
-  if(un){ e.stopPropagation(); B.uninstall(un.getAttribute('data-uninstall')); return; }
-  const row = t.closest('[data-detail]');
-  if(row){ openSheet(row.getAttribute('data-detail')); return; }
-  const tab = t.closest('.tab');
-  if(tab){ switchTab(tab.dataset.view); return; }
+  const useSrc=t.closest('[data-usesrc]');
+  if(useSrc){e.stopPropagation();B.setSource(useSrc.getAttribute('data-usesrc'));closeSheet();toast('Source set \u00b7 reloading');doRefresh();return}
+  const inst=t.closest('[data-install]');
+  if(inst){e.stopPropagation();beginInstall(inst.getAttribute('data-install'));return}
+  if(t.closest('[data-busy]')){e.stopPropagation();return}
+  const op=t.closest('[data-open]');
+  if(op){e.stopPropagation();B.open(op.getAttribute('data-open'));return}
+  const un=t.closest('[data-uninstall]');
+  if(un){e.stopPropagation();B.uninstall(un.getAttribute('data-uninstall'));return}
+  const row=t.closest('[data-detail]');
+  if(row){openSheet(row.getAttribute('data-detail'));return}
+  const tab=t.closest('.tab');
+  if(tab){if(tabDragged){tabDragged=false;return}if(tab.dataset.view!==S.view||tab.classList.contains('fab'))switchTab(tab.dataset.view);return}
 });
-
-$('#themeBtn').addEventListener('click', function(){
-  const r = document.documentElement;
-  const dark = r.dataset.theme ? r.dataset.theme === 'dark'
-             : matchMedia('(prefers-color-scheme: dark)').matches;
-  r.dataset.theme = dark ? 'light' : 'dark';
-  toast(dark ? 'Light mode' : 'Dark mode');
-});
-$('#sheetClose').addEventListener('click', closeSheet);
-$('#sheetMore').addEventListener('click', function(){
+$('#sheetClose').addEventListener('click',closeSheet);
+$('#sheetMore').addEventListener('click',function(){
   if(!S.sheetPkg) return;
-  let a = null;
-  try { a = B.detail(S.sheetPkg); } catch(e){}
-  if(a && a.source){ window.open(a.source, '_blank'); return; }
+  let a=null;try{a=B.detail(S.sheetPkg)}catch(e){}
+  if(a&&a.source){window.open(a.source,'_blank');return}
   toast('Nothing else to show for this app');
 });
-$('#scrim').addEventListener('click', closeSheet);
 function doRefresh(){
-  S.refreshing = true;
-  $('#strip').classList.add('on');
-  updateStrip({phase:'probe', pct:2, detail:'checking sources\u2026'});
-  pollStart();
-  B.load(true);
+  S.refreshing=true;$('#strip').classList.add('on');
+  updateStrip({phase:'probe',pct:2,detail:'checking sources\u2026'});pollStart();B.load(true);
 }
-$('#refreshBtn').addEventListener('click', doRefresh);
-
-/* ---- sources sheet ---- */
 function openSources(){
-  const s = B.sources();
-  const rows = s.list.map(function(m){
-    const inUse = s.current === m.url;
-    return '<div class="row"><div class="meta"><b>' + esc(m.host) + '</b><small>' + esc(m.url) + '</small></div>' +
-      (inUse ? '<span class="badge">In use</span>' : '<button class="get" data-usesrc="' + esc(m.url) + '">Use</button>') +
-      '</div>';
+  const s=B.sources();
+  const rows=s.list.map(m=>{
+    const inUse=s.current===m.url;
+    return '<div class="row"><div class="meta"><b>'+esc(m.host)+'</b><small>'+esc(m.url)+'</small></div>'+
+      (inUse?'<span class="badge">In use</span>':'<button class="get" data-usesrc="'+esc(m.url)+'">Use</button>')+'</div>';
   }).join('');
-  $('#sheetBody').innerHTML =
-    '<div class="sheet-head"><div style="flex:1"><h2>Sources</h2>' +
-      '<div class="cat">Where the catalogue and apps come from</div></div></div>' +
-    '<div class="desc">Liquid Store asks every source at once and downloads from whichever answers fastest. ' +
-      'If loading keeps failing, pick one below, or enter your own repository address.</div>' +
-    '<div class="searchbar g" style="margin:6px 0 14px">' +
-      '<input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="' + esc(s.custom || '') + '">' +
-    '</div>' +
-    '<div class="installrow"><button class="bigget g" id="srcSave"><span>Save and reload</span></button></div>' +
-    '<div class="eyebrow">Official mirrors</div>' + rows +
-    '<div class="nofooter">No ads &middot; No account &middot; No tracking</div>';
-  $('#scrim').classList.add('on');
+  $('#sheetBody').innerHTML=
+    '<div class="sheet-head"><div style="flex:1"><h2>Sources</h2><div class="cat">Where the catalogue and apps come from</div></div></div>'+
+    '<div class="desc">Liquid Store asks every source at once and downloads from whichever answers fastest. If loading keeps failing, pick one below, or enter your own repository address.</div>'+
+    '<div class="searchbar g"><input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="'+esc(s.custom||'')+'"></div>'+
+    '<div class="installrow"><button class="bigget g press" id="srcSave"><span>Save and reload</span></button></div>'+
+    '<div class="eyebrow">Official mirrors</div>'+rows+footer();
   $('#sheet').classList.add('on');
-  const save = $('#srcSave');
-  if(save) save.addEventListener('click', function(){
-    const v = $('#srcInput').value.trim();
-    B.setSource(v);
-    closeSheet();
-    toast(v ? 'Source set to ' + v : 'Using the fastest source');
-    doRefresh();
+  const save=$('#srcSave');
+  if(save) save.addEventListener('click',function(){
+    const v=$('#srcInput').value.trim();B.setSource(v);closeSheet();
+    toast(v?'Source set to '+v:'Using the fastest source');doRefresh();
   });
 }
-$('#sourceBtn').addEventListener('click', openSources);
 
-/* paginate on scroll */
+/* scroll: compact nav title + pagination */
 document.querySelectorAll('.view').forEach(function(v){
-  v.addEventListener('scroll', function(){
+  v.addEventListener('scroll',function(){
+    if(v.classList.contains('on')) $('#navbar').classList.toggle('show',v.scrollTop>50);
     if(!S.ready) return;
-    if(v.scrollTop + v.clientHeight < v.scrollHeight - 400) return;
-    const view = v.id.replace('view-','');
-    if(view !== 'games' && view !== 'apps') return;
-    const cat = view === 'games' ? 'Games' : S.category;
-    const key = view + ':';
-    const page = S.pages[key];
-    const box = v.querySelector('[data-listbox]');
-    const label = v.querySelector('[data-count]');
-    if(page && box) loadMore(view, cat, box, label, page, false);
-  }, {passive:true});
+    if(v.scrollTop+v.clientHeight<v.scrollHeight-400) return;
+    const view=v.id.replace('view-','');
+    if(view!=='games'&&view!=='apps') return;
+    const cat=view==='games'?'Games':S.category;
+    const page=S.pages[view+':'], box=v.querySelector('[data-listbox]'), label=v.querySelector('[data-count]');
+    if(page&&box) loadMore(view,cat,box,label,page,false);
+  },{passive:true});
 });
-
-/* Silent failures have bitten this app before - say something instead. */
-window.addEventListener('error', function(ev){
-  try { toast('Something went wrong: ' + (ev.message || 'unknown')); } catch(e){}
-});
-
-function tickClock(){
-  const d = new Date();
-  let h = d.getHours() % 12 || 12;
-  $('#clock').textContent = h + ':' + String(d.getMinutes()).padStart(2,'0');
-}
-tickClock(); setInterval(tickClock, 20000);
-
-/* deep links for testing: #games #apps #search #app/<pkg> */
+window.addEventListener('error',function(ev){try{toast('Something went wrong: '+(ev.message||'unknown'))}catch(e){}});
+function tickClock(){const d=new Date();$('#clock').textContent=(d.getHours()%12||12)+':'+String(d.getMinutes()).padStart(2,'0')}
+tickClock();setInterval(tickClock,20000);
 (function(){
-  const h = (location.hash||'').replace(/^#/,'');
-  if(!h) return;
-  if(h.indexOf('app/') === 0){ setTimeout(()=>openSheet(h.slice(4)), 200); return; }
-  if(h === 'sources'){ setTimeout(openSources, 250); return; }
-  if(TITLES[h]) setTimeout(()=>switchTab(h), 200);
+  const h=(location.hash||'').replace(/^#/,''); if(!h) return;
+  if(h.indexOf('app/')===0){setTimeout(()=>openSheet(h.slice(4)),200);return}
+  if(h==='sources'){setTimeout(openSources,250);return}
+  if(TITLES[h]) setTimeout(()=>switchTab(h),200);
 })();
-
 boot();
-/* place the lens immediately: do not depend on a frame having run */
 moveLens(true);
-requestAnimationFrame(function(){ moveLens(true); });
-window.addEventListener('load', function(){ moveLens(true); });
+requestAnimationFrame(()=>moveLens(true));
+window.addEventListener('load',()=>moveLens(true));
 </script>
 </body>
 </html>
