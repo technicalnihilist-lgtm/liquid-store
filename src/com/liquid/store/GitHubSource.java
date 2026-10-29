@@ -20,7 +20,9 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -36,7 +38,7 @@ public class GitHubSource {
 
     private static final String CURATED = "github_apps.json";
     private static final String CACHE = "github_cache.json";
-    private static final long TTL = 6L * 60 * 60 * 1000;      // six hours
+    private static final long TTL = 12L * 60 * 60 * 1000;     // twelve hours
     private static final String UA = "LiquidStore/3.4";
 
     public static class Result {
@@ -54,13 +56,27 @@ public class GitHubSource {
         }
         try {
             List<AppEntry> fresh = fetchAll(ctx);
-            writeCache(ctx, fresh);
-            return new Result(fresh, false, "");
+            List<AppEntry> merged = mergeWithPrevious(ctx.getFilesDir(), fresh);
+            writeCache(ctx, merged);
+            return new Result(merged, false, "");
         } catch (Throwable t) {
             Result c = readCache(ctx);
             if (c != null) return c;                       // stale beats nothing
             return new Result(new ArrayList<AppEntry>(), false, msg(t));
         }
+    }
+
+    /**
+     * A refresh that only partly succeeds (rate limit, one repo down) must not
+     * shrink the catalogue - anything we knew before and did not re-fetch stays.
+     */
+    static List<AppEntry> mergeWithPrevious(File dir, List<AppEntry> fresh) {
+        List<AppEntry> old = readCacheApps(dir, false);
+        if (old.isEmpty()) return fresh;
+        Map<String, AppEntry> byPkg = new LinkedHashMap<String, AppEntry>();
+        for (AppEntry a : old) if (a.pkg != null && a.pkg.length() > 0) byPkg.put(a.pkg, a);
+        for (AppEntry a : fresh) if (a.pkg != null && a.pkg.length() > 0) byPkg.put(a.pkg, a);
+        return new ArrayList<AppEntry>(byPkg.values());
     }
 
     /** only what is on disk - safe to call on the UI thread at startup */
@@ -235,10 +251,15 @@ public class GitHubSource {
     static File cacheFile(File dir) { return new File(dir, CACHE); }
 
     private static Result readCache(Context ctx) {
-        return readCache(ctx.getFilesDir());
+        return readCache(ctx.getFilesDir(), true);
     }
 
-    static Result readCache(File dir) {
+    static List<AppEntry> readCacheApps(File dir, boolean requireFresh) {
+        Result r = readCache(dir, requireFresh);
+        return r == null ? new ArrayList<AppEntry>() : r.apps;
+    }
+
+    static Result readCache(File dir, boolean requireFresh) {
         File f = cacheFile(dir);
         if (!f.isFile() || f.length() == 0) return null;
         InputStream in = null;
@@ -271,8 +292,8 @@ public class GitHubSource {
                     if (a.pkg.length() > 0) list.add(a);
                 }
             }
-            if (!fresh) return null;
-            return new Result(list, true, "");
+            if (requireFresh && !fresh) return null;
+            return new Result(list, fresh, "");
         } catch (Throwable t) {
             return null;
         } finally { try { if (in != null) in.close(); } catch (IOException ignored) { } }
