@@ -261,6 +261,10 @@ input{font-family:inherit}
 .spin{width:36px;height:36px;margin:0 auto 14px;border-radius:50%;border:3px solid var(--fill);border-top-color:var(--blue);animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* ---- bounce: JS drives the spring via the independent `scale` property ---- */
+.press:active,.get:active,.bigcard:active{transform:none}
+button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.avatar,.row{-webkit-tap-highlight-color:transparent;will-change:scale}
 </style>
 </head>
 <body>
@@ -929,6 +933,89 @@ boot();
 moveLens(true);
 requestAnimationFrame(()=>moveLens(true));
 window.addEventListener('load',()=>moveLens(true));
+
+/* ================= Bounce + water sound ================= */
+(function(){
+  var SEL='button,.press,[data-detail],[data-cat],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.avatar,.row,a[href]';
+  var down=null,pressAnim=null,canAnim=!!(document.documentElement.animate);
+
+  function depth(el){
+    var w=el.getBoundingClientRect().width;
+    return w>220?0.97:w>110?0.94:0.86;   /* big cards move a little, small buttons a lot */
+  }
+  function pressIn(el){
+    if(!canAnim)return;
+    try{
+      var s=depth(el);
+      pressAnim=el.animate([{scale:'1'},{scale:String(s)}],{duration:110,easing:'ease-out',fill:'forwards'});
+    }catch(e){}
+  }
+  function release(el){
+    if(!canAnim||!el)return;
+    try{
+      var s=depth(el);
+      if(pressAnim){pressAnim.cancel();pressAnim=null}
+      el.animate([
+        {scale:String(s)},
+        {scale:String(Math.min(1.12,1+(1-s)*0.9)),offset:.35},
+        {scale:String(1-(1-s)*0.3),offset:.6},
+        {scale:String(1+(1-s)*0.12),offset:.82},
+        {scale:'1'}
+      ],{duration:520,easing:'cubic-bezier(.2,.8,.3,1)'});
+    }catch(e){}
+  }
+
+  /* ---- water drop sound (synthesised, no audio file needed) ---- */
+  var ac=null;
+  function ctx(){
+    try{
+      if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}
+      if(ac.state==='suspended')ac.resume();
+      return ac;
+    }catch(e){return null}
+  }
+  function bloop(c,t,f0,f1,dur,vol){
+    var o=c.createOscillator(),g=c.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(f0,t);
+    o.frequency.exponentialRampToValueAtTime(f1,t+dur*0.45);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(c.destination);
+    o.start(t);o.stop(t+dur+0.02);
+  }
+  function waterSound(){
+    var c=ctx();if(!c)return;
+    var t=c.currentTime+0.005;
+    bloop(c,t,   320, 980, 0.24,0.34);   /* main drop  */
+    bloop(c,t+0.07,520,1500,0.17,0.16);  /* small bubble */
+    bloop(c,t+0.15,210, 560,0.22,0.14);  /* low glug   */
+    /* soft splash */
+    var len=Math.floor(c.sampleRate*0.28),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+    for(var i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.2);
+    var n=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();
+    n.buffer=buf;bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=0.7;
+    g.gain.value=0.07;
+    n.connect(bp);bp.connect(g);g.connect(c.destination);n.start(t);
+  }
+
+  document.addEventListener('pointerdown',function(e){
+    ctx();                               /* unlock audio on first touch */
+    var el=e.target.closest&&e.target.closest(SEL);
+    if(!el||el.disabled)return;
+    down=el;pressIn(el);
+  },true);
+  function up(){if(down){release(down);down=null}}
+  document.addEventListener('pointerup',up,true);
+  document.addEventListener('pointercancel',up,true);
+
+  /* Get / Update button -> water sound */
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-install]');
+    if(b)waterSound();
+  },true);
+})();
 </script>
 </body>
 </html>
