@@ -27,6 +27,10 @@ public class AppEntry {
     public long size;
     public String hash = "";
     public String hashType = "";
+
+    /** set for GitHub-release entries, where the APK is not repo-relative */
+    public String absApkUrl = "";
+    public String absIconUrl = "";
     public int minSdk;
 
     public String displayName() {

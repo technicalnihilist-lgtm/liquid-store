@@ -61,6 +61,9 @@ public class StoreBridge {
     /** swapped wholesale as batches arrive, so readers always see a whole catalogue */
     private volatile Map<String, AppEntry> index = new HashMap<String, AppEntry>();
     private volatile boolean partial;
+    /** GitHub-release apps, merged into the live index on every publish */
+    private volatile Map<String, AppEntry> ghApps = new HashMap<String, AppEntry>();
+    private volatile List<AppEntry> lastApps = new ArrayList<AppEntry>();
     private volatile String phase = "idle";
     private volatile int pct = 0;
     private volatile String detail = "not loaded";
@@ -120,6 +123,13 @@ public class StoreBridge {
         error = null;
         cancelRequested = false;
         push("state");
+        /* GitHub apps first, from disk - instant, and they show up straight away */
+        try { applyGithub(GitHubSource.cached(ctx)); } catch (Throwable ignored) { }
+        io.execute(new Runnable() {
+            public void run() {
+                try { applyGithub(GitHubSource.load(ctx, force).apps); } catch (Throwable ignored) { }
+            }
+        });
         final List<String> sources = mirrors();
         io.execute(new Runnable() {
             public void run() {
@@ -230,9 +240,21 @@ public class StoreBridge {
         for (AppEntry a : apps) {
             if (a.pkg != null) m.put(a.pkg, a);
         }
+        lastApps = apps;
+        m.putAll(ghApps);
         index = m;
         partial = isPartial;
         push("apps");
+    }
+
+    /** swap in the GitHub catalogue and republish without a full reload */
+    private void applyGithub(List<AppEntry> apps) {
+        Map<String, AppEntry> m = new HashMap<String, AppEntry>();
+        for (AppEntry a : apps) {
+            if (a != null && a.pkg != null && a.pkg.length() > 0) m.put(a.pkg, a);
+        }
+        ghApps = m;
+        publish(lastApps, partial);
     }
 
     private List<AppEntry> all() {
@@ -422,6 +444,7 @@ public class StoreBridge {
     }
 
     private String iconUrl(AppEntry a) {
+        if (a.absIconUrl != null && a.absIconUrl.length() > 0) return a.absIconUrl;
         if (a.icon == null || a.icon.length() == 0) return "";
         return base() + "/" + a.icon;
     }
@@ -467,6 +490,7 @@ public class StoreBridge {
     }
 
     private String installUrl(AppEntry a) {
+        if (a.absApkUrl != null && a.absApkUrl.length() > 0) return a.absApkUrl;
         return base() + "/" + a.apkName;
     }
 

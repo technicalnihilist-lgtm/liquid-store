@@ -40,6 +40,12 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 - **Light and dark.** Light glass by default, following the system preference, with a
   toggle in the toolbar. Both are driven from the same set of colour tokens.
 - **Arcade.** A curated games page — newest first, then the full list.
+- **GitHub releases, alongside F-Droid.** A curated list of open-source projects that
+  publish their own APK on GitHub is merged into the same catalogue, so they appear in
+  search and in the category lists next to everything else. Results are cached for six
+  hours to stay well inside GitHub's unauthenticated rate limit, and the asset's SHA-256
+  from the GitHub API is verified on install where the project publishes one.
+  The list lives in `assets/github_apps.json` - add a repo there to include it.
 - **Sources screen.** Pin a specific mirror, or enter your own repository address.
 - **No account, no login, no ads.** There is nothing to sign into.
 
