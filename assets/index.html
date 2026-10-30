@@ -273,6 +273,7 @@ button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.a
 <div class="stage"></div>
 
 <div class="phone">
+  <div class="navbar" id="navbar"><b id="navTitle">Today</b></div>
 
 
   <div class="strip g" id="strip">
@@ -470,18 +471,18 @@ function imgFail(el){
   el.remove();
 }
 function applyImages(){
-  /* whenever a URL lands in the native cache, upgrade every <img> pointing at it */
-  for(const url in IMG_DONE){
-    const d=IMG_DONE[url];
-    const imgs=document.querySelectorAll('img[data-cand]');
-    for(let q=0;q<imgs.length;q++){
-      const im=imgs[q];
-      const c=(im.getAttribute('data-cand')||'').split('|')[0];
-      if(c===url&&im.getAttribute('src')!==d){
-        im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
-        if(im.parentNode) im.parentNode.classList.add('has');
-      }
-    }
+  /* One pass over the images. Scanning the document once per cached URL made
+     this quadratic - with a hundred cached icons it ran a hundred full DOM
+     queries for every single image that arrived. */
+  const imgs=document.querySelectorAll('img[data-cand]');
+  for(let q=0;q<imgs.length;q++){
+    const im=imgs[q];
+    if(im.getAttribute('data-native')==='2') continue;
+    const c=(im.getAttribute('data-cand')||'').split('|')[0];
+    const d=IMG_DONE[c];
+    if(!d) continue;
+    im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
+    if(im.parentNode) im.parentNode.classList.add('has');
   }
   for(const url in IMG_WAIT){
     let d=IMG_DONE[url];
@@ -758,6 +759,8 @@ window.__store=function(type){
   else if(type==='image') applyImages();
 };
 window.__onBack=function(){
+  /* the full-screen screenshot sits above the sheet, so it must close first */
+  if($('#lb')&&$('#lb').classList.contains('on')){closeLb();return true}
   if($('#menuwrap').classList.contains('on')){closeMenu();return true}
   if($('#sheet').classList.contains('on')){closeSheet();return true}
   if(S.view!=='today'){switchTab('today');return true}
