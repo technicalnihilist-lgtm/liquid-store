@@ -59,13 +59,7 @@ input{font-family:inherit}
 .press:active{transform:scale(.94)}
 
 /* ================= Top chrome ================= */
-.statusbar{position:absolute;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;
-  padding:calc(10px + var(--safe-t)) 28px 0;height:calc(44px + var(--safe-t));font-size:15px;font-weight:600;pointer-events:none}
-.statusbar .icons{display:flex;gap:6px;align-items:center}
-.sb-bat{width:24px;height:12px;border:1.4px solid currentColor;border-radius:4px;position:relative;opacity:.9}
-.sb-bat::after{content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0}
-.sb-bat i{position:absolute;inset:1.5px;width:70%;background:currentColor;border-radius:2px;display:block}
-.navbar{position:absolute;top:0;left:0;right:0;z-index:55;height:calc(48px + var(--safe-t));
+.navbar{position:absolute;top:0;left:0;right:0;z-index:55;height:calc(60px + var(--safe-t));
   display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;
   background:var(--glass);backdrop-filter:blur(26px) saturate(190%);-webkit-backdrop-filter:blur(26px) saturate(190%);
   border-bottom:.5px solid var(--sep);opacity:0;transition:opacity .2s;pointer-events:none}
@@ -73,7 +67,7 @@ input{font-family:inherit}
 .navbar b{font-size:17px;font-weight:600}
 
 .views{position:absolute;inset:0}
-.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(44px + var(--safe-t)) 20px 150px;
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(56px + var(--safe-t)) 20px 150px;
   -webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(10px) scale(.995);
   transition:opacity .28s ease,transform .28s ease,visibility .28s}
 .view.on{opacity:1;visibility:visible;transform:none}
@@ -205,6 +199,14 @@ input{font-family:inherit}
 .pagebar .iconbtn{pointer-events:auto}
 .iconbtn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
 .iconbtn svg{width:19px;height:19px}
+/* full-screen screenshot viewer */
+.lb{position:absolute;inset:0;z-index:130;display:none;place-items:center;background:rgba(0,0,0,.96)}
+.lb.on{display:grid}
+.lb img{max-width:100%;max-height:100%;object-fit:contain}
+.lb .lbx{position:absolute;top:calc(14px + var(--safe-t));right:16px;width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.18);color:#fff;font-size:15px;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.28);z-index:2}
+.shot{cursor:zoom-in}
 .sheet-body{flex:1;overflow-y:auto;padding:calc(66px + var(--safe-t)) 20px 50px;scrollbar-width:none}
 .sheet-body::-webkit-scrollbar{display:none}
 .sheet-head{display:flex;gap:18px;align-items:flex-start}
@@ -224,8 +226,8 @@ input{font-family:inherit}
 .stat b{display:block;font-size:17px;font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shots{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:4px 20px 10px;scrollbar-width:none;scroll-snap-type:x mandatory}
 .shots::-webkit-scrollbar{display:none}
-.shot{flex:0 0 auto;width:158px;height:342px;border-radius:24px;box-shadow:0 0 0 .5px var(--sep);background:var(--card);position:relative;overflow:hidden;scroll-snap-align:start}
-.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.shot{flex:0 0 auto;width:158px;height:342px;border-radius:24px;box-shadow:0 0 0 .5px var(--sep);background:#0c1118;position:relative;overflow:hidden;scroll-snap-align:start}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .25s}
 .shot .ph{position:absolute;inset:14px;border-radius:14px;border:1px dashed var(--sep)}
 .shot span{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:11px;color:var(--dimmer);letter-spacing:1px}
 .shot.has .ph,.shot.has span{opacity:0}
@@ -271,15 +273,7 @@ button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.a
 <div class="stage"></div>
 
 <div class="phone">
-  <div class="statusbar">
-    <span id="clock">9:41</span>
-    <span class="icons">
-      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="6" width="3" height="6" rx="1"/><rect x="9" y="3" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
-      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0L8 11.2Zm0-4.4a6 6 0 0 0-4.3 1.8L2 6.9a8.5 8.5 0 0 1 12 0l-1.7 1.7A6 6 0 0 0 8 6.8Z"/></svg>
-      <span class="sb-bat"><i></i></span>
-    </span>
-  </div>
-  <div class="navbar" id="navbar"><b id="navTitle">Today</b></div>
+
 
   <div class="strip g" id="strip">
     <div class="strip-bar"><i id="stripBar"></i></div>
@@ -332,6 +326,11 @@ button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.a
       <button class="iconbtn g press" id="sheetMore" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg></button>
     </div>
     <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <div class="lb" id="lb" aria-hidden="true">
+    <img id="lbImg" alt="Screenshot">
+    <button class="lbx" id="lbClose" aria-label="Close">&#10005;</button>
   </div>
 
   <div class="loader" id="loader">
@@ -443,9 +442,16 @@ function imgCandidates(a){
   if(a.iconCand&&a.iconCand.length) return a.iconCand.filter(Boolean);
   return a.icon?[a.icon,a.iconAlt||''].filter(Boolean):[];
 }
+const IMG_REQ={};
 function imgTagFor(cands,cls){
   if(!cands||!cands.length) return '';
   const cached=IMG_DONE[cands[0]];
+  /* Fetch through the native cache immediately instead of waiting for the
+     WebView's own request to fail - the WebView request is the flaky one. */
+  if(hasNative&&!cached&&!IMG_REQ[cands[0]]){
+    IMG_REQ[cands[0]]=1;
+    try{Android.fetchImage(cands[0])}catch(e){}
+  }
   return '<img'+(cls?' class="'+cls+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
     ' onload="this.style.opacity=1;this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
 }
@@ -464,6 +470,19 @@ function imgFail(el){
   el.remove();
 }
 function applyImages(){
+  /* whenever a URL lands in the native cache, upgrade every <img> pointing at it */
+  for(const url in IMG_DONE){
+    const d=IMG_DONE[url];
+    const imgs=document.querySelectorAll('img[data-cand]');
+    for(let q=0;q<imgs.length;q++){
+      const im=imgs[q];
+      const c=(im.getAttribute('data-cand')||'').split('|')[0];
+      if(c===url&&im.getAttribute('src')!==d){
+        im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
+        if(im.parentNode) im.parentNode.classList.add('has');
+      }
+    }
+  }
   for(const url in IMG_WAIT){
     let d=IMG_DONE[url];
     if(!d){try{d=Android.imageData(url)}catch(e){d=''} if(!d) continue; IMG_DONE[url]=d}
@@ -850,9 +869,24 @@ $('#menuwrap').addEventListener('click',function(e){
   else if(k==='refresh') doRefresh();
 });
 
+/* ---------- full-screen screenshot viewer ---------- */
+function openLb(src){
+  if(!src) return;
+  const lb=$('#lb'); if(!lb) return;
+  $('#lbImg').src=src;
+  lb.classList.add('on');
+}
+function closeLb(){const lb=$('#lb');if(lb)lb.classList.remove('on')}
+
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
   const t=e.target;
+  const shot=t.closest&&t.closest('.shot');
+  if(shot){
+    const im=shot.querySelector('img');
+    if(im&&im.getAttribute('src')){openLb(im.getAttribute('src'));return}
+  }
+  if(t.id==='lb'||t.id==='lbImg'||(t.closest&&t.closest('#lbClose'))){closeLb();return}
   if(t.closest('[data-menu]')){openMenu();return}
   const catBtn=t.closest('[data-cat]');
   if(catBtn&&S.ready){
@@ -921,8 +955,6 @@ document.querySelectorAll('.view').forEach(function(v){
   },{passive:true});
 });
 window.addEventListener('error',function(ev){try{toast('Something went wrong: '+(ev.message||'unknown'))}catch(e){}});
-function tickClock(){const d=new Date();$('#clock').textContent=(d.getHours()%12||12)+':'+String(d.getMinutes()).padStart(2,'0')}
-tickClock();setInterval(tickClock,20000);
 (function(){
   const h=(location.hash||'').replace(/^#/,''); if(!h) return;
   if(h.indexOf('app/')===0){setTimeout(()=>openSheet(h.slice(4)),200);return}
