@@ -199,14 +199,29 @@ input{font-family:inherit}
 .pagebar .iconbtn{pointer-events:auto}
 .iconbtn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
 .iconbtn svg{width:19px;height:19px}
-/* ---------- depth: layers tilt against each other in 3D ---------- */
-:root{--dx:0;--dy:0;--amt:0}
-.phone{perspective:1100px}
-.tabbar{transform:translateZ(16px) rotateY(calc(var(--dx)*var(--amt)*6deg)) rotateX(calc(var(--dy)*var(--amt)*-6deg));
-  transform-style:preserve-3d}
-.hero,.bigcard{transform:translateZ(9px) rotateY(calc(var(--dx)*var(--amt)*8deg)) rotateX(calc(var(--dy)*var(--amt)*-8deg))}
-.navbar{transform:rotateY(calc(var(--dx)*var(--amt)*3deg)) rotateX(calc(var(--dy)*var(--amt)*-3deg))}
-.stage{transform:translate3d(calc(var(--dx)*var(--amt)*-18px),calc(var(--dy)*var(--amt)*-14px),0) scale(1.05)}
+/* ---------- depth: every surface sits at its own depth ----------
+   perspective() goes inside each transform so the effect does not depend on
+   an ancestor chain of preserve-3d, which would force a huge layer tree. */
+.hero,.bigcard,.row,.tile,.hcard,.chip,.searchbar,.mi,.ic,.tabbar,.navbar,
+.pagebar,.setrow,.stat,.shot,.pill,.pill2,.bigget,.get,.arc,.loadcard,.avatar,.get{
+  transform:perspective(700px)
+            rotateY(calc(var(--dx) * var(--amt) * var(--r,0deg)))
+            rotateX(calc(var(--dy) * var(--amt) * var(--r,0deg) * -1))
+            translateZ(calc(var(--z,0px) * var(--amt)))
+}
+/* near things lean more, far things barely move */
+.tabbar{--z:34px;--r:9deg}
+.hero,.bigcard{--z:26px;--r:11deg}
+.pagebar{--z:22px;--r:7deg}
+.navbar{--z:18px;--r:5deg}
+.chip,.searchbar,.mi,.tile,.hcard,.arc,.loadcard{--z:16px;--r:7deg}
+.row,.setrow,.stat{--z:10px;--r:4.5deg}
+.ic,.shot,.pill,.pill2,.bigget,.get,.avatar{--z:5px;--r:2.5deg}
+/* detail page content, without touching the sheet's own slide transform */
+.sheet-body>*{--z:14px;--r:5deg}
+/* the background drifts the other way, which is what sells the parallax */
+.stage{transform:translate3d(calc(var(--dx) * var(--amt) * -34px),
+                            calc(var(--dy) * var(--amt) * -30px),0) scale(1.08)}
 
 /* settings controls */
 .setrow{display:flex;align-items:center;gap:14px;padding:15px 2px;border-top:.5px solid var(--sep)}
