@@ -199,6 +199,28 @@ input{font-family:inherit}
 .pagebar .iconbtn{pointer-events:auto}
 .iconbtn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
 .iconbtn svg{width:19px;height:19px}
+/* ---------- depth: layers tilt against each other in 3D ---------- */
+:root{--dx:0;--dy:0;--amt:0}
+.phone{perspective:1100px}
+.tabbar{transform:translateZ(16px) rotateY(calc(var(--dx)*var(--amt)*6deg)) rotateX(calc(var(--dy)*var(--amt)*-6deg));
+  transform-style:preserve-3d}
+.hero,.bigcard{transform:translateZ(9px) rotateY(calc(var(--dx)*var(--amt)*8deg)) rotateX(calc(var(--dy)*var(--amt)*-8deg))}
+.navbar{transform:rotateY(calc(var(--dx)*var(--amt)*3deg)) rotateX(calc(var(--dy)*var(--amt)*-3deg))}
+.stage{transform:translate3d(calc(var(--dx)*var(--amt)*-18px),calc(var(--dy)*var(--amt)*-14px),0) scale(1.05)}
+
+/* settings controls */
+.setrow{display:flex;align-items:center;gap:14px;padding:15px 2px;border-top:.5px solid var(--sep)}
+.setrow:first-of-type{border-top:none}
+.setrow .meta b{font-size:15px}
+.setrow .meta small{font-size:12.5px;color:var(--dim);display:block;margin-top:2px}
+.sw{flex:0 0 auto;width:50px;height:30px;border-radius:15px;background:var(--fill);position:relative;transition:background .2s}
+.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.sw.on{background:var(--blue)}
+.sw.on i{transform:translateX(20px)}
+.rng{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--fill);outline:none;margin:10px 0 2px}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--blue);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
+.rngval{font-variant-numeric:tabular-nums;font-size:13px;color:var(--dim);text-align:right}
+
 /* full-screen screenshot viewer */
 .lb{position:absolute;inset:0;z-index:130;display:none;place-items:center;background:rgba(0,0,0,.96)}
 .lb.on{display:grid}
@@ -313,6 +335,7 @@ button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.a
   <div class="menuwrap" id="menuwrap">
     <div class="menu g">
       <button class="mi" data-m="theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"/></svg>Appearance</button>
+      <button class="mi" data-m="depth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 3 7.4l9 4.6 9-4.6z"/><path d="M3 12.2l9 4.6 9-4.6"/><path d="M3 16.9l9 4.6 9-4.6"/></svg>Depth</button>
       <button class="mi" data-m="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.4 3.6 7.7 12 12l8.4-4.3z"/><path d="M3.6 12.2 12 16.5l8.4-4.3"/><path d="M3.6 16.7 12 21l8.4-4.3"/></svg>Sources</button>
       <button class="mi" data-m="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>Refresh catalogue</button>
     </div>
@@ -869,6 +892,7 @@ $('#menuwrap').addEventListener('click',function(e){
     const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
     r.dataset.theme=dark?'light':'dark';toast(dark?'Light appearance':'Dark appearance');
   }else if(k==='src') openSources();
+  else if(k==='depth') openDepth();
   else if(k==='refresh') doRefresh();
 });
 
@@ -923,6 +947,88 @@ function doRefresh(){
   S.refreshing=true;$('#strip').classList.add('on');
   updateStrip({phase:'probe',pct:2,detail:'checking sources\u2026'});pollStart();B.load(true);
 }
+/* ---------- 4D depth ---------- */
+const DEPTH_KEY='liquid.depth';
+const D={on:true, amt:0.45, tilt:false, dx:0, dy:0, tx:0, ty:0, raf:0};
+function depthLoad(){
+  try{
+    const raw=localStorage.getItem(DEPTH_KEY);
+    if(raw){const o=JSON.parse(raw);if(typeof o.on==='boolean')D.on=o.on;if(typeof o.amt==='number')D.amt=o.amt;if(typeof o.tilt==='boolean')D.tilt=o.tilt}
+  }catch(e){}
+}
+function depthSave(){try{localStorage.setItem(DEPTH_KEY,JSON.stringify({on:D.on,amt:D.amt,tilt:D.tilt}))}catch(e){}}
+function depthApply(){
+  const r=document.documentElement;
+  r.style.setProperty('--amt', D.on ? String(D.amt) : '0');
+  if(!D.on){r.style.setProperty('--dx','0');r.style.setProperty('--dy','0')}
+}
+function depthFrame(){
+  D.raf=0;
+  const k=0.14;
+  D.dx+=(D.tx-D.dx)*k; D.dy+=(D.ty-D.dy)*k;
+  const r=document.documentElement;
+  r.style.setProperty('--dx',D.dx.toFixed(4));
+  r.style.setProperty('--dy',D.dy.toFixed(4));
+  if(Math.abs(D.tx-D.dx)>0.001||Math.abs(D.ty-D.dy)>0.001) D.raf=requestAnimationFrame(depthFrame);
+}
+function depthKick(){ if(!D.on) return; if(!D.raf) D.raf=requestAnimationFrame(depthFrame); }
+function depthPoint(nx,ny){
+  D.tx=Math.max(-1,Math.min(1,nx));
+  D.ty=Math.max(-1,Math.min(1,ny));
+  depthKick();
+}
+function depthInit(){
+  depthLoad(); depthApply();
+  /* touch / pointer: the whole screen becomes a window you look through */
+  document.addEventListener('pointermove',function(e){
+    if(!D.on||D.tilt) return;
+    depthPoint((e.clientX/window.innerWidth)*2-1,(e.clientY/window.innerHeight)*2-1);
+  },{passive:true});
+  document.addEventListener('pointerleave',function(){ if(D.on&&!D.tilt) depthPoint(0,0) },{passive:true});
+  /* device tilt, only when the user turns it on */
+  window.addEventListener('deviceorientation',function(e){
+    if(!D.on||!D.tilt) return;
+    if(e.gamma==null&&e.beta==null) return;
+    const g=Math.max(-35,Math.min(35,e.gamma||0))/35;
+    const b=Math.max(-35,Math.min(35,(e.beta||0)-45))/35;
+    depthPoint(g,b);
+  },{passive:true});
+}
+function openDepth(){
+  $('#sheetBody').innerHTML=
+    '<div class="sheet-head"><div style="flex:1"><h2>Depth</h2>'+
+      '<div class="cat">Layers tilt against each other as you move</div></div></div>'+
+    '<div class="desc">The tab bar, cards and background sit at different depths, so the screen tilts like a window when you drag or tilt the phone. Turn it down if it feels busy.</div>'+
+    '<div class="setrow"><div class="meta"><b>Enable depth</b><small>Off leaves everything flat</small></div>'+
+      '<div class="sw'+(D.on?' on':'')+'" id="dOn" role="switch" aria-checked="'+D.on+'"><i></i></div></div>'+
+    '<div class="setrow" style="display:block"><div class="meta"><b>Strength</b><small>How far the layers move</small></div>'+
+      '<input type="range" class="rng" id="dAmt" min="0" max="100" step="1" value="'+Math.round(D.amt*100)+'">'+
+      '<div class="rngval" id="dAmtVal">'+Math.round(D.amt*100)+'%</div></div>'+
+    '<div class="setrow"><div class="meta"><b>Follow device tilt</b><small>Use the phone&rsquo;s sensors instead of touch</small></div>'+
+      '<div class="sw'+(D.tilt?' on':'')+'" id="dTilt" role="switch" aria-checked="'+D.tilt+'"><i></i></div></div>'+
+    footer();
+  $('#sheet').classList.add('on');
+
+  $('#dOn').addEventListener('click',function(){
+    D.on=!D.on; this.classList.toggle('on',D.on); this.setAttribute('aria-checked',String(D.on));
+    depthApply(); depthSave(); if(!D.on){D.tx=0;D.ty=0;depthKick()}
+    toast(D.on?'Depth on':'Depth off');
+  });
+  $('#dTilt').addEventListener('click',function(){
+    D.tilt=!D.tilt; this.classList.toggle('on',D.tilt); this.setAttribute('aria-checked',String(D.tilt));
+    depthSave(); if(D.tilt){D.tx=0;D.ty=0;depthKick()}
+    toast(D.tilt?'Following device tilt':'Following touch');
+  });
+  const rng=$('#dAmt');
+  rng.addEventListener('input',function(){
+    D.amt=(+this.value)/100; $('#dAmtVal').textContent=this.value+'%';
+    depthApply(); depthKick();
+  });
+  rng.addEventListener('change',function(){depthSave()});
+}
+
+depthInit();
+
 function openSources(){
   const s=B.sources();
   const rows=s.list.map(m=>{
