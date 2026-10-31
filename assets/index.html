@@ -201,12 +201,15 @@ input{font-family:inherit}
 .iconbtn svg{width:19px;height:19px}
 /* ---------- depth: every surface sits at its own depth ----------
    perspective() goes inside each transform so the effect does not depend on
-   an ancestor chain of preserve-3d, which would force a huge layer tree. */
+   an ancestor chain of preserve-3d, which would force a huge layer tree.
+   Each layer reads the touch tilt (--dx/--dy) plus a slow ambient sway
+   (--ax/--ay), so the depth is visible even when nothing is being touched. */
 .hero,.bigcard,.row,.tile,.hcard,.chip,.searchbar,.mi,.ic,.tabbar,.navbar,
-.pagebar,.setrow,.stat,.shot,.pill,.pill2,.bigget,.get,.arc,.loadcard,.avatar,.get{
+.pagebar,.setrow,.stat,.shot,.pill,.pill2,.bigget,.get,.arc,.loadcard,.avatar,
+.sheet-body>*{
   transform:perspective(700px)
-            rotateY(calc(var(--dx) * var(--amt) * var(--r,0deg)))
-            rotateX(calc(var(--dy) * var(--amt) * var(--r,0deg) * -1))
+            rotateY(calc((var(--dx) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
+            rotateX(calc((var(--dy) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
             translateZ(calc(var(--z,0px) * var(--amt)))
 }
 /* near things lean more, far things barely move */
@@ -215,13 +218,18 @@ input{font-family:inherit}
 .pagebar{--z:22px;--r:7deg}
 .navbar{--z:18px;--r:5deg}
 .chip,.searchbar,.mi,.tile,.hcard,.arc,.loadcard{--z:16px;--r:7deg}
-.row,.setrow,.stat{--z:10px;--r:4.5deg}
+.row,.setrow,.stat,.sheet-body>*{--z:10px;--r:4.5deg}
 .ic,.shot,.pill,.pill2,.bigget,.get,.avatar{--z:5px;--r:2.5deg}
-/* detail page content, without touching the sheet's own slide transform */
-.sheet-body>*{--z:14px;--r:5deg}
-/* the background drifts the other way, which is what sells the parallax */
-.stage{transform:translate3d(calc(var(--dx) * var(--amt) * -34px),
-                            calc(var(--dy) * var(--amt) * -30px),0) scale(1.08)}
+/* the hero lags slightly behind the rows while the list scrolls */
+.hero,.bigcard{transform:perspective(700px)
+            rotateY(calc((var(--dx) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
+            rotateX(calc((var(--dy) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
+            translateZ(calc(var(--z,0px) * var(--amt)))
+            translateY(calc(var(--sy,0) * -0.05px))}
+/* the background drifts against everything else, and lags the scroll */
+.stage{transform:translate3d(calc((var(--dx) + var(--ax,0)) * var(--amt) * -34px),
+                            calc((var(--dy) + var(--ay,0)) * var(--amt) * -30px + var(--sy,0) * 0.08px),
+                            0) scale(1.08)}
 
 /* settings controls */
 .setrow{display:flex;align-items:center;gap:14px;padding:15px 2px;border-top:.5px solid var(--sep)}
@@ -807,6 +815,7 @@ window.__onBack=function(){
 
 /* ---------- tabs + liquid lens ---------- */
 function switchTab(v){
+  document.documentElement.style.setProperty('--sy','0');
   S.view=v;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='view-'+v));
@@ -1009,6 +1018,34 @@ function depthInit(){
     depthPoint(g,b);
   },{passive:true});
 }
+/* a slow, cheap sway so the depth is visible without touching the screen.
+   It only feeds the background and chrome, so the rows are never restyled. */
+var ambT=0, ambTimer=0;
+function ambientStart(){
+  if(ambTimer) return;
+  ambTimer=setInterval(function(){
+    if(!D.on||document.hidden) return;
+    ambT+=0.055;
+    const r=document.documentElement;
+    r.style.setProperty('--ax',(Math.sin(ambT)*0.30).toFixed(3));
+    r.style.setProperty('--ay',(Math.cos(ambT*0.73)*0.22).toFixed(3));
+  },50);
+}
+function ambientStop(){ if(ambTimer){clearInterval(ambTimer);ambTimer=0}
+  const r=document.documentElement; r.style.setProperty('--ax','0'); r.style.setProperty('--ay','0'); }
+
+/* scroll parallax: the background and hero lag behind the list */
+function bindScrollParallax(){
+  document.querySelectorAll('.view').forEach(function(v){
+    if(v.getAttribute('data-par')==='1') return;
+    v.setAttribute('data-par','1');
+    v.addEventListener('scroll',function(){
+      if(!D.on) return;
+      document.documentElement.style.setProperty('--sy', String(Math.min(v.scrollTop,400)));
+    },{passive:true});
+  });
+}
+
 function openDepth(){
   $('#sheetBody').innerHTML=
     '<div class="sheet-head"><div style="flex:1"><h2>Depth</h2>'+
@@ -1026,7 +1063,8 @@ function openDepth(){
 
   $('#dOn').addEventListener('click',function(){
     D.on=!D.on; this.classList.toggle('on',D.on); this.setAttribute('aria-checked',String(D.on));
-    depthApply(); depthSave(); if(!D.on){D.tx=0;D.ty=0;depthKick()}
+    depthApply(); depthSave(); if(!D.on){D.tx=0;D.ty=0;depthKick();ambientStop()}
+    else ambientStart();
     toast(D.on?'Depth on':'Depth off');
   });
   $('#dTilt').addEventListener('click',function(){
@@ -1043,6 +1081,8 @@ function openDepth(){
 }
 
 depthInit();
+ambientStart();
+bindScrollParallax();
 
 function openSources(){
   const s=B.sources();
