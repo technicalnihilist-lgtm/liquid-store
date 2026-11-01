@@ -56,6 +56,8 @@ public class StoreBridge {
     private final ExecutorService io = Executors.newFixedThreadPool(3);
     private final Handler main = new Handler(Looper.getMainLooper());
     private final File workDir;
+    /** the image cache directory and its byte budget */
+    private final ImageCache images;
 
     private volatile IndexLoader.Repo repo;
     /** swapped wholesale as batches arrive, so readers always see a whole catalogue */
@@ -86,7 +88,16 @@ public class StoreBridge {
         this.ctx = ctx;
         this.web = web;
         this.workDir = new File(ctx.getFilesDir(), "repo");
+        this.images = new ImageCache(imageDir());
         INSTANCE = this;
+        /* An install that has been around a while may already have filled the
+           image cache past the budget, so shrink it once - off the main thread,
+           because it is a directory scan. */
+        io.execute(new Runnable() {
+            public void run() {
+                try { images.checkNow(); } catch (Throwable ignored) { }
+            }
+        });
     }
 
     // ------------------------------------------------------------ catalogue
@@ -830,11 +841,15 @@ public class StoreBridge {
 
     // ------------------------------------------------------------ image cache
 
-    /** Bytes fetched for an image the WebView could not load itself. */
-    private File imageFile(String url) {
+    private File imageDir() {
         File d = new File(ctx.getCacheDir(), "img");
         if (!d.exists()) d.mkdirs();
-        return new File(d, sha1(url) + ".bin");
+        return d;
+    }
+
+    /** Bytes fetched for an image the WebView could not load itself. */
+    private File imageFile(String url) {
+        return new File(imageDir(), sha1(url) + ".bin");
     }
 
     @JavascriptInterface
@@ -876,6 +891,9 @@ public class StoreBridge {
                             if (tmp.length() == 0) throw new IOException("empty image");
                             if (!tmp.renameTo(f)) throw new IOException("could not store image");
                             stored = true;
+                            /* keep the directory inside its budget - this is
+                               the only place bytes are added to it */
+                            images.stored(f.length());
                         } finally {
                             try { in.close(); } catch (IOException ignored) { }
                             if (!stored) { try { tmp.delete(); } catch (Throwable ignored) { } }
