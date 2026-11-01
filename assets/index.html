@@ -661,8 +661,13 @@ function renderArcade(){
   h+=all.apps.length?all.apps.map((a,i)=>rowHtml(a,i+1)).join(''):emptyRow();
   $('#view-arcade').innerHTML=h;
 }
-function renderCategoryView(view){
+function renderCategoryView(view,keep){
   const page=S.pages[view+':']||(S.pages[view+':']={offset:0,done:false});
+  /* keep: re-draw for a state change (install progress, install result) and put
+     back every page the user had already scrolled to. Without it a single
+     progress tick threw away the paginated list and dropped the reader back to
+     the first 40 rows. */
+  const want=keep?page.offset:0;
   let h=head(view==='games'?'Games':'Apps');
   if(view==='apps'){
     const cats=B.categories();
@@ -673,11 +678,13 @@ function renderCategoryView(view){
   h+=`<div class="sec ${view==='apps'?'':'first'}"><h2>${view==='games'?'Top Games':(S.category?esc(S.category):'All Apps')}</h2><span data-count></span></div><div data-listbox></div>`;
   const el=$('#view-'+view); el.innerHTML=h;
   page.offset=0;page.done=false;
-  loadMore(view,cat,el.querySelector('[data-listbox]'),el.querySelector('[data-count]'),page,true);
+  loadMore(view,cat,el.querySelector('[data-listbox]'),el.querySelector('[data-count]'),page,true,want);
 }
-function loadMore(view,cat,box,label,page,replace){
+function loadMore(view,cat,box,label,page,replace,want){
   if(!box||page.done) return;
-  const r=B.list('',cat,'name',page.offset,40);
+  /* one call for the whole restored range, not one per page */
+  const limit=want&&want>40?want:40;
+  const r=B.list('',cat,'name',page.offset,limit);
   if(label) label.textContent=r.total+(r.total===1?' app':' apps');
   if(replace) box.innerHTML='';
   if(r.apps.length===0&&page.offset===0) box.innerHTML='<div class="empty">No apps in this category.</div>';
@@ -778,7 +785,7 @@ function refreshVisible(){
   if(S.view==='today') renderToday();
   else if(S.view==='search') runSearch();
   else if(S.view==='arcade') renderArcade();
-  else renderCategoryView(S.view);
+  else renderCategoryView(S.view,true);
   const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
   if(S.sheetPkg) renderSheetActions(B.detail(S.sheetPkg));
 }
