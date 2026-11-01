@@ -769,10 +769,37 @@ function showPermission(){
   if(b) b.addEventListener('click',()=>{B.requestInstallPermission();toast('Turn on "Allow from this source", then press Get again.')});
   $('#sheet').classList.add('on');
 }
+/* One progress tick changes exactly one control: the ring on that package's
+   Get button, and - if its detail page happens to be open - the fill of its
+   pill. refreshVisible() rebuilt the entire visible list for that, so every
+   half second of a download threw away and re-created every loaded row (and
+   re-queried the catalogue behind it): 250 ms per tick over 240 rows on a
+   throttled CPU, i.e. the list froze for the length of the download. Patch
+   the two controls in place instead - same markup getBtnHtml() would emit,
+   so nothing visual differs. */
+function paintProgress(pkg){
+  const inst=S.installing[pkg]; if(!inst) return;
+  const html=getBtnHtml({pkg:pkg});
+  const nodes=document.querySelectorAll('[data-detail]');
+  for(let i=0;i<nodes.length;i++){
+    const el=nodes[i];
+    if(el.getAttribute('data-detail')!==pkg) continue;
+    const btn=el.querySelector('.get');
+    if(btn) btn.outerHTML=html;
+  }
+  if(S.sheetPkg===pkg){
+    const pill=document.querySelector('#sheetActions [data-busy]');
+    if(pill){
+      const fill=pill.querySelector('.fill'), lbl=pill.querySelector('span:last-child');
+      if(fill) fill.style.width=inst.pct+'%';
+      if(lbl) lbl.textContent=inst.pct+'%';
+    }
+  }
+}
 function pollInstall(){
   if(!hasNative) return;
   const p=B.progress(); if(!p.pkg) return;
-  if(p.phase==='download'||p.phase==='installing'){S.installing[p.pkg]={pct:p.pct};refreshVisible()}
+  if(p.phase==='download'||p.phase==='installing'){S.installing[p.pkg]={pct:p.pct};paintProgress(p.pkg)}
   else if(p.phase==='success'){delete S.installing[p.pkg];toast('Installed - open it any time');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
   else if(p.phase==='failed'){delete S.installing[p.pkg];toast(p.error||'Install failed');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
 }
