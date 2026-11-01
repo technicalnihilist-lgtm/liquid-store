@@ -612,7 +612,7 @@ public class StoreBridge {
             if (a == null) {
                 w.name("ok").value(false);
                 w.name("error").value("That app is not in the catalogue.");
-            } else if (!"idle".equals(insPhase) && !"failed".equals(insPhase)) {
+            } else if (installBusy()) {
                 w.name("ok").value(false);
                 w.name("error").value("Another install is already running.");
             } else if (!canInstallNow()) {
@@ -627,6 +627,20 @@ public class StoreBridge {
         } catch (IOException ignored) {
         }
         return sw.toString();
+    }
+
+    /**
+     * True only while a session is genuinely in flight. The old guard asked
+     * whether the phase was neither "idle" nor "failed", which is also true
+     * of "success" - so the first completed install latched the bridge into a
+     * state where every later install was refused with "Another install is
+     * already running" until the app was restarted. Block on the live phases
+     * instead, and let the terminal ones start a new session.
+     */
+    private boolean installBusy() {
+        return "download".equals(insPhase)
+                || "installing".equals(insPhase)
+                || "confirm".equals(insPhase);
     }
 
     private boolean canInstallNow() {
