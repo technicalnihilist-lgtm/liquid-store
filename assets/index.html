@@ -484,7 +484,10 @@ function iconEl(a,cls){
   const c=pair(a.pkg), letter=esc((a.name||a.pkg||'?').trim().charAt(0).toUpperCase());
   return `<div class="ic ${cls||''}" style="background:linear-gradient(145deg,${c[0]},${c[1]})"><span class="ltr">${letter}</span>${imgTag(a)}</div>`;
 }
-const IMG_WAIT={}, IMG_DONE={};
+const IMG_WAIT={};
+/* Bytes we have already fetched for an image, as data URIs, most recently used
+   last. Bounded: see imgCachePut(). */
+const IMG_DONE=new Map();
 /* How long a parked icon may keep costing us a bridge call. Longer than the
    native fetch can possibly take (8s connect + 15s read), so a slow icon is
    never dropped while it is still downloading. */
@@ -500,19 +503,49 @@ const IMG_REQ={};
    on has already reported, and any parked URL with nothing in the cache is
    dead for good. */
 let IMG_REQ_N=0, IMG_EV_N=0;
+/* The cache used to be a plain object that only ever grew: every icon and every
+   screenshot the WebView failed to load was decoded once through the bridge and
+   then held as a base64 data URI for the rest of the session. Nothing evicted it,
+   and a screenshot is up to 900 KB of bytes - 1.2 M characters of string - so
+   browsing twenty app pages left 40 MB of image data resident, with no ceiling
+   however long the store stayed open. It is now an LRU with a byte budget: the
+   images on screen stay, the ones scrolled past are dropped. Nothing visual
+   changes - a dropped URL simply takes the same path it took the first time it
+   was shown, which re-reads it from the native file cache on the next render. */
+const IMG_DONE_MAX=6*1024*1024;
+let IMG_DONE_BYTES=0;
+function imgCacheGet(url){
+  const d=IMG_DONE.get(url);
+  if(d===undefined) return '';
+  IMG_DONE.delete(url);IMG_DONE.set(url,d);      /* most recently used goes last */
+  return d;
+}
+function imgCachePut(url,d){
+  const old=IMG_DONE.get(url);
+  if(old!==undefined){IMG_DONE_BYTES-=old.length;IMG_DONE.delete(url)}
+  IMG_DONE.set(url,d);IMG_DONE_BYTES+=d.length;
+  while(IMG_DONE_BYTES>IMG_DONE_MAX&&IMG_DONE.size>1){
+    const k=IMG_DONE.keys().next().value;
+    IMG_DONE_BYTES-=IMG_DONE.get(k).length;
+    IMG_DONE.delete(k);
+    /* forget that we ever asked, so a later render can ask again instead of
+       being told the URL is already spoken for */
+    delete IMG_REQ[k];
+  }
+}
 /* One request per URL, ever. Both the renderer and imgFail want the same icon
    and the same icon is drawn in several places (big card, row, detail sheet),
    so asking unconditionally meant a dozen parallel downloads of one file. The
    native cache writes each URL to a single temp path, so those parallel
    downloads clobbered each other and left a truncated icon cached for good. */
 function requestImage(url){
-  if(!hasNative||!url||IMG_DONE[url]||IMG_REQ[url]) return;
+  if(!hasNative||!url||IMG_DONE.has(url)||IMG_REQ[url]) return;
   IMG_REQ[url]=1;IMG_REQ_N++;
   try{Android.fetchImage(url)}catch(e){}
 }
 function imgTagFor(cands,cls){
   if(!cands||!cands.length) return '';
-  const cached=IMG_DONE[cands[0]];
+  const cached=imgCacheGet(cands[0]);
   /* Fetch through the native cache immediately instead of waiting for the
      WebView's own request to fail - the WebView request is the flaky one. */
   if(!cached) requestImage(cands[0]);
@@ -532,6 +565,13 @@ function imgFail(el){
     const w=IMG_WAIT[url]||(IMG_WAIT[url]={els:[],at:Date.now()});
     w.els.push(el);
     requestImage(url);
+    /* The fetch can finish before the <img> has got through its own candidate
+       chain, in which case its 'image' event has already been consumed and no
+       later one is coming for this URL - the icon would stay blank until some
+       unrelated image happened to arrive. If nothing is still outstanding, do
+       the lookup now; applyImages() parks nothing and either fills the element
+       or retires the wait exactly as a real event would. */
+    if(IMG_EV_N>=IMG_REQ_N) applyImages();
     return;
   }
   el.remove();
@@ -546,7 +586,7 @@ function applyImages(){
     const im=imgs[q];
     if(im.getAttribute('data-native')==='2') continue;
     const c=(im.getAttribute('data-cand')||'').split('|')[0];
-    const d=IMG_DONE[c];
+    const d=imgCacheGet(c);
     if(!d) continue;
     im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
     if(im.parentNode) im.parentNode.classList.add('has');
@@ -554,7 +594,7 @@ function applyImages(){
   const now=Date.now(), settled=IMG_EV_N>=IMG_REQ_N;
   for(const url in IMG_WAIT){
     const w=IMG_WAIT[url];
-    let d=IMG_DONE[url];
+    let d=imgCacheGet(url);
     if(!d){
       try{d=Android.imageData(url)}catch(e){d=''}
       if(!d){
@@ -574,7 +614,7 @@ function applyImages(){
         }
         continue;
       }
-      IMG_DONE[url]=d;
+      imgCachePut(url,d);
     }
     const els=w.els;
     for(let k=0;k<els.length;k++){
