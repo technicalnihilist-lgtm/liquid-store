@@ -485,11 +485,21 @@ function iconEl(a,cls){
   return `<div class="ic ${cls||''}" style="background:linear-gradient(145deg,${c[0]},${c[1]})"><span class="ltr">${letter}</span>${imgTag(a)}</div>`;
 }
 const IMG_WAIT={}, IMG_DONE={};
+/* How long a parked icon may keep costing us a bridge call. Longer than the
+   native fetch can possibly take (8s connect + 15s read), so a slow icon is
+   never dropped while it is still downloading. */
+const IMG_WAIT_MS=30000;
 function imgCandidates(a){
   if(a.iconCand&&a.iconCand.length) return a.iconCand.filter(Boolean);
   return a.icon?[a.icon,a.iconAlt||''].filter(Boolean):[];
 }
 const IMG_REQ={};
+/* Every requestImage() call makes exactly one fetchImage(), and the bridge
+   answers each one with exactly one 'image' event - on failure too. So when
+   the events seen catch up with the requests made, every fetch we are waiting
+   on has already reported, and any parked URL with nothing in the cache is
+   dead for good. */
+let IMG_REQ_N=0, IMG_EV_N=0;
 /* One request per URL, ever. Both the renderer and imgFail want the same icon
    and the same icon is drawn in several places (big card, row, detail sheet),
    so asking unconditionally meant a dozen parallel downloads of one file. The
@@ -497,7 +507,7 @@ const IMG_REQ={};
    downloads clobbered each other and left a truncated icon cached for good. */
 function requestImage(url){
   if(!hasNative||!url||IMG_DONE[url]||IMG_REQ[url]) return;
-  IMG_REQ[url]=1;
+  IMG_REQ[url]=1;IMG_REQ_N++;
   try{Android.fetchImage(url)}catch(e){}
 }
 function imgTagFor(cands,cls){
@@ -517,13 +527,17 @@ function imgFail(el){
   if(i+1<cands.length){el.setAttribute('data-i',String(i+1));el.src=cands[i+1];return}
   const url=cands[0]||el.src;
   if(url&&el.getAttribute('data-native')!=='1'&&hasNative){
-    el.setAttribute('data-native','1');(IMG_WAIT[url]=IMG_WAIT[url]||[]).push(el);
+    el.setAttribute('data-native','1');
+    /* each parked URL remembers when it was parked, so a wait can expire */
+    const w=IMG_WAIT[url]||(IMG_WAIT[url]={els:[],at:Date.now()});
+    w.els.push(el);
     requestImage(url);
     return;
   }
   el.remove();
 }
 function applyImages(){
+  IMG_EV_N++;
   /* One pass over the images. Scanning the document once per cached URL made
      this quadratic - with a hundred cached icons it ran a hundred full DOM
      queries for every single image that arrived. */
@@ -537,10 +551,32 @@ function applyImages(){
     im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
     if(im.parentNode) im.parentNode.classList.add('has');
   }
+  const now=Date.now(), settled=IMG_EV_N>=IMG_REQ_N;
   for(const url in IMG_WAIT){
+    const w=IMG_WAIT[url];
     let d=IMG_DONE[url];
-    if(!d){try{d=Android.imageData(url)}catch(e){d=''} if(!d) continue; IMG_DONE[url]=d}
-    const els=IMG_WAIT[url];
+    if(!d){
+      try{d=Android.imageData(url)}catch(e){d=''}
+      if(!d){
+        /* Nothing cached. Retire the wait instead of polling it for the life
+           of the page: imageData is a synchronous bridge call (a file stat on
+           the device), and a mirror that has no icon for an app never answers,
+           so every dead URL used to stay in this table for good and cost one
+           call per image event - quadratic in the number of missing icons. A
+           re-render also left the detached <img> parked here. */
+        let live=0;
+        for(let k=0;k<w.els.length;k++) if(w.els[k].parentNode) live++;
+        if(!live||settled||now-w.at>IMG_WAIT_MS){delete IMG_WAIT[url];continue}
+        if(live!==w.els.length){
+          const keep=[];
+          for(let k=0;k<w.els.length;k++) if(w.els[k].parentNode) keep.push(w.els[k]);
+          w.els=keep;
+        }
+        continue;
+      }
+      IMG_DONE[url]=d;
+    }
+    const els=w.els;
     for(let k=0;k<els.length;k++){
       const el=els[k]; el.setAttribute('data-native','2'); el.style.opacity=1;
       if(el.parentNode) el.parentNode.classList.add('has'); el.src=d;
