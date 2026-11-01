@@ -838,23 +838,34 @@ public class StoreBridge {
                             ((java.net.HttpURLConnection) c).setRequestProperty("User-Agent", "LiquidStore/2.2");
                         }
                         InputStream in = new BufferedInputStream(c.getInputStream(), 1 << 15);
-                        File tmp = new File(f.getPath() + ".part");
-                        OutputStream out = new FileOutputStream(tmp);
+                        /* A temp file per fetch, not one shared name per URL: two
+                           downloads of the same image used to write the same path at
+                           once, and whichever renamed first left a truncated file in
+                           the cache that was then served forever. */
+                        File tmp = File.createTempFile("img", ".part", f.getParentFile());
+                        boolean stored = false;
                         try {
-                            byte[] buf = new byte[1 << 15];
-                            int n;
-                            long total = 0;
-                            while ((n = in.read(buf)) > 0) {
-                                total += n;
-                                if (total > 900 * 1024) throw new IOException("image too large");
-                                out.write(buf, 0, n);
+                            OutputStream out = new FileOutputStream(tmp);
+                            try {
+                                byte[] buf = new byte[1 << 15];
+                                int n;
+                                long total = 0;
+                                while ((n = in.read(buf)) > 0) {
+                                    total += n;
+                                    if (total > 900 * 1024) throw new IOException("image too large");
+                                    out.write(buf, 0, n);
+                                }
+                                out.flush();
+                            } finally {
+                                try { out.close(); } catch (IOException ignored) { }
                             }
+                            if (tmp.length() == 0) throw new IOException("empty image");
+                            if (!tmp.renameTo(f)) throw new IOException("could not store image");
+                            stored = true;
                         } finally {
-                            try { out.close(); } catch (IOException ignored) { }
                             try { in.close(); } catch (IOException ignored) { }
+                            if (!stored) { try { tmp.delete(); } catch (Throwable ignored) { } }
                         }
-                        if (f.exists() && !f.delete()) { /* replaced below */ }
-                        if (!tmp.renameTo(f)) throw new IOException("could not store image");
                     }
                 } catch (Throwable ignored) {
                 }
