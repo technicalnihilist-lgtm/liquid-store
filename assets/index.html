@@ -898,7 +898,10 @@ function switchTab(v){
   $('#navTitle').textContent=TITLES[v];
   const cur=document.querySelector('.view.on');
   $('#navbar').classList.toggle('show',!!cur&&cur.scrollTop>50);
-  setScrollOffset(D.on?cur:null);       /* the offset belongs to the view now on screen */
+  /* the offset belongs to the view now on screen: drop any frame still queued
+     for the view we just left and write this one straight away */
+  if(syRaf){cancelAnimationFrame(syRaf);syRaf=0;syEl=null}
+  setScrollOffset(D.on?cur:null);
   moveLens(false);                      /* lens first, so the slide never waits on rendering */
   requestAnimationFrame(function(){setTimeout(function(){
     if(S.view!==v) return;
@@ -1118,12 +1121,29 @@ function ambientStop(){ if(ambTimer){clearInterval(ambTimer);ambTimer=0}
    value that had not changed. Remember what was last written and skip the
    no-op. Same helper on a tab switch, so the offset always belongs to the
    view that is actually on screen. */
-let syLast=null;
+let syLast=null, syRaf=0, syEl=null;
 function setScrollOffset(v){
   const sy=String(Math.min(v?Math.max(0,v.scrollTop):0,400));
   if(sy===syLast) return;
   syLast=sy;
   document.documentElement.style.setProperty('--sy',sy);
+}
+/* A scroll gesture fires many events per frame and every write of --sy on
+   :root invalidates style for the whole document. Written straight from the
+   scroll handler, that write sat between the pagination handler's geometry
+   reads (clientHeight / scrollHeight), so each of those reads forced a full
+   style recalc plus layout of every row on screen - roughly 5 ms an event on
+   a desktop CPU, i.e. tens of ms on a phone, for a value the browser can only
+   paint once a frame anyway. Coalesce to a single read and write per frame:
+   the parallax lands on exactly the same numbers, at the rate it is drawn. */
+function queueScrollOffset(v){
+  syEl=v;
+  if(syRaf) return;
+  syRaf=requestAnimationFrame(function(){
+    syRaf=0;
+    const el=syEl; syEl=null;
+    setScrollOffset(el);
+  });
 }
 /* scroll parallax: the background and hero lag behind the list */
 function bindScrollParallax(){
@@ -1132,7 +1152,7 @@ function bindScrollParallax(){
     v.setAttribute('data-par','1');
     v.addEventListener('scroll',function(){
       if(!D.on) return;
-      setScrollOffset(v);
+      queueScrollOffset(v);
     },{passive:true});
   });
 }
