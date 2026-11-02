@@ -901,7 +901,7 @@ function paintNow(force){
   const now=Date.now(); if(!force&&now-lastPaint<400) return; lastPaint=now;
   if(S.view==='search') return;
   const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
-  if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(); else renderCategoryView(S.view);
+  if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(); else renderCategoryView(S.view,true);
   const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
 }
 let readyAt=0;
