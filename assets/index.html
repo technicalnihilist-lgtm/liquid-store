@@ -728,11 +728,13 @@ function renderCategoryView(view,keep){
   page.offset=0;page.done=false;
   loadMore(view,cat,el.querySelector('[data-listbox]'),el.querySelector('[data-count]'),page,true,want);
 }
-function loadMore(view,cat,box,label,page,replace,want){
+function loadMore(view,cat,box,label,page,replace,want,q,sort){
   if(!box||page.done) return;
   /* one call for the whole restored range, not one per page */
   const limit=want&&want>40?want:40;
-  const r=B.list('',cat,'name',page.offset,limit);
+  /* q/sort are only supplied by search, which pages by relevance against a
+     live query; the catalogue views keep sorting by name with no filter */
+  const r=B.list(q||'',cat,sort||'name',page.offset,limit);
   if(label) label.textContent=r.total+(r.total===1?' app':' apps');
   if(replace) box.innerHTML='';
   if(r.apps.length===0&&page.offset===0) box.innerHTML='<div class="empty">No apps in this category.</div>';
@@ -745,17 +747,53 @@ function renderSearch(){
     <input id="searchInput" placeholder="Apps, games and more" autocomplete="off" spellcheck="false" value="${esc(S.query)}"></div><div id="searchOut"></div>`;
   const input=$('#searchInput');
   input.addEventListener('input',()=>{S.query=input.value;runSearch()});
+  /* opening the tab starts at the top of the results, not where the last
+     visit left off - the same thing switchTab does to the catalogue views */
+  const sp=S.pages['search:']; if(sp) sp.q=null;
   runSearch();
   if(S.focusSearch){setTimeout(()=>input.focus(),80);S.focusSearch=false}
 }
+/* Search asked for one page of sixty and then stopped: the heading reported
+   the true match count while the list under it held sixty rows and offered no
+   way to reach the rest, so a query matching four hundred apps silently lost
+   eight hits in every nine - and the reader had no sign anything was missing.
+   It now pages in like Games and Apps do, against the same relevance order.
+
+   A re-render for the same query puts back the pages already scrolled to, so
+   an install tick or a returning tab no longer drops the reader back to the
+   first page; a different query starts again at the top. */
 function runSearch(){
   const out=$('#searchOut'); if(!out) return;
   const q=S.query.trim();
-  if(!q){out.innerHTML=`<div class="sec first"><h2>Popular Right Now</h2></div>`+B.list('','','updated',0,8).apps.map(a=>rowHtml(a)).join('');return}
-  const r=B.list(q,'','relevance',0,60);
-  if(!r.apps.length){out.innerHTML=`<div class="empty">No results for &ldquo;${esc(q)}&rdquo;.<br>Try &ldquo;player&rdquo;, &ldquo;keyboard&rdquo; or &ldquo;reader&rdquo;.</div>`;return}
-  out.innerHTML=`<div class="sec first"><h2>${r.total} Result${r.total===1?'':'s'}</h2></div>`+r.apps.map(a=>rowHtml(a)).join('');
+  const page=S.pages['search:']||(S.pages['search:']={offset:0,done:false,q:''});
+  if(!q){
+    page.offset=0;page.done=true;page.q='';
+    out.innerHTML=`<div class="sec first"><h2>Popular Right Now</h2></div>`+B.list('','','updated',0,8).apps.map(a=>rowHtml(a)).join('');
+    searchTop();
+    return;
+  }
+  const changed=page.q!==q;
+  const want=changed?0:page.offset;
+  page.q=q;page.offset=0;page.done=false;
+  const first=B.list(q,'','relevance',0,Math.max(60,want));
+  if(!first.apps.length){
+    page.done=true;
+    out.innerHTML=`<div class="empty">No results for &ldquo;${esc(q)}&rdquo;.<br>Try &ldquo;player&rdquo;, &ldquo;keyboard&rdquo; or &ldquo;reader&rdquo;.</div>`;
+    return;
+  }
+  out.innerHTML=`<div class="sec first"><h2>${first.total} Result${first.total===1?'':'s'}</h2></div><div data-listbox></div>`;
+  const box=out.querySelector('[data-listbox]');
+  box.insertAdjacentHTML('beforeend',first.apps.map(a=>rowHtml(a)).join(''));
+  page.offset=first.apps.length;
+  if(page.offset>=first.total) page.done=true;
+  /* A new query must be read from its first result. The list is rebuilt in
+     place, so the view kept the offset of the previous query's list - type a
+     new search while scrolled to the bottom and you landed in the middle of
+     the new matches, with the scroll handler firing straight away and pulling
+     in a page nobody asked for. */
+  if(changed) searchTop();
 }
+function searchTop(){const v=$('#view-search');if(v) v.scrollTop=0}
 
 /* ---------- detail page ---------- */
 function openSheet(pkg){
@@ -1271,10 +1309,18 @@ document.querySelectorAll('.view').forEach(function(v){
     if(!S.ready) return;
     if(v.scrollTop+v.clientHeight<v.scrollHeight-400) return;
     const view=v.id.replace('view-','');
-    if(view!=='games'&&view!=='apps') return;
-    const cat=view==='games'?'Games':S.category;
+    if(view!=='games'&&view!=='apps'&&view!=='search') return;
     const page=S.pages[view+':'], box=v.querySelector('[data-listbox]'), label=v.querySelector('[data-count]');
-    if(page&&box) loadMore(view,cat,box,label,page,false);
+    if(!page||!box) return;
+    if(view==='search'){
+      /* only extend a list that belongs to the query still in the box */
+      const q=S.query.trim();
+      if(!q||page.q!==q) return;
+      loadMore(view,'',box,label,page,false,0,q,'relevance');
+      return;
+    }
+    const cat=view==='games'?'Games':S.category;
+    loadMore(view,cat,box,label,page,false,0,'','name');
   },{passive:true});
 });
 window.addEventListener('error',function(ev){try{toast('Something went wrong: '+(ev.message||'unknown'))}catch(e){}});
