@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Everything the store UI is allowed to do, exposed to JavaScript as
@@ -72,9 +73,16 @@ public class StoreBridge {
     private volatile String error;
     private volatile boolean cancelRequested;
 
+    /** how long a package snapshot is trusted before it is scanned again */
+    private static final long INSTALLED_TTL_MS = 8000;
+
     /** swapped wholesale on refresh, so readers never see a half-built map */
     private volatile Map<String, Long> installed = new HashMap<String, Long>();
     private volatile long installedAt;
+    /** one scan at a time, however many callers arrive in the same window */
+    private final AtomicBoolean scanInFlight = new AtomicBoolean(false);
+    /** a forced refresh that arrived while a scan was running is not lost */
+    private volatile boolean rescanWanted;
 
     // install state
     private volatile String insPkg;
@@ -90,6 +98,9 @@ public class StoreBridge {
         this.workDir = new File(ctx.getFilesDir(), "repo");
         this.images = new ImageCache(imageDir());
         INSTANCE = this;
+        /* Start the package scan now, off the caller's thread, so the first
+           list() already has a snapshot to draw from. */
+        refreshInstalled(true);
         /* An install that has been around a while may already have filled the
            image cache past the budget, so shrink it once - off the main thread,
            because it is a directory scan. */
@@ -530,20 +541,66 @@ public class StoreBridge {
 
     // ------------------------------------------------------------ installed
 
+    /**
+     * Keep the installed map fresh without doing the work on a caller's thread.
+     *
+     * list() and detail() are called from JavaScript, so this used to run
+     * PackageManager.getInstalledPackages() - a binder call that walks every
+     * package on the device, hundreds of them once QUERY_ALL_PACKAGES is
+     * granted - synchronously inside the call that serves the WebView. The
+     * page is frozen for the whole enumeration, because the bridge answers
+     * only when the method returns: a 65-second session issues about 106
+     * list() and 18 detail() calls, and the eight-second window let nine full
+     * enumerations run in that time. Each one stalled whatever the reader was
+     * doing - a scroll, a search keystroke, opening an app page.
+     *
+     * Nothing on screen needs it synchronously. The map is only read to draw
+     * an Installed/Update badge, and it was already allowed to be eight
+     * seconds stale. So the scan runs on the io pool, one at a time, readers
+     * keep the previous snapshot until the new one is swapped in, and the UI is
+     * told to redraw only when the snapshot actually changed.
+     */
     private void refreshInstalled(boolean force) {
         long now = System.currentTimeMillis();
-        if (!force && now - installedAt < 8000) return;
+        if (!force && now - installedAt < INSTALLED_TTL_MS) return;
         installedAt = now;
+        if (!scanInFlight.compareAndSet(false, true)) {
+            /* a forced refresh must not be swallowed by the scan already
+               running - it may have started before the package landed */
+            if (force) rescanWanted = true;
+            return;
+        }
+        io.execute(new Runnable() {
+            public void run() {
+                Map<String, Long> m = scanInstalled();
+                if (m != null) {
+                    boolean changed = !m.equals(installed);
+                    installed = m;
+                    if (changed) push("installed");
+                }
+                scanInFlight.set(false);
+                if (rescanWanted) {
+                    rescanWanted = false;
+                    installedAt = 0;
+                    refreshInstalled(true);
+                }
+            }
+        });
+    }
+
+    /** Every installed package and its version code, or null if it cannot be read. */
+    private Map<String, Long> scanInstalled() {
         try {
             PackageManager pm = ctx.getPackageManager();
             List<PackageInfo> ps = pm.getInstalledPackages(0);
-            Map<String, Long> m = new HashMap<String, Long>();
+            Map<String, Long> m = new HashMap<String, Long>(Math.max(16, ps.size() * 2));
             for (PackageInfo pi : ps) {
                 long vc = Build.VERSION.SDK_INT >= 28 ? pi.getLongVersionCode() : pi.versionCode;
                 m.put(pi.packageName, vc);
             }
-            installed = m;
+            return m;
         } catch (Throwable ignored) {
+            return null;
         }
     }
 
