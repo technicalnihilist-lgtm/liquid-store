@@ -343,8 +343,9 @@ public class StoreBridge {
         for (AppEntry a : source.values()) {
             if (category.length() > 0 && !category.equalsIgnoreCase(a.category)) continue;
             if (needle.length() > 0) {
-                String hay = (a.displayName() + " " + a.pkg + " " + a.summary + " " + a.category).toLowerCase(Locale.US);
-                if (!hay.contains(needle)) continue;
+                /* one lowercase haystack per entry, built once and reused -
+                   see AppEntry.haystack() */
+                if (!a.haystack().contains(needle)) continue;
             }
             out.add(a);
         }
