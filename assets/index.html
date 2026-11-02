@@ -570,14 +570,22 @@ function imgFail(el){
        later one is coming for this URL - the icon would stay blank until some
        unrelated image happened to arrive. If nothing is still outstanding, do
        the lookup now; applyImages() parks nothing and either fills the element
-       or retires the wait exactly as a real event would. */
-    if(IMG_EV_N>=IMG_REQ_N) applyImages();
+       or retires the wait exactly as a real event would. Pass false: no event
+       has arrived here, and counting one anyway is what broke this. */
+    if(IMG_EV_N>=IMG_REQ_N) applyImages(false);
     return;
   }
   el.remove();
 }
-function applyImages(){
-  IMG_EV_N++;
+/* `countEvent` is false only for the pass imgFail() runs on its own behalf.
+   Every other caller is the bridge reporting a finished fetch, so it is one
+   event. Counting the manual pass as well left IMG_EV_N permanently ahead of
+   IMG_REQ_N, and since the retirement test below is IMG_EV_N>=IMG_REQ_N it
+   then read as "every fetch has reported" for the rest of the session: each
+   later parked icon was dropped while its bytes were still in flight and
+   stayed a letter placeholder instead of the real icon. */
+function applyImages(countEvent){
+  if(countEvent!==false) IMG_EV_N++;
   /* One pass over the images. Scanning the document once per cached URL made
      this quadratic - with a hundred cached icons it ran a hundred full DOM
      queries for every single image that arrived. */
