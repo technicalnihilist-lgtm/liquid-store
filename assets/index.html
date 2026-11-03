@@ -806,16 +806,36 @@ function runSearch(){
 function searchTop(){const v=$('#view-search');if(v) v.scrollTop=0}
 
 /* ---------- detail page ---------- */
+/* Fill the sheet with a new page.
+
+   The sheet body is one scrolling element that every page reuses, so its
+   scrollTop survived the swap: open an app, read to the bottom, go back, tap
+   another one, and that page appeared already scrolled to its end - the reader
+   landed on the footer and the package line, with the icon, the name and the
+   Get button far above the fold, and had to scroll up to find out which app
+   they had just opened. Every page the sheet shows starts at its top now.
+
+   keepScroll is for the one case that is not a new page: re-rendering the app
+   that is already on screen, which happens when an install finishes or the
+   installed list changes. That must leave the reader where they were. */
+function sheetBody(html,keepScroll){
+  const b=$('#sheetBody');
+  b.innerHTML=html;
+  if(!keepScroll) b.scrollTop=0;
+  return b;
+}
 function openSheet(pkg){
   let a=null;
   try{a=B.detail(pkg)}catch(err){toast('Could not open that app \u2014 '+(err&&err.message?err.message:'unknown error'));return}
   if(!a||!a.pkg) return;
+  /* decided before sheetPkg moves: same app, sheet already showing */
+  const same=S.sheetPkg===pkg&&$('#sheet').classList.contains('on');
   S.sheetPkg=pkg;
   const links=[];
   if(a.source) links.push(`<a href="${esc(a.source)}" target="_blank" rel="noopener">Source code</a>`);
   if(a.issues) links.push(`<a href="${esc(a.issues)}" target="_blank" rel="noopener">Report a bug</a>`);
   if(a.web) links.push(`<a href="${esc(a.web)}" target="_blank" rel="noopener">Website</a>`);
-  $('#sheetBody').innerHTML=`
+  sheetBody(`
     <div class="sheet-head">${iconEl(a,'xl')}
       <div style="flex:1;min-width:0"><h2>${esc(a.name)}</h2>
         ${a.author?`<div class="dev">${esc(a.author)}</div>`:''}
@@ -830,7 +850,7 @@ function openSheet(pkg){
     <div class="desc">${esc(a.description||a.summary||a.sum||'')}</div>
     ${links.length?`<div class="linkrow">${links.join('')}</div>`:''}
     <div class="meta-list"><b>Package</b> ${esc(a.pkg)}<br>${a.summary?`<b>Summary</b> ${esc(a.summary)}<br>`:''}</div>
-    ${footer()}`;
+    ${footer()}`,same);
   renderSheetActions(a);
   $('#sheet').classList.add('on');
 }
@@ -857,10 +877,10 @@ function beginInstall(pkg){
 }
 function showPermission(){
   const c=B.canInstall();
-  $('#sheetBody').innerHTML=`<div class="sheet-head"><div style="flex:1"><h2>One permission needed</h2><div class="cat">Install unknown apps</div></div></div>
+  sheetBody(`<div class="sheet-head"><div style="flex:1"><h2>One permission needed</h2><div class="cat">Install unknown apps</div></div></div>
     <div class="desc">${esc(c.message||'Android needs your permission before Liquid Store can install apps. This is a one-time switch - after that installs start straight from the store.')}</div>
     <div class="installrow"><button class="bigget g press" id="grantBtn"><span>Open settings</span></button></div>
-    <div class="meta-list">Nothing else is requested: no account, no sign-in, no advertising identifier.</div>`;
+    <div class="meta-list">Nothing else is requested: no account, no sign-in, no advertising identifier.</div>`);
   const b=$('#grantBtn');
   if(b) b.addEventListener('click',()=>{B.requestInstallPermission();toast('Turn on "Allow from this source", then press Get again.')});
   $('#sheet').classList.add('on');
@@ -1264,7 +1284,7 @@ function bindScrollParallax(){
 }
 
 function openDepth(){
-  $('#sheetBody').innerHTML=
+  sheetBody(
     '<div class="sheet-head"><div style="flex:1"><h2>Depth</h2>'+
       '<div class="cat">Layers tilt against each other as you move</div></div></div>'+
     '<div class="desc">The tab bar, cards and background sit at different depths, so the screen tilts like a window when you drag or tilt the phone. Turn it down if it feels busy.</div>'+
@@ -1275,7 +1295,7 @@ function openDepth(){
       '<div class="rngval" id="dAmtVal">'+Math.round(D.amt*100)+'%</div></div>'+
     '<div class="setrow"><div class="meta"><b>Follow device tilt</b><small>Use the phone&rsquo;s sensors instead of touch</small></div>'+
       '<div class="sw'+(D.tilt?' on':'')+'" id="dTilt" role="switch" aria-checked="'+D.tilt+'"><i></i></div></div>'+
-    footer();
+    footer());
   $('#sheet').classList.add('on');
 
   $('#dOn').addEventListener('click',function(){
@@ -1308,12 +1328,12 @@ function openSources(){
     return '<div class="row"><div class="meta"><b>'+esc(m.host)+'</b><small>'+esc(m.url)+'</small></div>'+
       (inUse?'<span class="badge">In use</span>':'<button class="get" data-usesrc="'+esc(m.url)+'">Use</button>')+'</div>';
   }).join('');
-  $('#sheetBody').innerHTML=
+  sheetBody(
     '<div class="sheet-head"><div style="flex:1"><h2>Sources</h2><div class="cat">Where the catalogue and apps come from</div></div></div>'+
     '<div class="desc">Liquid Store asks every source at once and downloads from whichever answers fastest. If loading keeps failing, pick one below, or enter your own repository address.</div>'+
     '<div class="searchbar g"><input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="'+esc(s.custom||'')+'"></div>'+
     '<div class="installrow"><button class="bigget g press" id="srcSave"><span>Save and reload</span></button></div>'+
-    '<div class="eyebrow">Official mirrors</div>'+rows+footer();
+    '<div class="eyebrow">Official mirrors</div>'+rows+footer());
   $('#sheet').classList.add('on');
   const save=$('#srcSave');
   if(save) save.addEventListener('click',function(){
