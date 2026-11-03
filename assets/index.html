@@ -71,6 +71,16 @@ input{font-family:inherit}
   -webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(10px) scale(.995);
   transition:opacity .28s ease,transform .28s ease,visibility .28s}
 .view.on{opacity:1;visibility:visible;transform:none}
+/* A view that is not on screen is already invisible, but its whole subtree was
+   still restyled on every write of the depth variables: all five views are
+   rendered and kept in the document, and the four that are off screen hold
+   about five sixths of every element, so the ambient sway alone re-resolved
+   them ~13 times a second to produce nothing anyone can see. Skipping a
+   skipped view is invisible by construction, and it takes roughly three
+   quarters of the idle style work with it. .fading is the view we have just
+   left: it keeps its contents painted until its fade-out has finished, so the
+   cross-fade between tabs looks exactly as it did. */
+.view:not(.on):not(.fading){content-visibility:hidden}
 .view::-webkit-scrollbar{display:none}
 
 .lt{display:flex;justify-content:space-between;align-items:flex-end;padding:10px 0 12px;gap:12px}
@@ -978,9 +988,19 @@ window.__onBack=function(){
 
 /* ---------- tabs + liquid lens ---------- */
 function switchTab(v){
+  const prev=document.querySelector('.view.on');
   S.view=v;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='view-'+v));
+  /* The view we just left is still fading out over the one coming in, so it
+     must keep painting until that is done - only then may the stylesheet skip
+     it (see .view:not(.on):not(.fading)). 600ms clears the .28s transition
+     even when the fade starts late behind a re-render. */
+  if(prev&&!prev.classList.contains('on')){
+    prev.classList.add('fading');
+    clearTimeout(prev.fadeT);
+    prev.fadeT=setTimeout(function(){prev.classList.remove('fading');prev.fadeT=0},600);
+  }
   $('#navTitle').textContent=TITLES[v];
   const cur=document.querySelector('.view.on');
   $('#navbar').classList.toggle('show',!!cur&&cur.scrollTop>50);
