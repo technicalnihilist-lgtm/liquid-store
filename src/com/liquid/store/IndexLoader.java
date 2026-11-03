@@ -292,6 +292,18 @@ public class IndexLoader {
         if (pr.notModified && cache.isFile()) {
             p.onPhase("cache", 100, "already up to date");
             Repo r = readCache(cache, p);
+            /* "Not modified" says the saved catalogue is current - it says
+               nothing about the host that saved it. baseUrl is whatever mirror
+               wrote the cache, and the reason we are probing the others is
+               that this one may have stopped answering. Keeping it meant the
+               store loaded a perfectly good catalogue while every icon, every
+               screenshot and every APK was built from a host that no longer
+               replies - and Refresh could not dig it out, because a
+               not-modified reply never rewrites the cache, so the dead address
+               survived until the index itself changed upstream. The mirror
+               that just answered is the one to fetch the files from, which is
+               exactly what the download path below already does. */
+            if (pr.base != null && pr.base.length() > 0) r.baseUrl = pr.base;
             p.onApps(r.apps);
             return r;
         }
