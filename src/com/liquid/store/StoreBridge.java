@@ -56,6 +56,26 @@ public class StoreBridge {
     private final Context ctx;
     private final WebView web;
     private final ExecutorService io = Executors.newFixedThreadPool(3);
+    /**
+     * Icon and screenshot fetches, on their own pool.
+     *
+     * They used to share {@link #io} with the catalogue load, the
+     * installed-package scan and the APK download, and they are the one kind of
+     * work on that pool that is both numerous and slow: every render asks for
+     * every icon it draws, so one screenful of a slow catalogue queues dozens
+     * of fetches, and each one is allowed 8 s to connect and 15 s to read. On a
+     * three-thread pool the user's own actions ended up behind all of them -
+     * tapping Refresh, tapping Get (the APK download is on the same pool, so
+     * the ring sat at 0% and nothing was even requested), or waiting for the
+     * Installed/Update badges, which need the package scan that was queued
+     * behind the icons too. Scrolling a few pages of the catalogue put a
+     * quarter of an hour of dead icon fetches in front of them.
+     *
+     * Images are also the only work here that is safe to leave behind: an icon
+     * that arrives late is simply drawn late. So they get their own pool, the
+     * same width, and can no longer delay anything the reader asked for.
+     */
+    private final ExecutorService imgIo = Executors.newFixedThreadPool(3);
     private final Handler main = new Handler(Looper.getMainLooper());
     private final File workDir;
     /** the image cache directory and its byte budget */
@@ -968,7 +988,9 @@ public class StoreBridge {
     @JavascriptInterface
     public void fetchImage(final String url) {
         if (url == null || url.length() == 0) return;
-        io.execute(new Runnable() {
+        /* imgIo, not io: see the field comment - an icon must never queue in
+           front of a catalogue load, an install or a package scan */
+        imgIo.execute(new Runnable() {
             public void run() {
                 try {
                     File f = imageFile(url);
