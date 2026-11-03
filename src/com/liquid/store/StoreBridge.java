@@ -550,17 +550,36 @@ public class StoreBridge {
     /**
      * Every URL shape an icon might live at, best first. F-Droid's v1 index
      * names a file at the repo root; the site also serves a per-app layout.
+     *
+     * An entry that carries its own absolute icon URL has no icon in the repo
+     * at all - the GitHub-release catalogue is built from release metadata, so
+     * it never has a repo-relative one - and the shapes below cannot exist for
+     * it. Guessing them was the whole answer the page ever got: it prefers this
+     * list over the "icon" field whenever the list is non-empty, so it asked
+     * the mirror for a file that was never there, twice, and gave up on the
+     * letter placeholder while the real URL - the one iconUrl() already hands
+     * out as "icon" - was never tried. Every GitHub app drew a letter instead
+     * of its icon and cost two dead requests doing it.
      */
-    private List<String> iconCandidates(AppEntry a) {
+    static List<String> iconCandidates(String absIconUrl, String icon, String pkg,
+                                       String base, String canonical) {
         List<String> out = new ArrayList<String>(4);
-        String b = base(), c = canonical();
-        if (a.icon != null && a.icon.length() > 0) {
-            out.add(b + "/" + a.icon);
-            if (!c.equals(b)) out.add(c + "/" + a.icon);
+        if (absIconUrl != null && absIconUrl.length() > 0) {
+            out.add(absIconUrl);
+            return out;
         }
-        out.add(b + "/" + a.pkg + "/en-US/icon.png");
-        if (!c.equals(b)) out.add(c + "/" + a.pkg + "/en-US/icon.png");
+        String b = base, c = canonical;
+        if (icon != null && icon.length() > 0) {
+            out.add(b + "/" + icon);
+            if (!c.equals(b)) out.add(c + "/" + icon);
+        }
+        out.add(b + "/" + pkg + "/en-US/icon.png");
+        if (!c.equals(b)) out.add(c + "/" + pkg + "/en-US/icon.png");
         return dedupe(out);
+    }
+
+    private List<String> iconCandidates(AppEntry a) {
+        return iconCandidates(a.absIconUrl, a.icon, a.pkg, base(), canonical());
     }
 
     private List<String> shotCandidates(AppEntry a, int index, String file) {
