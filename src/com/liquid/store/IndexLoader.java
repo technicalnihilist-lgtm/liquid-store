@@ -129,8 +129,18 @@ public class IndexLoader {
 
         List<String> list = new ArrayList<String>();
         if (mirrors != null) for (String m : mirrors) if (m != null && m.length() > 0) list.add(m);
-        boolean explicit = !list.isEmpty();
-        if (!explicit) for (String m : DEFAULT_MIRRORS) list.add(m);
+        if (list.isEmpty()) for (String m : DEFAULT_MIRRORS) list.add(m);
+        /* "explicit" has to mean the reader pinned a source of their own: that
+           is the only case in which falling back to the official list is a
+           different thing to try. It used to be !list.isEmpty(), and
+           StoreBridge.mirrors() hands us the whole official list when nothing
+           is pinned, so it was always true. Every cold start that could not
+           reach a mirror therefore probed the same ten mirrors twice - twenty
+           requests instead of ten, and six extra seconds of "checking" before
+           the "Could not load" screen (measured: 12.2 s against 6.1 s) - and
+           the progress line read "checking 10 chosen source". Compare the list
+           with the official one instead. */
+        boolean explicit = !sameMirrors(list, DEFAULT_MIRRORS);
 
         String[] meta = readMeta(dir);
         p.onPhase("probe", 2, "checking " + list.size() + (explicit ? " chosen source" : " sources"));
@@ -166,6 +176,11 @@ public class IndexLoader {
             }
         }
         throw last == null ? new IOException("all sources failed") : last;
+    }
+
+    /** true when the list holds exactly the official mirrors, in any order */
+    private static boolean sameMirrors(List<String> list, String[] official) {
+        return list.size() == official.length && list.containsAll(Arrays.asList(official));
     }
 
     // ------------------------------------------------------------------ probe
