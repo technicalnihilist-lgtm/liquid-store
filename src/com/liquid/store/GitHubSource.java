@@ -53,10 +53,22 @@ public class GitHubSource {
         Result(List<AppEntry> a, boolean c, String e) { apps = a; fromCache = c; error = e; }
     }
 
-    /** cache if fresh, otherwise fetch; never throws */
+    /**
+     * cache if fresh, otherwise fetch; never throws.
+     *
+     * The fallback on failure used to be the *fresh-only* reader, i.e. the same
+     * call that had already declined to answer a moment earlier, so the
+     * "stale beats nothing" line below it could never fire. Every GitHub app
+     * in the catalogue comes from this cache, so twelve hours after the last
+     * successful refresh - or straight away, if the user taps Refresh while
+     * offline - the fetch failed and the whole GitHub half of the store
+     * silently disappeared until a refresh happened to succeed again. The
+     * fallback reads the saved catalogue regardless of its age now, which is
+     * what the line was always meant to do.
+     */
     public static Result load(Context ctx, boolean force) {
         if (!force) {
-            Result c = readCache(ctx);
+            Result c = readCache(ctx.getFilesDir(), true);
             if (c != null) return c;
         }
         try {
@@ -65,7 +77,7 @@ public class GitHubSource {
             writeCache(ctx, merged);
             return new Result(merged, false, "");
         } catch (Throwable t) {
-            Result c = readCache(ctx);
+            Result c = readCache(ctx.getFilesDir(), false);
             if (c != null) return c;                       // stale beats nothing
             return new Result(new ArrayList<AppEntry>(), false, msg(t));
         }
@@ -103,9 +115,16 @@ public class GitHubSource {
         return new ArrayList<AppEntry>(byPkg.values());
     }
 
-    /** only what is on disk - safe to call on the UI thread at startup */
+    /**
+     * Only what is on disk - safe to call on the UI thread at startup.
+     *
+     * Age is deliberately not consulted: this is the copy the store draws
+     * while the refresh is still running, and a day-old list of GitHub apps is
+     * worth incomparably more than an empty one. Asking for a fresh cache here
+     * meant it answered "nothing" for exactly the sessions that needed it most.
+     */
     public static List<AppEntry> cached(Context ctx) {
-        Result c = readCache(ctx);
+        Result c = readCache(ctx.getFilesDir(), false);
         return c == null ? new ArrayList<AppEntry>() : c.apps;
     }
 
@@ -307,10 +326,6 @@ public class GitHubSource {
     // ---------- cache ----------
 
     static File cacheFile(File dir) { return new File(dir, CACHE); }
-
-    private static Result readCache(Context ctx) {
-        return readCache(ctx.getFilesDir(), true);
-    }
 
     static List<AppEntry> readCacheApps(File dir, boolean requireFresh) {
         Result r = readCache(dir, requireFresh);
