@@ -710,14 +710,25 @@ function renderToday(){
   $('#todayUpdated').innerHTML=colScroll(B.list('','','updated',0,9).apps);
   $('#todayNew').innerHTML=colScroll(B.list('','','new',0,9).apps);
 }
-function renderArcade(){
+function renderArcade(keep){
   const fresh=B.list('','Games','updated',0,8), all=B.list('','Games','name',0,40);
   let h=head('Arcade','Play freely');
   h+=`<div class="arc g"><b>Everything here is free</b><span>No ads, no in-app purchases, no account. Every app is open source and installs straight from the repository.</span></div>`;
   if(fresh.apps.length) h+=`<div class="sec"><h2>New This Week</h2><span>${fresh.total} games</span></div><div class="hcards">${fresh.apps.map(hcard).join('')}</div>`;
-  h+=`<div class="sec"><h2>All Games</h2><span>${all.total}</span></div>`;
-  h+=all.apps.length?all.apps.map((a,i)=>rowHtml(a,i+1)).join(''):emptyRow();
-  $('#view-arcade').innerHTML=h;
+  h+=`<div class="sec"><h2>All Games</h2><span>${all.total}</span></div><div data-listbox></div>`;
+  const el=$('#view-arcade'); el.innerHTML=h;
+  /* "All Games" asked for forty rows and then stopped, and the scroll handler
+     did not page Arcade at all, so the heading counted every game in the
+     catalogue while the list under it held forty and offered no way to reach
+     the rest - the same silent truncation that Search had. Page it in against
+     the same name order the heading counts. The header keeps its plain count
+     (no data-count) so nothing about the row reads differently. */
+  const page=S.pages['arcade:']||(S.pages['arcade:']={offset:0,done:false});
+  const want=keep?page.offset:0;
+  page.offset=0;page.done=false;
+  const box=el.querySelector('[data-listbox]');
+  if(!all.total) box.innerHTML=emptyRow();
+  else loadMore('arcade','Games',box,null,page,true,want,'','name');
 }
 function renderCategoryView(view,keep){
   const page=S.pages[view+':']||(S.pages[view+':']={offset:0,done:false});
@@ -943,7 +954,7 @@ function refreshVisible(){
   const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
   if(S.view==='today') renderToday();
   else if(S.view==='search') runSearch();
-  else if(S.view==='arcade') renderArcade();
+  else if(S.view==='arcade') renderArcade(true);
   else renderCategoryView(S.view,true);
   const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
   if(S.sheetPkg) renderSheetActions(B.detail(S.sheetPkg));
@@ -987,7 +998,7 @@ function paintNow(force){
   const now=Date.now(); if(!force&&now-lastPaint<400) return; lastPaint=now;
   if(S.view==='search') return;
   const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
-  if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(); else renderCategoryView(S.view,true);
+  if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(true); else renderCategoryView(S.view,true);
   const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
 }
 let readyAt=0;
@@ -1423,7 +1434,7 @@ document.querySelectorAll('.view').forEach(function(v){
     if(!S.ready) return;
     if(v.scrollTop+v.clientHeight<v.scrollHeight-400) return;
     const view=v.id.replace('view-','');
-    if(view!=='games'&&view!=='apps'&&view!=='search') return;
+    if(view!=='games'&&view!=='apps'&&view!=='search'&&view!=='arcade') return;
     const page=S.pages[view+':'], box=v.querySelector('[data-listbox]'), label=v.querySelector('[data-count]');
     if(!page||!box) return;
     if(view==='search'){
@@ -1433,7 +1444,7 @@ document.querySelectorAll('.view').forEach(function(v){
       loadMore(view,'',box,label,page,false,0,q,'relevance');
       return;
     }
-    const cat=view==='games'?'Games':S.category;
+    const cat=(view==='games'||view==='arcade')?'Games':S.category;
     loadMore(view,cat,box,label,page,false,0,'','name');
   },{passive:true});
 });
