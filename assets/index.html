@@ -919,9 +919,25 @@ function pollInstall(){
   else if(p.phase==='success'){delete S.installing[p.pkg];toast('Installed - open it any time');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
   else if(p.phase==='failed'){delete S.installing[p.pkg];toast(p.error||'Install failed');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
 }
+/* The install poll belongs to an install, and only to an install.
+
+   pollStart() used to be called from boot() and from doRefresh(), so every
+   launch - and every refresh - opened a 500 ms interval that asked the bridge
+   for install progress before any install existed, and pollStop() was reached
+   only by an install that finished or by a catalogue that finished loading. A
+   catalogue that never finishes - no network, every mirror down, the "Could
+   not load" screen - therefore left that timer running for the rest of the
+   session: two synchronous progress() calls across the WebView bridge every
+   second, for ever, on a page that had nothing to report and no way to be rid
+   of it. It is started by beginInstall() now, stopped by the terminal phase of
+   the install that started it, and stopped by the error screen; a catalogue
+   that merely finishes loading no longer stops it, because a refresh can land
+   while an install is still running. */
 let pollTimer=null;
 function pollStart(){if(pollTimer||!hasNative)return;pollTimer=setInterval(pollInstall,500)}
 function pollStop(){if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
+/* true while any install is still in flight */
+function installingNow(){for(const k in S.installing) return true; return false}
 function refreshVisible(){
   if(!S.ready) return;
   const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
@@ -949,10 +965,12 @@ function boot(){
   if(st.phase==='error'){showError(st);return}
   if(st.count>0) applyPartial(st); else showLoader(true,'Loading catalogue','Contacting the app repository\u2026',st.pct||0);
   $('#loadAction').onclick=null;
-  B.load(false);pollStart();
+  B.load(false);
 }
 function showError(st){
   showLoader(true,'Could not load',st.error||'The catalogue could not be reached.',0,'Retry');
+  /* nothing is loading any more, so nothing needs polling */
+  if(!installingNow()) pollStop();
   $('#loadAction').onclick=function(){showLoader(true,'Loading catalogue','Contacting the app repository\u2026',0);$('#strip').classList.add('on');B.load(true)};
 }
 function applyPartial(st){
@@ -976,7 +994,7 @@ let readyAt=0;
 function onReady(){
   const st=B.state(); if(st.phase!=='ready') return;
   const now=Date.now(); if(now-readyAt<300) return; readyAt=now;
-  const first=!S.ready; S.ready=true;S.partial=false;pollStop();showLoader(false);
+  const first=!S.ready; S.ready=true;S.partial=false;if(!installingNow()) pollStop();showLoader(false);
   $('#strip').classList.remove('on');S.stats=B.stats();
   const upd=B.list('','','updated',0,30);
   if(upd.apps.length){const day=Math.floor(Date.now()/86400000);S.featured=upd.apps[day%upd.apps.length]}
@@ -1175,7 +1193,7 @@ $('#sheetMore').addEventListener('click',function(){
 });
 function doRefresh(){
   S.refreshing=true;$('#strip').classList.add('on');
-  updateStrip({phase:'probe',pct:2,detail:'checking sources\u2026'});pollStart();B.load(true);
+  updateStrip({phase:'probe',pct:2,detail:'checking sources\u2026'});B.load(true);
 }
 /* ---------- 4D depth ---------- */
 const DEPTH_KEY='liquid.depth';
