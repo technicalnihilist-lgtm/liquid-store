@@ -1002,7 +1002,20 @@ function onReady(){
   if(S.sheetPkg){try{renderSheetActions(B.detail(S.sheetPkg))}catch(e){}}
   if(!first&&S.refreshing){S.refreshing=false;toast(S.lastPhase==='cache'?'Already up to date':'Catalogue updated')}
 }
+/* The bridge calls this for every kind of event, and three of those kinds -
+   an image finishing, install progress, a package scan - never look at the
+   catalogue state. Asking for it first meant a JSON bridge call (built field
+   by field in Java, shipped across the bridge, parsed here) for every single
+   icon and screenshot that arrived: measured over four screenfuls of the
+   catalogue, an image burst of 35 events carried 35 state() calls and about
+   5 KB of JSON that nothing read, on the thread that is also trying to paint
+   the rows. Handle those three first and read the snapshot only for the
+   events that actually use it. S.lastPhase is only ever read by onReady()'s
+   refresh toast, and the catalogue events below are what set it. */
 window.__store=function(type){
+  if(type==='image'){applyImages();return}
+  if(type==='progress'){pollInstall();return}
+  if(type==='installed'){refreshVisible();return}
   const st=B.state(); S.lastPhase=st.phase;
   if(type==='state'){
     if(st.phase==='ready'){onReady();return}
@@ -1011,9 +1024,6 @@ window.__store=function(type){
     else if(!S.ready) showLoader(true,st.phase==='parse'?'Reading the catalogue':'Downloading the catalogue',st.detail||'',st.pct||0);
   }else if(type==='apps'){ if(!S.ready&&st.count>0) applyPartial(st) }
   else if(type==='ready') onReady();
-  else if(type==='progress') pollInstall();
-  else if(type==='installed') refreshVisible();
-  else if(type==='image') applyImages();
 };
 window.__onBack=function(){
   /* the full-screen screenshot sits above the sheet, so it must close first */
