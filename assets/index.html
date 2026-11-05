@@ -1085,6 +1085,18 @@ function switchTab(v){
   }
   $('#navTitle').textContent=TITLES[v];
   const cur=document.querySelector('.view.on');
+  /* Games, Apps, Arcade and Search are rebuilt from their first page by the
+     deferred block at the end of this function, so the offset the view still
+     carries belongs to a longer list that no longer exists. It used to be
+     left in place: scroll Apps down to four hundred rows, look at Games,
+     come back, and the reader landed at the bottom of the forty rows that had
+     been rebuilt - every row above them gone - while the scroll handler,
+     seeing a position near the end, pulled pages back in to cover the gap it
+     had just opened. Search has always been returned to its top (see
+     renderSearch); the paged catalogue views are returned to theirs here, so
+     a tab opens where it says it does. Today is not paged - its offset still
+     describes the list it is showing - so it keeps its place. */
+  if(cur&&(v==='games'||v==='apps'||v==='arcade'||v==='search')) cur.scrollTop=0;
   $('#navbar').classList.toggle('show',!!cur&&cur.scrollTop>50);
   /* the offset belongs to the view now on screen: drop any frame still queued
      for the view we just left and write this one straight away */
