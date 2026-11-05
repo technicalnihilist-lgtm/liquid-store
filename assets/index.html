@@ -41,10 +41,22 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 input{font-family:inherit}
 .stage{position:fixed;inset:0;background:var(--stage)}
 
-.phone{position:relative;height:100dvh;width:100%;max-width:480px;margin:0 auto;overflow:hidden;background:transparent}
+/* The phone frame's height is the one declaration the whole layout hangs on:
+   every child of .phone is absolutely positioned, so if this line is dropped
+   the frame measures zero and the store draws nothing but its background.
+
+   dvh arrived in Chrome 108, two years after everything else in this
+   stylesheet - inset (87), aspect-ratio (88), content-visibility (85) - and
+   WebView only gets it when the device updates it. On an Android 7-9 phone
+   whose WebView has not been updated since 2022 (no Play Store, a frozen
+   WebView, an AOSP build) the dvh declaration is invalid at parse time, the
+   fallback below is what the frame gets, and the store looks exactly as it
+   did before dvh existed. Where dvh is understood the second declaration wins
+   and nothing about the layout changes by a pixel. */
+.phone{position:relative;height:100vh;height:100dvh;width:100%;max-width:480px;margin:0 auto;overflow:hidden;background:transparent}
 @media (min-width:640px){
   body{display:grid;place-items:center}
-  .phone{height:min(900px,94dvh);border-radius:48px;background:var(--bg);border:1px solid var(--sep);box-shadow:0 40px 90px rgba(0,0,0,.35)}
+  .phone{height:min(900px,94vh);height:min(900px,94dvh);border-radius:48px;background:var(--bg);border:1px solid var(--sep);box-shadow:0 40px 90px rgba(0,0,0,.35)}
 }
 
 /* ================= Liquid Glass ================= */
