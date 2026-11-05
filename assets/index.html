@@ -774,7 +774,15 @@ function loadMore(view,cat,box,label,page,replace,want,q,sort){
   if(label) label.textContent=r.total+(r.total===1?' app':' apps');
   if(replace) box.innerHTML='';
   if(r.apps.length===0&&page.offset===0) box.innerHTML='<div class="empty">No apps in this category.</div>';
-  else box.insertAdjacentHTML('beforeend',r.apps.map((a,i)=>rowHtml(a,page.offset+i+1)).join(''));
+  /* A chart number belongs to the catalogue lists, not to search results.
+     Search draws its first page with rowHtml(a) and no rank, but it pages in
+     through here, and this line numbered every row it appended: scroll a
+     result list past sixty and the rows after it grew a 20px rank column,
+     starting at "61" with nothing above it to count from, and every icon on
+     them shifted right by that column - a list that changed shape halfway
+     down and stayed that way. Rank only the lists that start at the top with
+     a number; q is set only by search (see the note above). */
+  else box.insertAdjacentHTML('beforeend',r.apps.map((a,i)=>rowHtml(a,q?0:page.offset+i+1)).join(''));
   page.offset+=r.apps.length;
   if(page.offset>=r.total||r.apps.length===0) page.done=true;
 }
