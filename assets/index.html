@@ -213,13 +213,28 @@ input{font-family:inherit}
    perspective() goes inside each transform so the effect does not depend on
    an ancestor chain of preserve-3d, which would force a huge layer tree.
    Each layer reads the touch tilt (--dx/--dy) plus a slow ambient sway
-   (--ax/--ay), so the depth is visible even when nothing is being touched. */
+   (--ax/--ay), so the depth is visible even when nothing is being touched.
+
+   --dx and --dy carry a 0 fallback like every other variable here, and it is
+   not decoration. They are written by depthFrame(), which only ever runs from
+   a pointer move, and depthApply() only writes them when depth is switched
+   off - so on a normal launch, with depth on, they were simply not defined.
+   A var() with no fallback and no value makes the whole declaration invalid
+   at computed-value time, so all of these surfaces - every row, card, chip,
+   the tab bar, the navbar, the stage - resolved to transform:none instead of
+   the perspective they were written for, and the ambient sway wrote --ax/--ay
+   twenty times a second into declarations that could not resolve. The depth
+   the store is built around was therefore absent from first paint until the
+   reader first touched the screen, at which point every one of those layers
+   jumped to its depth at once. With the fallback the same layers resolve to
+   the rest pose (dx=dy=0, the state the sway animates around) from the first
+   frame, which is what the transform above always described. */
 .hero,.bigcard,.row,.tile,.hcard,.chip,.searchbar,.mi,.ic,.tabbar,.navbar,
 .pagebar,.setrow,.stat,.shot,.pill,.pill2,.bigget,.get,.arc,.loadcard,.avatar,
 .sheet-body>*{
   transform:perspective(700px)
-            rotateY(calc((var(--dx) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
-            rotateX(calc((var(--dy) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
+            rotateY(calc((var(--dx,0) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
+            rotateX(calc((var(--dy,0) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
             translateZ(calc(var(--z,0px) * var(--amt)))
 }
 /* near things lean more, far things barely move */
@@ -232,13 +247,13 @@ input{font-family:inherit}
 .ic,.shot,.pill,.pill2,.bigget,.get,.avatar{--z:5px;--r:2.5deg}
 /* the hero lags slightly behind the rows while the list scrolls */
 .hero,.bigcard{transform:perspective(700px)
-            rotateY(calc((var(--dx) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
-            rotateX(calc((var(--dy) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
+            rotateY(calc((var(--dx,0) + var(--ax,0)) * var(--amt) * var(--r,0deg)))
+            rotateX(calc((var(--dy,0) + var(--ay,0)) * var(--amt) * var(--r,0deg) * -1))
             translateZ(calc(var(--z,0px) * var(--amt)))
             translateY(calc(var(--sy,0) * -0.05px))}
 /* the background drifts against everything else, and lags the scroll */
-.stage{transform:translate3d(calc((var(--dx) + var(--ax,0)) * var(--amt) * -34px),
-                            calc((var(--dy) + var(--ay,0)) * var(--amt) * -30px + var(--sy,0) * 0.08px),
+.stage{transform:translate3d(calc((var(--dx,0) + var(--ax,0)) * var(--amt) * -34px),
+                            calc((var(--dy,0) + var(--ay,0)) * var(--amt) * -30px + var(--sy,0) * 0.08px),
                             0) scale(1.08)}
 
 /* settings controls */
