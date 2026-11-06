@@ -605,11 +605,12 @@ function imgFail(el){
     /* The fetch can finish before the <img> has got through its own candidate
        chain, in which case its 'image' event has already been consumed and no
        later one is coming for this URL - the icon would stay blank until some
-       unrelated image happened to arrive. If nothing is still outstanding, do
-       the lookup now; applyImages() parks nothing and either fills the element
-       or retires the wait exactly as a real event would. Pass false: no event
-       has arrived here, and counting one anyway is what broke this. */
-    if(IMG_EV_N>=IMG_REQ_N) applyImages(false);
+       unrelated image happened to arrive. requestImage() leaves IMG_REQ[url]
+       at 2 once the bridge has reported that fetch (see applyImages), so the
+       lookup is done here only in that case, and only for this URL. Pass
+       false: no event has arrived here, and counting one anyway is what
+       broke this. */
+    if(IMG_REQ[url]===2) applyImages(url,false);
     return;
   }
   el.remove();
@@ -620,9 +621,20 @@ function imgFail(el){
    IMG_REQ_N, and since the retirement test below is IMG_EV_N>=IMG_REQ_N it
    then read as "every fetch has reported" for the rest of the session: each
    later parked icon was dropped while its bytes were still in flight and
-   stayed a letter placeholder instead of the real icon. */
-function applyImages(countEvent){
+   stayed a letter placeholder instead of the real icon.
+
+   `reported` is the URL whose fetch the bridge has just finished. The page is
+   told which one now (see StoreBridge.pushImage) and only that URL's wait is
+   looked up. Without it this loop asked imageData() about every parked image
+   on every single image event, and imageData is a synchronous bridge call - a
+   SHA-1 of the URL and then a file stat, on the thread that is also trying to
+   paint. One screenful of forty icons therefore cost about forty calls per
+   icon: measured on a 640-row catalogue, 22,699 imageData calls to page
+   through it against 566 fetches. Now it is one call per fetch. */
+function applyImages(reported, countEvent){
   if(countEvent!==false) IMG_EV_N++;
+  /* 1 means requested, 2 means requested and answered - see requestImage() */
+  if(reported) IMG_REQ[reported]=2;
   /* One pass over the images. Scanning the document once per cached URL made
      this quadratic - with a hundred cached icons it ran a hundred full DOM
      queries for every single image that arrived. */
@@ -638,6 +650,10 @@ function applyImages(countEvent){
   }
   const now=Date.now(), settled=IMG_EV_N>=IMG_REQ_N;
   for(const url in IMG_WAIT){
+    /* Only the URL the bridge just reported can have new bytes behind it.
+       Every other parked image is still downloading, so asking about it would
+       be a bridge call for a file that cannot be there yet. */
+    if(url!==reported) continue;
     const w=IMG_WAIT[url];
     let d=imgCacheGet(url);
     if(!d){
@@ -1058,8 +1074,8 @@ function onReady(){
    the rows. Handle those three first and read the snapshot only for the
    events that actually use it. S.lastPhase is only ever read by onReady()'s
    refresh toast, and the catalogue events below are what set it. */
-window.__store=function(type){
-  if(type==='image'){applyImages();return}
+window.__store=function(type,arg){
+  if(type==='image'){applyImages(arg||null);return}
   if(type==='progress'){pollInstall();return}
   if(type==='installed'){refreshVisible();return}
   const st=B.state(); S.lastPhase=st.phase;
