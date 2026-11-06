@@ -1586,7 +1586,20 @@ window.addEventListener('load',()=>moveLens(true));
 /* ================= Bounce + water sound ================= */
 (function(){
   var SEL='button,.press,[data-detail],[data-cat],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.avatar,.row,a[href]';
-  var down=null,pressAnim=null,canAnim=!!(document.documentElement.animate);
+  /* One press per control, one press per finger.
+
+     `down` and `pressAnim` were two single variables for the whole page, so a
+     second pointer's pointerdown overwrote both: the first control's press
+     animation was never cancelled, and it is created with fill:'forwards', so
+     it goes on holding that control at 0.86-0.97 scale. Press a row with one
+     thumb and another row with the other, then lift both: the first row stays
+     at scale 0.97 with a finished animation still in effect - a control left
+     visibly smaller than the ones beside it until its list happens to be
+     re-rendered, plus an animation object the document keeps alive with it.
+
+     Keyed by element and by pointer, every press has its own lifetime, and
+     the one-finger path is exactly what it was: one entry in, one entry out. */
+  var pressed=new Map(),downBy=new Map(),canAnim=!!(document.documentElement.animate);
 
   function depth(el){
     var w=el.getBoundingClientRect().width;
@@ -1594,16 +1607,20 @@ window.addEventListener('load',()=>moveLens(true));
   }
   function pressIn(el){
     if(!canAnim)return;
+    var old=pressed.get(el);
+    if(old){old.cancel();pressed.delete(el)}
     try{
       var s=depth(el);
-      pressAnim=el.animate([{scale:'1'},{scale:String(s)}],{duration:110,easing:'ease-out',fill:'forwards'});
+      pressed.set(el,el.animate([{scale:'1'},{scale:String(s)}],{duration:110,easing:'ease-out',fill:'forwards'}));
     }catch(e){}
   }
   function release(el){
     if(!canAnim||!el)return;
+    /* the control's own press animation, not whatever was pressed last */
+    var held=pressed.get(el);
+    if(held){held.cancel();pressed.delete(el)}
     try{
       var s=depth(el);
-      if(pressAnim){pressAnim.cancel();pressAnim=null}
       el.animate([
         {scale:String(s)},
         {scale:String(Math.min(1.12,1+(1-s)*0.9)),offset:.35},
@@ -1653,9 +1670,17 @@ window.addEventListener('load',()=>moveLens(true));
     ctx();                               /* unlock audio on first touch */
     var el=e.target.closest&&e.target.closest(SEL);
     if(!el||el.disabled)return;
-    down=el;pressIn(el);
+    downBy.set(e.pointerId,el);
+    pressIn(el);
   },true);
-  function up(){if(down){release(down);down=null}}
+  /* release the control this pointer pressed - a finger that lifts must not
+     let go of a control another finger is still holding */
+  function up(e){
+    var el=downBy.get(e.pointerId);
+    if(el===undefined)return;
+    downBy.delete(e.pointerId);
+    release(el);
+  }
   document.addEventListener('pointerup',up,true);
   document.addEventListener('pointercancel',up,true);
 
