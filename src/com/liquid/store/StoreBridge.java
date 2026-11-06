@@ -53,6 +53,22 @@ public class StoreBridge {
 
     static volatile StoreBridge INSTANCE;
 
+    /**
+     * Set once the Activity is going away - see shutdown().
+     *
+     * This bridge outlives the Activity that made it. Its pools are still
+     * draining whatever they were doing when the reader left (an icon fetch, a
+     * package scan, the tail of a catalogue load) and every one of those paths
+     * ends in push()/pushImage(), i.e. in web.evaluateJavascript(). MainActivity
+     * then calls web.destroy(), which frees the native WebView, and a report
+     * that lands after it is a call into a destroyed WebView from a background
+     * thread - the failure is in the native half, so the try/catch around the
+     * call cannot catch it. INSTANCE, meanwhile, is what InstallReceiver uses
+     * to find the bridge, so a static field was also holding the Activity and
+     * its WebView for the life of the process.
+     */
+    private volatile boolean closed;
+
     private final Context ctx;
     private final WebView web;
     private final ExecutorService io = Executors.newFixedThreadPool(3);
@@ -141,6 +157,16 @@ public class StoreBridge {
     private volatile long insGot, insTotal;
     private volatile String insError;
     private volatile int sessionId = -1;
+
+    /**
+     * Let go of the WebView for good. Called by MainActivity.onDestroy()
+     * before it destroys the WebView itself, so that nothing this bridge runs
+     * afterwards can reach a freed one.
+     */
+    void shutdown() {
+        closed = true;
+        if (INSTANCE == this) INSTANCE = null;
+    }
 
     StoreBridge(Context ctx, WebView web) {
         this.ctx = ctx;
@@ -1073,9 +1099,13 @@ public class StoreBridge {
      * a URL carrying a quote or a backslash cannot break out of it.
      */
     void pushImage(final String url) {
+        if (closed) return;
         final String lit = org.json.JSONObject.quote(url == null ? "" : url);
         main.post(new Runnable() {
             public void run() {
+                /* checked here as well as at the call site: a report posted a
+                   moment before the Activity went away still runs afterwards */
+                if (closed) return;
                 try {
                     web.evaluateJavascript(
                             "window.__store&&window.__store('image'," + lit + ")", null);
@@ -1131,8 +1161,10 @@ public class StoreBridge {
     }
 
     void push(final String type) {
+        if (closed) return;
         main.post(new Runnable() {
             public void run() {
+                if (closed) return;
                 try {
                     web.evaluateJavascript("window.__store&&window.__store('" + type + "')", null);
                 } catch (Throwable ignored) {
