@@ -1055,7 +1055,32 @@ public class StoreBridge {
                     }
                 } catch (Throwable ignored) {
                 }
-                push("image");
+                pushImage(url);
+            }
+        });
+    }
+
+    /**
+     * Report one finished image fetch, naming the URL it was for.
+     *
+     * This used to be a bare push("image"), and the page had no way to tell
+     * which of the dozens of icons it was waiting on had just landed - so it
+     * asked imageData() about every one of them, one synchronous bridge call
+     * per parked image per event. With the URL named, the page looks up that
+     * one file and nothing else: one call per fetch instead of about forty.
+     *
+     * JSONObject.quote gives a correctly escaped JavaScript string literal, so
+     * a URL carrying a quote or a backslash cannot break out of it.
+     */
+    void pushImage(final String url) {
+        final String lit = org.json.JSONObject.quote(url == null ? "" : url);
+        main.post(new Runnable() {
+            public void run() {
+                try {
+                    web.evaluateJavascript(
+                            "window.__store&&window.__store('image'," + lit + ")", null);
+                } catch (Throwable ignored) {
+                }
             }
         });
     }
