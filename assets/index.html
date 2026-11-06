@@ -652,8 +652,22 @@ function applyImages(reported, countEvent){
   for(const url in IMG_WAIT){
     /* Only the URL the bridge just reported can have new bytes behind it.
        Every other parked image is still downloading, so asking about it would
-       be a bridge call for a file that cannot be there yet. */
-    if(url!==reported) continue;
+       be a bridge call for a file that cannot be there yet.
+
+       But once every fetch we made has reported, none of them is still in
+       flight - and a parked URL with nothing in the cache can never be filled,
+       because requestImage() remembers it has already been asked and will not
+       ask again, and no second event will ever name it. So nothing would look
+       at that entry again: it stayed in this table for the life of the page,
+       holding the <img> elements of a list that had long since been
+       re-rendered, one entry per icon the mirror did not have. Measured at 85
+       after six screenfuls of a 200-row catalogue, and it only grows as the
+       reader scrolls and opens app pages. Retire them here, with a map lookup
+       and no bridge call: a file that was never fetched cannot be on disk. */
+    if(url!==reported){
+      if(settled&&!IMG_DONE.has(url)) delete IMG_WAIT[url];
+      continue;
+    }
     const w=IMG_WAIT[url];
     let d=imgCacheGet(url);
     if(!d){
