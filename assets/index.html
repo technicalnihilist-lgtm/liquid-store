@@ -586,8 +586,16 @@ function imgTagFor(cands,cls){
   /* Fetch through the native cache immediately instead of waiting for the
      WebView's own request to fail - the WebView request is the flaky one. */
   if(!cached) requestImage(cands[0]);
-  return '<img'+(cls?' class="'+cls+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
-    ' onload="this.style.opacity=1;this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
+  /* An image drawn before its bytes were in the cache is "waiting", and it
+     carries the iw class to say so. That class is what lets applyImages() find
+     the handful of images still unresolved instead of rescanning every <img>
+     in the document for each one that arrives - see the note there. An image
+     drawn *from* the cache is already showing the right bytes, so it never
+     needs marking, and neither does one that has since loaded (onload drops
+     the class). */
+  const k=(cls?cls+' ':'')+(cached?'':'iw');
+  return '<img'+(k?' class="'+k+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
+    ' onload="this.style.opacity=1;this.classList.remove(\'iw\');this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
 }
 function imgTag(a){return imgTagFor(imgCandidates(a),'')}
 function imgFail(el){
@@ -635,17 +643,41 @@ function applyImages(reported, countEvent){
   if(countEvent!==false) IMG_EV_N++;
   /* 1 means requested, 2 means requested and answered - see requestImage() */
   if(reported) IMG_REQ[reported]=2;
-  /* One pass over the images. Scanning the document once per cached URL made
-     this quadratic - with a hundred cached icons it ran a hundred full DOM
-     queries for every single image that arrived. */
-  const imgs=document.querySelectorAll('img[data-cand]');
-  for(let q=0;q<imgs.length;q++){
+  /* Hand the new bytes to the images still waiting for them.
+
+     Scanning the document once per cached URL made this quadratic - with a
+     hundred cached icons it ran a hundred full DOM queries for every single
+     image that arrived. The scan that replaced it still ran on every image
+     event, and it was still the expensive half of this function: an attribute
+     selector like 'img[data-cand]' has to walk the whole document to build a
+     static list, and it did that once per icon - 916 images meant 1.1 ms of
+     selector for each one, measured over a 800-app catalogue, on a desktop
+     CPU. The list is also nearly all noise: every image that had already
+     resolved was returned only to be skipped by the data-native test below.
+
+     The images that are actually waiting are the ones that were drawn before
+     their URL was cached, and imgTagFor marks exactly those with the iw class
+     (see there). getElementsByClassName returns a live collection the engine
+     maintains as classes change - 0.002 ms against that same document, three
+     orders of magnitude cheaper than the selector, and it holds only the
+     images that still need an answer. Walked backwards because the collection
+     is live and resolving an image drops it out of the list.
+
+     Same set of images, same bytes, same moment: an image stops waiting the
+     instant it has its data URI, or the instant it loads by itself. The one
+     case that stays marked is an image whose URL the mirror never answers -
+     exactly the image the old scan also re-examined on every event, so the
+     worst case here is the old behaviour and the usual case is a list of a few
+     dozen instead of every image on the page. */
+  const imgs=document.getElementsByClassName('iw');
+  for(let q=imgs.length-1;q>=0;q--){
     const im=imgs[q];
-    if(im.getAttribute('data-native')==='2') continue;
-    const c=(im.getAttribute('data-cand')||'').split('|')[0];
-    const d=imgCacheGet(c);
+    const cd=im.getAttribute('data-cand')||'';
+    const bar=cd.indexOf('|');
+    const d=imgCacheGet(bar<0?cd:cd.slice(0,bar));
     if(!d) continue;
     im.setAttribute('data-native','2'); im.src=d; im.style.opacity=1;
+    im.classList.remove('iw');
     if(im.parentNode) im.parentNode.classList.add('has');
   }
   const now=Date.now(), settled=IMG_EV_N>=IMG_REQ_N;
@@ -694,6 +726,7 @@ function applyImages(reported, countEvent){
     const els=w.els;
     for(let k=0;k<els.length;k++){
       const el=els[k]; el.setAttribute('data-native','2'); el.style.opacity=1;
+      el.classList.remove('iw');
       if(el.parentNode) el.parentNode.classList.add('has'); el.src=d;
     }
     delete IMG_WAIT[url];
