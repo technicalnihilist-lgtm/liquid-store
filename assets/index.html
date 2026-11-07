@@ -1108,6 +1108,30 @@ function showError(st){
   if(!installingNow()) pollStop();
   $('#loadAction').onclick=function(){showLoader(true,'Loading catalogue','Contacting the app repository\u2026',0);$('#strip').classList.add('on');B.load(true)};
 }
+/* A failed refresh must not take the store with it.
+
+   Every load ends in one of two states, and the page treated both the same:
+   phase "error" put the full-screen "Could not load" card up, whatever the
+   bridge was still holding. That is right for a first load - there is nothing
+   behind the card - and wrong for a refresh, because a refresh that fails
+   leaves the catalogue it was refreshing untouched: the index is still in
+   memory, every list still answers, every app page still opens, and the saved
+   copy on disk is still there for the next launch. The card covered all of it
+   with an opaque background, so a reader who tapped Refresh on a flaky
+   connection - or with all ten mirrors down, which is the case the error
+   message is written for - lost the store they were using and could not get it
+   back: Retry needs the network that just failed, and the back button quits
+   the app. Measured from a good catalogue of 200 rows: one failed refresh left
+   zero rows reachable.
+
+   The card is for "nothing to show" only. With a catalogue in hand the failure
+   is reported the way every other transient failure is - a toast - the
+   progress strip goes away, and the store stays exactly where it was. */
+function refreshFailed(st){
+  $('#strip').classList.remove('on');
+  S.refreshing=false;
+  toast('Could not refresh \u2014 '+(st.error||'the catalogue could not be reached.'));
+}
 function applyPartial(st){
   S.partial=!!st.partial;S.stats=B.stats();showLoader(false);
   $('#strip').classList.add('on');updateStrip(st);paintNow(false);
@@ -1154,7 +1178,7 @@ window.__store=function(type,arg){
   const st=B.state(); S.lastPhase=st.phase;
   if(type==='state'){
     if(st.phase==='ready'){onReady();return}
-    if(st.phase==='error'){showError(st);return}
+    if(st.phase==='error'){if(S.ready){refreshFailed(st);return}showError(st);return}
     if(st.count>0) applyPartial(st);
     else if(!S.ready) showLoader(true,st.phase==='parse'?'Reading the catalogue':'Downloading the catalogue',st.detail||'',st.pct||0);
   }else if(type==='apps'){ if(!S.ready&&st.count>0) applyPartial(st) }
