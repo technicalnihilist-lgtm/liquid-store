@@ -805,6 +805,30 @@ function renderCategoryView(view,keep){
   const cat=view==='games'?'Games':S.category;
   h+=`<div class="sec ${view==='apps'?'':'first'}"><h2>${view==='games'?'Top Games':(S.category?esc(S.category):'All Apps')}</h2><span data-count></span></div><div data-listbox></div>`;
   const el=$('#view-'+view); el.innerHTML=h;
+  /* A list rebuilt from its first page must also start at its first row.
+
+     Every other place that throws a list away and builds it again already
+     returns the reader to the top: switchTab() does it for Games, Apps,
+     Arcade and Search, renderSearch() does it for a new query, and 6.9 was
+     the tab switch that had forgotten. The category chips were the last one
+     left out - they are drawn inside the Apps view itself, so tapping one
+     calls renderCategoryView('apps') directly, never switchTab(), and the
+     view kept the offset of the longer list it was showing. Pick a category
+     after scrolling the catalogue and the reader landed in the middle of a
+     list they had never seen, with the chip row and the heading - the only
+     way to pick a different category - scrolled out of view above them. The
+     rebuild also shrank the list under them, which fires a scroll event, and
+     the paging handler saw a position near the end and pulled a second page
+     in to cover the gap it had just opened: measured 3734px into the new
+     list with 80 of its rows loaded, from one tap.
+
+     Set before loadMore() so the clamp-and-scroll that the shrinking list
+     triggers already finds the view at its top: the paging handler then
+     returns early, and nothing pages itself in. keep is exactly "this is not
+     a fresh list" (see above), and every keep:true caller restores the offset
+     itself - refreshVisible() and paintNow() both put back the scrollTop they
+     read - so this is the only place that needs to know. */
+  if(!keep) el.scrollTop=0;
   page.offset=0;page.done=false;
   loadMore(view,cat,el.querySelector('[data-listbox]'),el.querySelector('[data-count]'),page,true,want);
 }
