@@ -1486,8 +1486,26 @@ var ambT=0, ambTimer=0;
    running, exactly as before. */
 function covered(){
   if(window.innerWidth>=640) return false;
-  const s=$('#sheet'), l=$('#loader');
-  return !!((s&&s.classList.contains('on'))||(l&&l.classList.contains('on')));
+  const s=$('#sheet'), l=$('#loader'), b=$('#lb');
+  /* The full-screen screenshot viewer is the third surface that covers the
+     whole frame, and it was the one left out. It sits at z-index 130 over
+     everything, on rgba(0,0,0,.96), and nothing inside it is one of the
+     layers the sway moves - .lb and .lbx are not in the depth selector list,
+     and the <img> fills the screen. So a reader who taps a screenshot and
+     looks at it for a while paid the full ambient price for a document they
+     could not see: measured with the viewer open, 54 style recalculations and
+     916 ms of task time per 3 idle seconds, against 4 ms with depth switched
+     off - the same wall the sheet and the loader were already spared. The
+     viewer is exactly where a reader lingers, so it was the worst of the
+     three. Pausing here is the same trade the sheet already makes: ambT stops
+     advancing and the first tick after the viewer closes carries on from
+     where it left off. At 96% black the 4% that could still show through is
+     below anything the eye can resolve, and the wide-window layout - where
+     the stage really is visible around the frame - still returns false above,
+     so nothing about that case changes. */
+  return !!((s&&s.classList.contains('on'))
+         ||(l&&l.classList.contains('on'))
+         ||(b&&b.classList.contains('on')));
 }
 function ambientStart(){
   /* never hold a timer that has nothing to draw - see depthActive() */
