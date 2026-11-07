@@ -1302,7 +1302,29 @@ $('#sheetClose').addEventListener('click',closeSheet);
 $('#sheetMore').addEventListener('click',function(){
   if(!S.sheetPkg) return;
   let a=null;try{a=B.detail(S.sheetPkg)}catch(e){}
-  if(a&&a.source){window.open(a.source,'_blank');return}
+  /* window.open() is a no-op in this WebView. The app never enables
+     setSupportMultipleWindows (and has no WebChromeClient.onCreateWindow to
+     receive the popup), so a new window has nowhere to go: the call returns
+     null and not even a request is made. Every F-Droid entry carries a
+     sourceCode link, so this button - the only control on the detail page -
+     did nothing at all for nearly every app in the catalogue, while the
+     "Source code" anchor three lines up in the same page worked fine.
+
+     Take the path that anchor already takes: the WebView loads a
+     target="_blank" link itself and hands the URL to
+     MainActivity.shouldOverrideUrlLoading, which sends it to the browser.
+     The scheme check is not decoration - a.source comes from the catalogue
+     index, and shouldOverrideUrlLoading passes file:// straight through, so
+     an unchecked link could steer the store's own view. */
+  if(a&&a.source&&/^https?:\/\//i.test(a.source)){
+    const link=document.createElement('a');
+    link.href=a.source;link.target='_blank';link.rel='noopener';
+    link.style.display='none';
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+    return;
+  }
   toast('Nothing else to show for this app');
 });
 function doRefresh(){
