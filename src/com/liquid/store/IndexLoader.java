@@ -317,8 +317,29 @@ public class IndexLoader {
                not-modified reply never rewrites the cache, so the dead address
                survived until the index itself changed upstream. The mirror
                that just answered is the one to fetch the files from, which is
-               exactly what the download path below already does. */
-            if (pr.base != null && pr.base.length() > 0) r.baseUrl = pr.base;
+               exactly what the download path below already does.
+
+               Fixing it in memory was only half of it. The corrected address
+               was never written back, so it lasted exactly one session: the
+               next cold start reads the saved catalogue - which still names
+               the dead mirror - and serves it without probing anything (see
+               load(): a good cache is returned before any mirror is asked),
+               so the store drew letter placeholders and every Get failed
+               until the reader thought to tap Refresh, every launch, for as
+               long as that mirror stayed down. A 304 means the apps are
+               current, not that the address is; when the address changed,
+               write the catalogue back once so the repair outlives the
+               session. It is a single write, only on the run that found a
+               different mirror, and the bytes are the ones already in hand. */
+            if (pr.base != null && pr.base.length() > 0 && !pr.base.equals(r.baseUrl)) {
+                r.baseUrl = pr.base;
+                try {
+                    writeCache(cache, r);
+                } catch (IOException ignored) {
+                    /* a cache we cannot rewrite is still a catalogue we can
+                       serve - the next launch just pays for the probe again */
+                }
+            }
             p.onApps(r.apps);
             return r;
         }
