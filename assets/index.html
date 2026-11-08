@@ -517,6 +517,42 @@ const PALETTE=[['#4facfe','#1b4fd6'],['#ff9a44','#d6336c'],['#f857a6','#7b2ff7']
                ['#5aa9e6','#2a3fa8'],['#ff7e5f','#b02a5b'],['#a86bd1','#3b2a99'],['#38d6c4','#1a6bb0']];
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
 function pair(pkg){return PALETTE[hash(pkg)%PALETTE.length]}
+/* A catalogue-supplied URL, or "" if it is not one we are willing to render
+   as a link.
+
+   source, issues and webSite are four free-text fields of the remote index -
+   whatever the mirror serving the catalogue puts in them. The detail page drew
+   each one straight into <a href> and let the tap go where it said, and a tap
+   on a link with no scheme check does not go to a browser: the WebView has no
+   multiple-window support, so target="_blank" opens in the store's own window,
+   and MainActivity.shouldOverrideUrlLoading hands every navigation except
+   file:// to the system. file:// it returns false for - on purpose, because
+   that is how the store's own assets load. So a single entry in the index can
+   carry webSite "file:///data/data/com.liquid.store/files/repo/catalog.json",
+   or file:///android_asset/index.html, and one tap on the detail page replaces
+   the store with a raw local file, with no way back and no reload - the reader
+   has to kill the app. A javascript: URL is the same hole with a worse payload:
+   WebView evaluates it in the page that is already running, which is the page
+   holding the Android bridge, so the payload would inherit the store's
+   permission to install packages.
+
+   Only the schemes the store has any business opening are kept - http, https
+   and mailto, which is what every legitimate entry in the index uses. Anything
+   else is dropped exactly as an empty field already was, so nothing that used
+   to be drawn changes: an entry with https links renders the same three
+   anchors it always did, and one with none renders none. The scheme is read
+   with a strict pattern that cannot be fooled by the whitespace and control
+   characters a browser strips before parsing - a value with anything before
+   the colon other than a clean scheme name is not a link we can vouch for, so
+   it fails closed. The #sheetMore handler below already checks its URL this
+   way; these three anchors were the ones left out. */
+function safeLink(u){
+  const s=String(u==null?'':u).trim();
+  const m=/^([a-z][a-z0-9+.\-]*):/i.exec(s);
+  if(!m) return '';                                  /* relative - nothing to open */
+  const sch=m[1].toLowerCase();
+  return (sch==='http'||sch==='https'||sch==='mailto')?s:'';
+}
 function iconEl(a,cls){
   const c=pair(a.pkg), letter=esc((a.name||a.pkg||'?').trim().charAt(0).toUpperCase());
   return `<div class="ic ${cls||''}" style="background:linear-gradient(145deg,${c[0]},${c[1]})"><span class="ltr">${letter}</span>${imgTag(a)}</div>`;
@@ -967,9 +1003,12 @@ function openSheet(pkg){
   const same=S.sheetPkg===pkg&&$('#sheet').classList.contains('on');
   S.sheetPkg=pkg;
   const links=[];
-  if(a.source) links.push(`<a href="${esc(a.source)}" target="_blank" rel="noopener">Source code</a>`);
-  if(a.issues) links.push(`<a href="${esc(a.issues)}" target="_blank" rel="noopener">Report a bug</a>`);
-  if(a.web) links.push(`<a href="${esc(a.web)}" target="_blank" rel="noopener">Website</a>`);
+  /* every one of these is a field of the remote index, so it is checked
+     before it becomes a link the reader can tap - see safeLink() */
+  const srcUrl=safeLink(a.source), issUrl=safeLink(a.issues), webUrl=safeLink(a.web);
+  if(srcUrl) links.push(`<a href="${esc(srcUrl)}" target="_blank" rel="noopener">Source code</a>`);
+  if(issUrl) links.push(`<a href="${esc(issUrl)}" target="_blank" rel="noopener">Report a bug</a>`);
+  if(webUrl) links.push(`<a href="${esc(webUrl)}" target="_blank" rel="noopener">Website</a>`);
   sheetBody(`
     <div class="sheet-head">${iconEl(a,'xl')}
       <div style="flex:1;min-width:0"><h2>${esc(a.name)}</h2>
