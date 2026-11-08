@@ -139,6 +139,29 @@ public class StoreBridge {
     private volatile String error;
     private volatile boolean cancelRequested;
 
+    /**
+     * One catalogue load at a time, for the whole life of the load.
+     *
+     * load() used to guard itself by asking which phase the bridge was in, and
+     * the guard listed three of the five phases IndexLoader reports. "cache"
+     * was not one of them, and that is exactly the phase a load spends its
+     * first few hundred milliseconds in - opening the saved catalogue, or
+     * finding it already up to date and parsing it. So a reader who tapped
+     * Refresh while the store was reading its saved copy started a *second*
+     * load alongside the first: two probes of every mirror, two full downloads
+     * of the index (several megabytes on a metered connection), two publishes
+     * racing to swap the catalogue, and two threads writing
+     * catalog.json through the single fixed temp path it uses - which is how
+     * the saved catalogue ends up truncated and the next cold start has to
+     * fetch the whole index again.
+     *
+     * The phase string was the wrong thing to test anyway: it is a description
+     * for the progress strip, written by the loader from a background thread,
+     * and it only ever matched this guard by coincidence. A flag that is set
+     * when the load starts and cleared when its task ends cannot drift.
+     */
+    private final AtomicBoolean loadInFlight = new AtomicBoolean(false);
+
     /** how long a package snapshot is trusted before it is scanned again */
     private static final long INSTALLED_TTL_MS = 8000;
 
@@ -214,62 +237,78 @@ public class StoreBridge {
 
     @JavascriptInterface
     public void load(final boolean force) {
-        if ("probe".equals(phase) || "download".equals(phase) || "apps".equals(phase)) return;
-        phase = "probe";
-        pct = 0;
-        detail = "looking for the fastest source";
-        error = null;
-        cancelRequested = false;
-        push("state");
-        /* GitHub apps first, from disk - instant, and they show up straight away */
-        try { applyGithub(GitHubSource.cached(ctx)); } catch (Throwable ignored) { }
-        io.execute(new Runnable() {
-            public void run() {
-                try { applyGithub(GitHubSource.load(ctx, force).apps); } catch (Throwable ignored) { }
-            }
-        });
-        final List<String> sources = mirrors();
-        io.execute(new Runnable() {
-            public void run() {
-                try {
-                    IndexLoader.Repo r = IndexLoader.load(workDir, sources, force,
-                            new IndexLoader.Progress() {
-                                public void onPhase(String p, int c, String d) {
-                                    phase = p;
-                                    pct = c;
-                                    detail = d;
-                                    push("state");
-                                }
-
-                                public void onApps(List<AppEntry> apps) {
-                                    publish(apps, true);
-                                }
-                            },
-                            new IndexLoader.Cancel() {
-                                public boolean cancelled() { return cancelRequested; }
-                            });
-                    publish(r.apps, false);
-                    repo = r;
-                    phase = "ready";
-                    pct = 100;
-                    detail = r.apps.size() + " apps";
-                    refreshInstalled(true);
-                    push("ready");
-                } catch (Exception ex) {
-                    boolean wasCancelled = cancelRequested;
-                    cancelRequested = false;
-                    if (wasCancelled) {
-                        phase = index.isEmpty() ? "idle" : "ready";
-                        detail = index.isEmpty() ? "cancelled" : index.size() + " apps";
-                    } else {
-                        phase = "error";
-                        error = String.valueOf(ex.getMessage());
-                        detail = "could not load the catalogue";
-                    }
-                    push("state");
+        if (!loadInFlight.compareAndSet(false, true)) return;
+        try {
+            phase = "probe";
+            pct = 0;
+            detail = "looking for the fastest source";
+            error = null;
+            cancelRequested = false;
+            push("state");
+            /* GitHub apps first, from disk - instant, and they show up straight away */
+            try { applyGithub(GitHubSource.cached(ctx)); } catch (Throwable ignored) { }
+            io.execute(new Runnable() {
+                public void run() {
+                    try { applyGithub(GitHubSource.load(ctx, force).apps); } catch (Throwable ignored) { }
                 }
-            }
-        });
+            });
+            final List<String> sources = mirrors();
+            io.execute(new Runnable() {
+                public void run() {
+                    try {
+                        IndexLoader.Repo r = IndexLoader.load(workDir, sources, force,
+                                new IndexLoader.Progress() {
+                                    public void onPhase(String p, int c, String d) {
+                                        phase = p;
+                                        pct = c;
+                                        detail = d;
+                                        push("state");
+                                    }
+
+                                    public void onApps(List<AppEntry> apps) {
+                                        publish(apps, true);
+                                    }
+                                },
+                                new IndexLoader.Cancel() {
+                                    public boolean cancelled() { return cancelRequested; }
+                                });
+                        publish(r.apps, false);
+                        repo = r;
+                        phase = "ready";
+                        pct = 100;
+                        detail = r.apps.size() + " apps";
+                        refreshInstalled(true);
+                        push("ready");
+                    } catch (Exception ex) {
+                        boolean wasCancelled = cancelRequested;
+                        cancelRequested = false;
+                        if (wasCancelled) {
+                            phase = index.isEmpty() ? "idle" : "ready";
+                            detail = index.isEmpty() ? "cancelled" : index.size() + " apps";
+                        } else {
+                            phase = "error";
+                            error = String.valueOf(ex.getMessage());
+                            detail = "could not load the catalogue";
+                        }
+                        push("state");
+                    } finally {
+                        /* released here, by the load itself, on every path - a
+                           failed, cancelled or successful load all end up here,
+                           and only then may the next one start */
+                        loadInFlight.set(false);
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            /* the task never started, so nothing else will release the flag:
+               a load that wedged it would refuse every later Refresh for the
+               rest of the session, which is worse than the failure itself */
+            loadInFlight.set(false);
+            phase = "error";
+            error = String.valueOf(t.getMessage());
+            detail = "could not load the catalogue";
+            push("state");
+        }
     }
 
     @JavascriptInterface
