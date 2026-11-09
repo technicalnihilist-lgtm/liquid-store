@@ -1001,7 +1001,7 @@ function openSheet(pkg){
   if(!a||!a.pkg) return;
   /* decided before sheetPkg moves: same app, sheet already showing */
   const same=S.sheetPkg===pkg&&$('#sheet').classList.contains('on');
-  S.sheetPkg=pkg;
+  sheetApp(pkg);
   const links=[];
   /* every one of these is a field of the remote index, so it is checked
      before it becomes a link the reader can tap - see safeLink() */
@@ -1040,7 +1040,31 @@ function renderSheetActions(a){
   const secondary=a.installed?`<button class="pill2" data-uninstall="${esc(a.pkg)}">Uninstall</button>`:'';
   box.innerHTML=primary+secondary;
 }
-function closeSheet(){$('#sheet').classList.remove('on');S.sheetPkg=null}
+/* Which app, if any, the sheet is showing.
+
+   The sheet is one surface with several pages behind it - an app's page, the
+   Sources list, the Depth panel, and the "One permission needed" page - and
+   S.sheetPkg is the app that the pagebar's More button, the install poll and
+   refreshVisible() all act on. It was assigned in exactly two places: openSheet()
+   set it, and closeSheet() cleared it. Nothing cleared it when the sheet swapped
+   to a page that is not an app's, so those pages inherited whichever app had
+   been open before them.
+
+   The permission page is the one a reader really lands on, and it is reached
+   from inside an app's page: open an app, tap Get on a device that has not
+   allowed installs from this source yet, and the page that replaces it is
+   still filed under that app. Its More button then opened that app's source
+   URL in the browser - an app the reader was no longer looking at, and it took
+   the store with it, with no way back but to relaunch. An install finishing in
+   the background while the permission page was up did the same thing from the
+   other side: pollInstall() saw S.sheetPkg match and called openSheet(),
+   replacing the page the reader was reading with the app page underneath it.
+
+   Every page now states what it is, so "the sheet is showing app X" is true
+   exactly when it is. More on a page with no app returns silently, which is
+   what it already did whenever no app had been opened at all. */
+function sheetApp(pkg){ S.sheetPkg=pkg||null }
+function closeSheet(){$('#sheet').classList.remove('on');sheetApp(null)}
 
 /* ---------- install ---------- */
 function beginInstall(pkg){
@@ -1055,6 +1079,7 @@ function showPermission(){
     <div class="desc">${esc(c.message||'Android needs your permission before Liquid Store can install apps. This is a one-time switch - after that installs start straight from the store.')}</div>
     <div class="installrow"><button class="bigget g press" id="grantBtn"><span>Open settings</span></button></div>
     <div class="meta-list">Nothing else is requested: no account, no sign-in, no advertising identifier.</div>`);
+  sheetApp(null);                       /* not an app's page - see sheetApp() */
   const b=$('#grantBtn');
   if(b) b.addEventListener('click',()=>{B.requestInstallPermission();toast('Turn on "Allow from this source", then press Get again.')});
   $('#sheet').classList.add('on');
@@ -1786,6 +1811,7 @@ function openDepth(){
     '<div class="setrow"><div class="meta"><b>Follow device tilt</b><small>Use the phone&rsquo;s sensors instead of touch</small></div>'+
       '<div class="sw'+(D.tilt?' on':'')+'" id="dTilt" role="switch" aria-checked="'+D.tilt+'"><i></i></div></div>'+
     footer());
+  sheetApp(null);                       /* not an app's page - see sheetApp() */
   $('#sheet').classList.add('on');
 
   $('#dOn').addEventListener('click',function(){
@@ -1827,6 +1853,7 @@ function openSources(){
     '<div class="searchbar g"><input id="srcInput" placeholder="https://your.mirror/fdroid/repo" autocomplete="off" spellcheck="false" value="'+esc(s.custom||'')+'"></div>'+
     '<div class="installrow"><button class="bigget g press" id="srcSave"><span>Save and reload</span></button></div>'+
     '<div class="eyebrow">Official mirrors</div>'+rows+footer());
+  sheetApp(null);                       /* not an app's page - see sheetApp() */
   $('#sheet').classList.add('on');
   const save=$('#srcSave');
   if(save) save.addEventListener('click',function(){
