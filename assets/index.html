@@ -1793,6 +1793,9 @@ function bindScrollParallax(){
     v.setAttribute('data-par','1');
     v.addEventListener('scroll',function(){
       if(!D.on) return;
+      /* only the view on screen owns the parallax offset - see the note on the
+         pagination handler below, which is the same phantom event */
+      if(!v.classList.contains('on')) return;
       queueScrollOffset(v);
     },{passive:true});
   });
@@ -1862,10 +1865,48 @@ function openSources(){
   });
 }
 
-/* scroll: compact nav title + pagination */
+/* scroll: compact nav title + pagination.
+
+   Only the view on screen may act on a scroll event.
+
+   All five views stay in the document and each one is its own scroll box, and
+   a view that is not on screen is skipped by the stylesheet -
+   .view:not(.on):not(.fading){content-visibility:hidden}. Skipping the contents
+   also collapses that box: with nothing laid out inside it, scrollHeight falls
+   back to clientHeight and the browser clamps scrollTop to 0. Changing scrollTop
+   fires a scroll event, so leaving a scrolled view fires exactly one more of
+   them, on the view being left, the moment its fade-out ends and .fading is
+   dropped (see switchTab).
+
+   Both scroll handlers - this one and bindScrollParallax() above - then
+   treated it as a reader scrolling:
+
+   - Pagination. The near-the-end test was scrollTop+clientHeight < scrollHeight-400,
+     which for a collapsed box is 0+clientHeight < clientHeight-400 - false, so it
+     read as "the reader is at the bottom" and pulled the next page in. Measured
+     on a 420-app catalogue, four tab switches away from a part-loaded Apps list:
+     one list('', '', 'name', 40, 40) each time - a synchronous bridge call that
+     builds and sorts the page in Java and ships it back as JSON - and forty rows
+     of HTML inserted into a view nobody can see, 40 rows growing to 80, then
+     thrown away by the next renderCategoryView(). 3-5 ms of JavaScript thread per
+     switch on a desktop CPU, several times that on a phone, for output that is
+     always discarded. It also left S.pages['apps:'].offset ahead of the rows that
+     exist, which is the count refreshVisible()/paintNow() restore from.
+
+   - Parallax. The same event reached bindScrollParallax(), where scrollTop is now
+     0, so setScrollOffset() wrote --sy=0 over the offset of the view the reader
+     had just moved to. Measured: scroll Apps to 500, switch to Games, scroll Games
+     to 300 - --sy on .stage reads 300, then snaps to 0 about 600 ms later while
+     the reader is still on Games. The background and Today's cards lost their lag
+     and only got it back on the next scroll event.
+
+   The view being left can show neither of them, so both handlers return here. The
+   view on screen is unaffected: it carries .on, its box is not collapsed, and its
+   own scroll events take the same path they always did. */
 document.querySelectorAll('.view').forEach(function(v){
   v.addEventListener('scroll',function(){
-    if(v.classList.contains('on')) $('#navbar').classList.toggle('show',v.scrollTop>50);
+    if(!v.classList.contains('on')) return;
+    $('#navbar').classList.toggle('show',v.scrollTop>50);
     if(!S.ready) return;
     if(v.scrollTop+v.clientHeight<v.scrollHeight-400) return;
     const view=v.id.replace('view-','');
