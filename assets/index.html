@@ -675,6 +675,31 @@ function imgFail(el){
    paint. One screenful of forty icons therefore cost about forty calls per
    icon: measured on a 640-row catalogue, 22,699 imageData calls to page
    through it against 566 fetches. Now it is one call per fetch. */
+/* Drop the "waiting" marker from every image parked under one URL.
+
+   The marker is the only thing that puts an image in the list at the top of
+   applyImages(), and it was removed in exactly one place: when the bytes
+   finally arrived. An image whose bytes never arrive - the mirror has no icon
+   for that app, which is what every guessed URL shape in iconCandidates()
+   produces - kept its marker for the rest of the session, and the parked
+   entry that used to point at it was deleted as soon as every fetch had
+   reported. So the list stopped describing the images still waiting and
+   started describing every icon the mirror does not have: measured after one
+   screenful of a catalogue whose mirror was missing half its icons, 109 images
+   still marked and 109 getAttribute() calls on every single image event -
+   21,800 of them over 200 events, on the thread that is also painting, and one
+   more per icon every time another page is scrolled in. A refresh that
+   republishes the catalogue re-draws the views and adds the new ones.
+
+   Nothing about the drawing changes: .iw has no rule in the stylesheet, the
+   <img> is at opacity 0 until its onload sets it either way, and the letter
+   placeholder under it is what the reader sees in both cases - which is
+   exactly what they saw before. */
+function unmarkWait(w){
+  if(!w||!w.els) return;
+  const els=w.els;
+  for(let k=0;k<els.length;k++) els[k].classList.remove('iw');
+}
 function applyImages(reported, countEvent){
   if(countEvent!==false) IMG_EV_N++;
   /* 1 means requested, 2 means requested and answered - see requestImage() */
@@ -733,7 +758,7 @@ function applyImages(reported, countEvent){
        reader scrolls and opens app pages. Retire them here, with a map lookup
        and no bridge call: a file that was never fetched cannot be on disk. */
     if(url!==reported){
-      if(settled&&!IMG_DONE.has(url)) delete IMG_WAIT[url];
+      if(settled&&!IMG_DONE.has(url)){unmarkWait(IMG_WAIT[url]);delete IMG_WAIT[url]}
       continue;
     }
     const w=IMG_WAIT[url];
@@ -749,7 +774,14 @@ function applyImages(reported, countEvent){
            re-render also left the detached <img> parked here. */
         let live=0;
         for(let k=0;k<w.els.length;k++) if(w.els[k].parentNode) live++;
-        if(!live||settled||now-w.at>IMG_WAIT_MS){delete IMG_WAIT[url];continue}
+        if(!live||settled||now-w.at>IMG_WAIT_MS){
+          /* settled: every fetch we made has reported and none of them had
+             these bytes, so no later event can name this URL - see
+             unmarkWait(). A timed-out wait keeps its marker, because a fetch
+             that is still somehow in flight could yet report. */
+          if(settled) unmarkWait(w);
+          delete IMG_WAIT[url];continue
+        }
         if(live!==w.els.length){
           const keep=[];
           for(let k=0;k<w.els.length;k++) if(w.els[k].parentNode) keep.push(w.els[k]);
