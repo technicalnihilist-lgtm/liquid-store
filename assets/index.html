@@ -1304,7 +1304,33 @@ window.__store=function(type,arg){
     if(st.phase==='error'){if(S.ready){refreshFailed(st);return}showError(st);return}
     if(st.count>0) applyPartial(st);
     else if(!S.ready) showLoader(true,st.phase==='parse'?'Reading the catalogue':'Downloading the catalogue',st.detail||'',st.pct||0);
-  }else if(type==='apps'){ if(!S.ready&&st.count>0) applyPartial(st) }
+  }else if(type==='apps'){
+    /* An 'apps' event is not only a streaming event.
+     *
+     * The catalogue is republished whenever it changes, and one of those
+     * changes arrives long after the store is ready: the GitHub-release half
+     * of it is merged in from the network. GitHubSource.load() runs on the io
+     * pool alongside the F-Droid index and its release lookups are 36
+     * api.github.com round trips, so it finishes seconds after the index is
+     * ready and already drawn - and on a stale GitHub cache it is the only
+     * publish that carries the current versions.
+     *
+     * This branch only ever fired while the store was still filling in
+     * (`!S.ready`), so that publish was dropped. The entries were in the
+     * bridge's index - list() served them, detail() opened them - but nothing
+     * on screen had drawn them: measured with the harness, an app published
+     * after ready was absent from Today, from Apps and from whichever tab was
+     * open, until the reader switched tabs, which is the only thing that
+     * re-queries the bridge. Every GitHub app added or updated by that fetch
+     * stayed invisible for the rest of the session.
+     *
+     * Once ready, redraw what is on screen instead. refreshVisible() restores
+     * the scroll position and the pages already scrolled to, and it is the
+     * call the 'installed' event already uses for exactly this - "the
+     * catalogue changed underneath you". Nothing about the drawing changes. */
+    if(!S.ready){ if(st.count>0) applyPartial(st) }
+    else refreshVisible();
+  }
   else if(type==='ready') onReady();
 };
 window.__onBack=function(){
