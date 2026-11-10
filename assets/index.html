@@ -1571,10 +1571,34 @@ function depthLoad(){
   }catch(e){}
 }
 function depthSave(){try{localStorage.setItem(DEPTH_KEY,JSON.stringify({on:D.on,amt:D.amt,tilt:D.tilt}))}catch(e){}}
+/* Put the effect into its current state, and keep the two halves of it in step.
+
+   Switching depth off writes --dx and --dy back to 0, because that is the rest
+   pose the layers have to resolve to when there is no tilt (see the note on the
+   fallbacks in the stylesheet). It did not touch D.dx and D.dy, the spring
+   depthFrame() integrates - and with depth off nothing ever wrote them again,
+   so the two stopped describing the same thing: the stylesheet said the layers
+   were level, the spring still held the last tilt the finger had left them at.
+
+   The spring is what depthFrame() starts from, not the custom property. So the
+   first pointer move after depth came back on wrote that stale value straight
+   out: measured on this page, drag to the bottom edge (D.dy 0.9999), Depth
+   panel -> Enable depth off (--dy 0, D.dy still 0.9999), Enable depth on
+   (--dy 0, D.dy still 0.9999), then one move towards the top - --dy jumped
+   from 0 to 0.4859 in a single frame instead of easing from 0 towards -0.136
+   the way the spring describes. The whole screen snapped to a half tilt and
+   then slid, which is the one thing the spring exists to prevent, on the
+   gesture the panel is built around.
+
+   Zeroing the spring in the same branch as the two properties it feeds means
+   the two can never disagree, whichever path switches depth off. Nothing
+   visible changes: at any moment depth is on, D.dx and D.dy are exactly what
+   depthFrame() last wrote, and the only run this touches is one that was
+   writing 0 over a value nothing could see. */
 function depthApply(){
   const r=document.documentElement;
   r.style.setProperty('--amt', D.on ? String(D.amt) : '0');
-  if(!D.on){r.style.setProperty('--dx','0');r.style.setProperty('--dy','0')}
+  if(!D.on){r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');D.dx=0;D.dy=0}
 }
 function depthFrame(){
   D.raf=0;
