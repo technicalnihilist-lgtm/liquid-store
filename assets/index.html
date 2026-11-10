@@ -1265,12 +1265,48 @@ function updateStrip(st){
   $('#stripText').textContent=label+(st.detail?'  \u00b7  '+st.detail:'');
 }
 let lastPaint=0;
+const PAINT_GAP=400;
 function paintNow(force){
-  const now=Date.now(); if(!force&&now-lastPaint<400) return; lastPaint=now;
+  const now=Date.now(); if(!force&&now-lastPaint<PAINT_GAP) return; lastPaint=now;
   if(S.view==='search') return;
   const v=document.querySelector('.view.on'), top=v?v.scrollTop:0;
   if(S.view==='today') renderToday(); else if(S.view==='arcade') renderArcade(true); else renderCategoryView(S.view,true);
   const v2=document.querySelector('.view.on'); if(v2) v2.scrollTop=top;
+}
+/* Redraw the visible view at most once per PAINT_GAP while the catalogue
+   streams in, and always once more for the last batch.
+
+   A load publishes the catalogue every BATCH apps (IndexLoader.BATCH, 250) as
+   it parses, and the page treats each publish as "the catalogue changed
+   underneath you". That is the right reading, but on a *refresh* it was paid
+   in full every time: the store is already ready, so the 'apps' event went
+   straight to refreshVisible(), which throws the visible list away and builds
+   it again from every page the reader had scrolled to. A cold load never did
+   this - while !S.ready the same event goes through paintNow(), which is
+   throttled to one redraw per PAINT_GAP for exactly this reason - so the
+   expensive path was the one the reader triggers deliberately.
+
+   Measured on a 3000-app catalogue with 280 rows scrolled in: one refresh
+   publishes twelve times and rebuilt those 280 rows twelve times, 3360 rows
+   of HTML and about a second of the thread that is also painting, all to end
+   up with the same list. The reader sees the list they are scrolling flicker
+   and stall for the length of the download. On F-Droid's real index - about
+   twice that - it is two seconds and twenty-four rebuilds.
+
+   Trailing redraw matters: the GitHub half of the catalogue is merged in from
+   the network seconds after the store is ready and arrives as a single
+   'apps' publish (see the 'apps' branch below, which exists so it is not
+   dropped). A leading-edge-only throttle could swallow it if a redraw had
+   just run, so a timer guarantees the last event is always drawn, one gap
+   later. Nothing about the drawing changes - refreshVisible() restores the
+   scroll position and the pages already loaded, so the list is the same list
+   either way, just built once instead of once per batch. */
+let appsPaintT=0;
+function refreshSoon(){
+  const wait=PAINT_GAP-(Date.now()-lastPaint);
+  if(wait<=0){ clearTimeout(appsPaintT); appsPaintT=0; lastPaint=Date.now(); refreshVisible(); return; }
+  if(appsPaintT) return;
+  appsPaintT=setTimeout(function(){ appsPaintT=0; lastPaint=Date.now(); refreshVisible(); },wait);
 }
 let readyAt=0;
 function onReady(){
@@ -1324,12 +1360,14 @@ window.__store=function(type,arg){
      * re-queries the bridge. Every GitHub app added or updated by that fetch
      * stayed invisible for the rest of the session.
      *
-     * Once ready, redraw what is on screen instead. refreshVisible() restores
-     * the scroll position and the pages already scrolled to, and it is the
-     * call the 'installed' event already uses for exactly this - "the
+     * Once ready, redraw what is on screen instead - through refreshSoon(),
+     * which is refreshVisible() with the same one-per-PAINT_GAP ceiling the
+     * streaming load already gets from paintNow(); see there. refreshVisible()
+     * restores the scroll position and the pages already scrolled to, and it
+     * is the call the 'installed' event already uses for exactly this - "the
      * catalogue changed underneath you". Nothing about the drawing changes. */
     if(!S.ready){ if(st.count>0) applyPartial(st) }
-    else refreshVisible();
+    else refreshSoon();
   }
   else if(type==='ready') onReady();
 };
