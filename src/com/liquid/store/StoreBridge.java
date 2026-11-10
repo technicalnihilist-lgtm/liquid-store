@@ -185,10 +185,50 @@ public class StoreBridge {
      * Let go of the WebView for good. Called by MainActivity.onDestroy()
      * before it destroys the WebView itself, so that nothing this bridge runs
      * afterwards can reach a freed one.
+     *
+     * Clearing the flag was only half of letting go. Both pools live on the
+     * bridge, the bridge lives on the pool threads (every task is an inner
+     * class holding StoreBridge.this), and nothing ever shut them down - so the
+     * Activity that owned this bridge stayed reachable through ctx and web for
+     * as long as anything was still queued on them, with web already destroyed
+     * underneath it. And there is always something queued: icons and
+     * screenshots are asked for one per image drawn, so closing the store in
+     * the middle of a scrolled catalogue left dozens of fetches waiting, each
+     * allowed 8 s to connect and 15 s to read, on three threads. They went on
+     * downloading into a cache nobody would look at, on the reader's battery
+     * and data, after the app was gone - and every later launch added three
+     * more idle threads per pool, because a new Activity builds a new bridge
+     * and a new pair of pools.
+     *
+     * shutdownNow() drains the queues and interrupts what is running. Queued
+     * work is the point: an icon that has not started yet can only be drawn
+     * into a page that no longer exists, so dropping it changes nothing that
+     * could have been seen. A fetch already inside a socket read finishes on
+     * its own timeout and then finds its thread gone, which is also fine - it
+     * reports through pushImage(), and that is gated on closed.
      */
     void shutdown() {
         closed = true;
         if (INSTANCE == this) INSTANCE = null;
+        io.shutdownNow();
+        imgIo.shutdownNow();
+    }
+
+    /**
+     * Hand a task to one of the pools, unless this bridge has been shut down.
+     *
+     * Every submission goes through here: after shutdown() the pools reject, and
+     * a RejectedExecutionException thrown out of a @JavascriptInterface method
+     * is an exception in the page (and, from the scan's own tail, an uncaught
+     * one on a pool thread). Work for a closed bridge is simply not wanted.
+     */
+    private void submit(ExecutorService pool, Runnable task) {
+        if (closed) return;
+        try {
+            pool.execute(task);
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {
+            /* shutdown() got there between the check and the submit */
+        }
     }
 
     StoreBridge(Context ctx, WebView web) {
@@ -203,7 +243,7 @@ public class StoreBridge {
         /* An install that has been around a while may already have filled the
            image cache past the budget, so shrink it once - off the main thread,
            because it is a directory scan. */
-        io.execute(new Runnable() {
+        submit(io, new Runnable() {
             public void run() {
                 try { images.checkNow(); } catch (Throwable ignored) { }
             }
@@ -247,13 +287,13 @@ public class StoreBridge {
             push("state");
             /* GitHub apps first, from disk - instant, and they show up straight away */
             try { applyGithub(GitHubSource.cached(ctx)); } catch (Throwable ignored) { }
-            io.execute(new Runnable() {
+            submit(io, new Runnable() {
                 public void run() {
                     try { applyGithub(GitHubSource.load(ctx, force).apps); } catch (Throwable ignored) { }
                 }
             });
             final List<String> sources = mirrors();
-            io.execute(new Runnable() {
+            submit(io, new Runnable() {
                 public void run() {
                     try {
                         IndexLoader.Repo r = IndexLoader.load(workDir, sources, force,
@@ -730,7 +770,7 @@ public class StoreBridge {
             if (force) rescanWanted = true;
             return;
         }
-        io.execute(new Runnable() {
+        submit(io, new Runnable() {
             public void run() {
                 Map<String, Long> m = scanInstalled();
                 if (m != null) {
@@ -888,7 +928,7 @@ public class StoreBridge {
         insError = null;
         push("progress");
 
-        io.execute(new Runnable() {
+        submit(io, new Runnable() {
             public void run() {
                 PackageInstaller.Session session = null;
                 int id = -1;
@@ -1074,7 +1114,7 @@ public class StoreBridge {
         if (url == null || url.length() == 0) return;
         /* imgIo, not io: see the field comment - an icon must never queue in
            front of a catalogue load, an install or a package scan */
-        imgIo.execute(new Runnable() {
+        submit(imgIo, new Runnable() {
             public void run() {
                 try {
                     File f = imageFile(url);
