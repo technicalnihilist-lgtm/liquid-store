@@ -1308,6 +1308,42 @@ function refreshSoon(){
   if(appsPaintT) return;
   appsPaintT=setTimeout(function(){ appsPaintT=0; lastPaint=Date.now(); refreshVisible(); },wait);
 }
+/* The store reaches "ready" twice in a session: once at the end of the load
+   that filled it, and once at the end of every refresh the reader asks for.
+
+   The two are not the same thing, and this function used to treat them as if
+   they were. Its whole body is the cold-start path - build Today, Games, Apps,
+   Arcade and Search from their first page - and that is exactly right when
+   there is nothing on screen yet: five empty <section>s get their first rows.
+   Run again over a store that is already drawn, the same five calls throw away
+   the list the reader is reading and rebuild it from page one, at the top.
+
+   A refresh reaches this line with all of that work already done properly.
+   Every batch that streams in is drawn through refreshVisible(), which keeps
+   the pages already scrolled to and puts the scroll position back (see the
+   note on refreshSoon) - so for the length of the download the reader's place
+   is preserved. Then the load publishes its last event and this function
+   rebuilt all five views from scratch: measured on a 320-app catalogue with
+   280 rows scrolled into Apps, the refresh that kept 280 rows and 20766px of
+   scroll through every batch dropped to 40 rows at 0px on the ready event -
+   the list collapsed under the reader and the rows above them were gone, at
+   the exact moment the store told them the catalogue was updated.
+
+   Search paid a second bill for the same rebuild. renderSearch() replaces the
+   search field, so a refresh that landed while the reader was typing took the
+   keyboard away mid-word - on Android that is the IME closing and the view
+   jumping up, once per refresh - and re-drew the results from their first
+   sixty while the reader was 220 rows into them.
+
+   So only a cold start draws the store. A refresh redraws what is on screen
+   through refreshVisible(), the same call the streaming batches and the
+   'installed' event already use for "the catalogue changed underneath you":
+   it keeps the loaded pages, restores the scroll position, leaves the search
+   field (and its focus, and its query) alone, and patches the open sheet's
+   actions. The views that are not on screen are not left stale by this -
+   switchTab() rebuilds whichever one the reader moves to, from the catalogue
+   as it stands now, which is what it already did for every view a refresh had
+   never touched. */
 let readyAt=0;
 function onReady(){
   const st=B.state(); if(st.phase!=='ready') return;
@@ -1316,8 +1352,13 @@ function onReady(){
   $('#strip').classList.remove('on');S.stats=B.stats();
   const upd=B.list('','','updated',0,30);
   if(upd.apps.length){const day=Math.floor(Date.now()/86400000);S.featured=upd.apps[day%upd.apps.length]}
-  renderToday();renderCategoryView('games');renderCategoryView('apps');renderArcade();renderSearch();
-  if(S.sheetPkg){try{renderSheetActions(B.detail(S.sheetPkg))}catch(e){}}
+  if(first){
+    renderToday();renderCategoryView('games');renderCategoryView('apps');renderArcade();renderSearch();
+    if(S.sheetPkg){try{renderSheetActions(B.detail(S.sheetPkg))}catch(e){}}
+  }else{
+    /* a refresh: redraw the view that is on screen, in place - see above */
+    refreshVisible();
+  }
   if(!first&&S.refreshing){S.refreshing=false;toast(S.lastPhase==='cache'?'Already up to date':'Catalogue updated')}
 }
 /* The bridge calls this for every kind of event, and three of those kinds -
