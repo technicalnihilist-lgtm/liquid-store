@@ -1096,7 +1096,46 @@ function renderSheetActions(a){
    exactly when it is. More on a page with no app returns silently, which is
    what it already did whenever no app had been opened at all. */
 function sheetApp(pkg){ S.sheetPkg=pkg||null }
-function closeSheet(){$('#sheet').classList.remove('on');sheetApp(null)}
+/* Closing the sheet used to hide the page, not let go of it.
+
+   #sheet is never display:none - it is a flex box parked at
+   transform:translateX(104%) - and closeSheet() only dropped .on. So every
+   node of the last app page stayed in the document, including its icons and
+   all eight screenshots, each one carrying the data URI the native cache
+   handed it: the same base64 that IMG_DONE is carefully capped at 6 MB to
+   hold was still pinned in the DOM afterwards, where nothing evicts it. The
+   sheet is also still in the render tree at that offset, so the engine keeps
+   the decoded bitmaps as well - a screenshot at 1080x1920 is 8.3 MB of
+   pixels, and the page holds up to eight of them.
+
+   Measured on this page with a stand-in bridge serving 300 KB per screenshot:
+   after tapping back out of an app page, #sheetBody still held 9 images and
+   2.64 MB of base64 - the same numbers as while the page was open - and 9.67
+   MB across the whole document with every overlay closed. The next app page
+   replaced it, so the peak was one page, but that peak outlived the surface
+   by the rest of the session: browse a few apps and the store sits on tens of
+   megabytes of pixels nobody can see. Nothing visual changes - the page is
+   off screen the whole time - and openSheet() writes a fresh page into
+   #sheetBody before it shows the sheet again, so a reopened sheet cannot tell
+   the difference.
+
+   The clear waits for the slide-out. Dropping the content the instant .on
+   goes would empty the page while it is still travelling off screen, which is
+   the one moment it is visible; 420 ms clears the .38s transform even when
+   the transition starts late. The guard covers a sheet reopened inside that
+   window, which must keep the page it has just been given. */
+const SHEET_RELEASE_MS=420;
+function closeSheet(){
+  const sh=$('#sheet');
+  sh.classList.remove('on');
+  sheetApp(null);
+  clearTimeout(sh.releaseT);
+  sh.releaseT=setTimeout(function(){
+    if(sh.classList.contains('on')) return;      /* reopened while it slid out */
+    const b=$('#sheetBody');
+    if(b) b.innerHTML='';
+  },SHEET_RELEASE_MS);
+}
 
 /* ---------- install ---------- */
 function beginInstall(pkg){
@@ -1574,7 +1613,23 @@ function openLb(src){
   $('#lbImg').src=src;
   lb.classList.add('on');
 }
-function closeLb(){const lb=$('#lb');if(lb)lb.classList.remove('on')}
+/* The screenshot viewer is the other surface that hid its page instead of
+   letting go of it. It has no transition - .lb is display:none without .on -
+   so the image is already invisible the moment .on goes, and the src can be
+   dropped in the same breath. It used to be left in place, which pinned one
+   full-screen screenshot - the data URI, up to 900 KB of base64, and its
+   decoded bitmap - for the rest of the session after the reader closed it;
+   measured on this page, 1 image and 0.29 MB of base64 still in #lb after
+   closeLb().
+
+   removeAttribute, not src='': an empty src resolves against the document and
+   makes the engine request the page itself, which is the classic way to turn
+   "clear the image" into a network call. */
+function closeLb(){
+  const lb=$('#lb'); if(!lb) return;
+  lb.classList.remove('on');
+  const im=$('#lbImg'); if(im) im.removeAttribute('src');
+}
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
