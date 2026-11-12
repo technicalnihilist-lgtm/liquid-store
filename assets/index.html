@@ -268,6 +268,37 @@ input{font-family:inherit}
                             calc((var(--dy,0) + var(--ay,0)) * var(--amt) * -30px + var(--sy,0) * 0.08px),
                             0) scale(1.08)}
 
+/* With the effect off, the depth transforms resolve to identity - and the
+   compositor cannot tell.
+
+   perspective(700px) rotateY(0deg) rotateX(0deg) translateZ(0px) maps every
+   point of a flat element to itself, so at Strength 0, and with "Enable depth"
+   off (where --amt is 0), those layers draw exactly what they would draw with
+   no transform at all. What they also do is hold a compositor layer each:
+   measured on a 420-row Apps list with the effect off, 518 layers against 137
+   for the same document without the transforms, and 120 scrolled frames cost
+   5.2-7.2 s of main-thread task time at 83-100 ms a frame, against 1.7-3.1 s
+   at 17-33 ms. That is the state the panel offers to a reader whose device is
+   struggling - "turn it down if it feels busy" - and until now it bought back
+   the style work but not the layers.
+
+   So when the effect cannot move anything, the transforms are dropped. The
+   selector is the depth list above minus .hero/.bigcard: those two carry the
+   scroll parallax (--sy), which is deliberately not scaled by --amt and is
+   still visible at Strength 0, and .stage is not in that list at all.
+   Nothing about the drawing changes: the geometry of all 479 rows, icons,
+   buttons, cards and chrome is identical to the hundredth of a pixel with and
+   without this rule, and screenshots of Today, Apps and an app page differ
+   only in antialiasing rounding - a level or two on glyph and gradient edges -
+   because the same pixels are rasterised directly instead of through a layer
+   of their own. */
+:root.flat .row,:root.flat .tile,:root.flat .hcard,:root.flat .chip,
+:root.flat .searchbar,:root.flat .mi,:root.flat .ic,:root.flat .tabbar,
+:root.flat .navbar,:root.flat .pagebar,:root.flat .setrow,:root.flat .stat,
+:root.flat .shot,:root.flat .pill,:root.flat .pill2,:root.flat .bigget,
+:root.flat .get,:root.flat .arc,:root.flat .loadcard,:root.flat .avatar,
+:root.flat .sheet-body>*{transform:none}
+
 /* settings controls */
 .setrow{display:flex;align-items:center;gap:14px;padding:15px 2px;border-top:.5px solid var(--sep)}
 .setrow:first-of-type{border-top:none}
@@ -1775,6 +1806,10 @@ function depthSave(){try{localStorage.setItem(DEPTH_KEY,JSON.stringify({on:D.on,
    true on every Strength slider move, and this branch is not reached). */
 function depthApply(){
   const r=document.documentElement;
+  /* the stylesheet drops the depth transforms entirely while the effect is
+     off - see the :root.flat rule - so the state has to be kept in step with
+     the two values depthActive() reads, on every path that can change them */
+  r.classList.toggle('flat', !depthActive());
   r.style.setProperty('--amt', D.on ? String(D.amt) : '0');
   if(!D.on){
     r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');D.dx=0;D.dy=0;
