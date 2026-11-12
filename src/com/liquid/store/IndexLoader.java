@@ -234,10 +234,35 @@ public class IndexLoader {
             try { Thread.sleep(50); } catch (InterruptedException e) { break; }
         }
         pool.shutdownNow();
-        Collections.sort(out, new Comparator<Probe>() {
+        /* Hand back a snapshot, not the list the probes are still writing to.
+         *
+         * shutdownNow() interrupts the probe threads, it does not join them,
+         * and a probe that had already finished its request still runs the one
+         * line that adds it to `out` - after this method has returned. So the
+         * list the caller held was the same live object the threads were still
+         * appending to, and the order it was given here was not the order it
+         * kept: a mirror that missed the grace period was appended after the
+         * sort, at the end, and load() then iterated that list - `ranked.size()`
+         * is re-read on every pass - to decide which mirror to try and which
+         * three to name in the progress line. The one contract of this method
+         * is "fastest source first", and the answer it returned could change
+         * underneath the caller.
+         *
+         * Measured with three local mirrors, one answering at once and two at
+         * 1.6 s: probeAll() returned one probe, and the list it returned held
+         * three 2.2 s later. Nothing about a probe that answers inside the
+         * window changes - the snapshot holds exactly the entries the sort
+         * would have seen, in the same order - and a probe that answers after
+         * it is ignored, which is what "never wait for the slow ones" already
+         * meant. */
+        List<Probe> ranked;
+        synchronized (out) {
+            ranked = new ArrayList<Probe>(out);
+        }
+        Collections.sort(ranked, new Comparator<Probe>() {
             public int compare(Probe a, Probe b) { return Long.compare(a.ms, b.ms); }
         });
-        return out;
+        return ranked;
     }
 
     static Probe probeOne(String base, int timeoutMs, String prevLm, String prevEtag) {
