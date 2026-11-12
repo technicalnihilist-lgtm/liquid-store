@@ -592,6 +592,38 @@ const IMG_WAIT={};
 /* Bytes we have already fetched for an image, as data URIs, most recently used
    last. Bounded: see imgCachePut(). */
 const IMG_DONE=new Map();
+/* URLs the native cache has answered with nothing, once every fetch we had
+   made had already reported - so "there is no such file" rather than "not
+   yet".
+
+   The mirror does not have an icon for every app, and every guessed URL shape
+   in iconCandidates() is one more that may not exist. Nothing remembered that
+   answer: IMG_REQ stops a second *fetch*, but a re-render draws the icon
+   again, its <img> fails again, imgFail() parks it again and asks imageData()
+   again - a synchronous bridge call (a SHA-1 of the URL, then a file stat) on
+   the thread that is also painting, once per missing icon per render, for the
+   life of the session. Measured on a 200-row list whose mirror had half its
+   icons, four redraws (an install tick, a refresh, a tab switch) cost 369
+   extra imageData() calls - 516 of 616 answers were "nothing there" - and
+   every one of those images also carried a src the WebView kept re-requesting
+   over the network.
+
+   So remember the answer. A URL in here is drawn without the iw marker, which
+   is what keeps it out of applyImages()'s list and out of imgFail()'s parked
+   table, and the bridge is not asked about it again. Its src is left in place
+   on purpose: the WebView still gets its own chance at the file, so an icon
+   that was only briefly unreachable still appears the moment it loads. Only
+   the redundant half - the bridge call for a file the bridge has already said
+   is not there - goes away. Bounded, because a session can walk any number of
+   URLs: past the cap the set is dropped and re-learned, which is exactly the
+   cost that was being paid on every render before. */
+const IMG_NONE=new Set();
+const IMG_NONE_MAX=1024;
+function noteDead(url){
+  if(!url||IMG_DONE.has(url)) return;
+  if(IMG_NONE.size>=IMG_NONE_MAX) IMG_NONE.clear();
+  IMG_NONE.add(url);
+}
 /* How long a parked icon may keep costing us a bridge call. Longer than the
    native fetch can possibly take (8s connect + 15s read), so a slow icon is
    never dropped while it is still downloading. */
@@ -625,6 +657,8 @@ function imgCacheGet(url){
   return d;
 }
 function imgCachePut(url,d){
+  /* bytes exist after all - whatever we thought about this URL, forget it */
+  IMG_NONE.delete(url);
   const old=IMG_DONE.get(url);
   if(old!==undefined){IMG_DONE_BYTES-=old.length;IMG_DONE.delete(url)}
   IMG_DONE.set(url,d);IMG_DONE_BYTES+=d.length;
@@ -643,16 +677,20 @@ function imgCachePut(url,d){
    native cache writes each URL to a single temp path, so those parallel
    downloads clobbered each other and left a truncated icon cached for good. */
 function requestImage(url){
-  if(!hasNative||!url||IMG_DONE.has(url)||IMG_REQ[url]) return;
+  if(!hasNative||!url||IMG_DONE.has(url)||IMG_REQ[url]||IMG_NONE.has(url)) return;
   IMG_REQ[url]=1;IMG_REQ_N++;
   try{Android.fetchImage(url)}catch(e){}
 }
 function imgTagFor(cands,cls){
   if(!cands||!cands.length) return '';
   const cached=imgCacheGet(cands[0]);
+  /* A URL the bridge has already answered with nothing - see IMG_NONE. Drawn
+     without the iw marker and without asking again: this is the case that
+     used to cost one imageData() call per icon per render. */
+  const dead=!cached&&IMG_NONE.has(cands[0]);
   /* Fetch through the native cache immediately instead of waiting for the
      WebView's own request to fail - the WebView request is the flaky one. */
-  if(!cached) requestImage(cands[0]);
+  if(!cached&&!dead) requestImage(cands[0]);
   /* An image drawn before its bytes were in the cache is "waiting", and it
      carries the iw class to say so. That class is what lets applyImages() find
      the handful of images still unresolved instead of rescanning every <img>
@@ -660,7 +698,7 @@ function imgTagFor(cands,cls){
      drawn *from* the cache is already showing the right bytes, so it never
      needs marking, and neither does one that has since loaded (onload drops
      the class). */
-  const k=(cls?cls+' ':'')+(cached?'':'iw');
+  const k=(cls?cls+' ':'')+(cached||dead?'':'iw');
   return '<img'+(k?' class="'+k+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
     ' onload="this.style.opacity=1;this.classList.remove(\'iw\');this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
 }
@@ -671,6 +709,9 @@ function imgFail(el){
   const i=parseInt(el.getAttribute('data-i')||'0',10);
   if(i+1<cands.length){el.setAttribute('data-i',String(i+1));el.src=cands[i+1];return}
   const url=cands[0]||el.src;
+  /* Every candidate has failed and the bridge has already told us this one has
+     no bytes: nothing to park, nothing to ask. See IMG_NONE. */
+  if(url&&IMG_NONE.has(url)){el.remove();return}
   if(url&&el.getAttribute('data-native')!=='1'&&hasNative){
     el.setAttribute('data-native','1');
     /* each parked URL remembers when it was parked, so a wait can expire */
@@ -789,7 +830,13 @@ function applyImages(reported, countEvent){
        reader scrolls and opens app pages. Retire them here, with a map lookup
        and no bridge call: a file that was never fetched cannot be on disk. */
     if(url!==reported){
-      if(settled&&!IMG_DONE.has(url)){unmarkWait(IMG_WAIT[url]);delete IMG_WAIT[url]}
+      if(settled&&!IMG_DONE.has(url)){
+        unmarkWait(IMG_WAIT[url]);delete IMG_WAIT[url];
+        /* every fetch has reported and none of them had these bytes: this is
+           the same conclusion the retirement below reaches, so record it -
+           see IMG_NONE, which is what stops the next render asking again */
+        noteDead(url);
+      }
       continue;
     }
     const w=IMG_WAIT[url];
@@ -810,7 +857,7 @@ function applyImages(reported, countEvent){
              these bytes, so no later event can name this URL - see
              unmarkWait(). A timed-out wait keeps its marker, because a fetch
              that is still somehow in flight could yet report. */
-          if(settled) unmarkWait(w);
+          if(settled){unmarkWait(w);noteDead(url)}
           delete IMG_WAIT[url];continue
         }
         if(live!==w.els.length){
