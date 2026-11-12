@@ -1751,10 +1751,35 @@ function depthSave(){try{localStorage.setItem(DEPTH_KEY,JSON.stringify({on:D.on,
    visible changes: at any moment depth is on, D.dx and D.dy are exactly what
    depthFrame() last wrote, and the only run this touches is one that was
    writing 0 over a value nothing could see. */
+/* Switching depth off resolves the scroll parallax too, not just the tilt.
+
+   --sy is written by setScrollOffset(), which only ever runs from a scroll
+   event or a tab switch, and bindScrollParallax() stops feeding it the moment
+   D.on goes false - so the last offset the reader scrolled to stayed written
+   on the two things that read it, .stage and Today's cards, for as long as
+   depth stayed off. Neither use of it is scaled by --amt: the stage's
+   translateY is --sy*0.08px and the cards' is --sy*-0.05px, so they kept
+   moving the layers after the rotation that --amt scales had gone. Measured
+   on this page: scroll Today to 400 with depth on, then Depth panel -> Enable
+   depth off - the stage stayed translated 32px and the App of the Day card
+   was drawn 20px above the box it is laid out in, overlapping the "Today"
+   heading, and scrolling back to the top changed nothing because no scroll
+   handler was listening any more. The offset only cleared on the next tab
+   switch, which passes null to setScrollOffset() for exactly this reason.
+
+   The switch says "Off leaves everything flat", and that is what this makes
+   true: the two layers resolve to the rest pose the reader's next tab switch
+   would have given them anyway. Nothing else changes - while depth is on,
+   --sy is the scroll offset exactly as before, and the parallax is not
+   touched at all on the paths that matter (depthApply() is called with D.on
+   true on every Strength slider move, and this branch is not reached). */
 function depthApply(){
   const r=document.documentElement;
   r.style.setProperty('--amt', D.on ? String(D.amt) : '0');
-  if(!D.on){r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');D.dx=0;D.dy=0}
+  if(!D.on){
+    r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');D.dx=0;D.dy=0;
+    setScrollOffset(null);
+  }
 }
 function depthFrame(){
   D.raf=0;
