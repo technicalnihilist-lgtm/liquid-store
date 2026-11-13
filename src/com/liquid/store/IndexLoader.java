@@ -62,8 +62,30 @@ public class IndexLoader {
 
     private static final String UA = "LiquidStore/2.1";
     private static final String INDEX = "/index-v1.jar";
+    /**
+     * How much of an app's description the store keeps.
+     *
+     * One limit, not two. The parser clips a description to this, and the saved
+     * catalogue used to clip it again on the way out - to 420, a different
+     * number - so the text the store served depended on where the catalogue had
+     * come from: 700 characters on the launch that downloaded it, 420 plus an
+     * ellipsis on every launch after that, because load() serves the saved copy
+     * without asking the network. The shortfall was permanent: the cache is the
+     * only place the text is kept, so the 280 characters the write threw away
+     * were gone until a forced refresh re-downloaded the whole index, and the
+     * next write dropped them again.
+     *
+     * Measured on this class, with a description at the parser's own ceiling:
+     * parsed 700 characters, written to catalog.json, read back - 421. The same
+     * entry opened from a freshly downloaded catalogue showed 700.
+     *
+     * The write now stores what the parse produced, so an app page reads the
+     * same whether the catalogue came off the disk or off the wire. The saved
+     * file grows only by the text it was already throwing away - a description
+     * that is longer than 420 characters, which most are not - and nothing else
+     * about it changes.
+     */
     private static final int MAX_DESC = 700;
-    private static final int MAX_DESC_CACHE = 420;
     private static final int BATCH = 250;
     /** entries the saved catalogue hands the store before it is fully parsed */
     private static final int FIRST_PUBLISH = 500;
@@ -761,7 +783,10 @@ public class IndexLoader {
                 w.name("pkg").value(a.pkg);
                 w.name("name").value(nz(a.name));
                 w.name("sum").value(nz(a.summary));
-                w.name("desc").value(clip(a.description, MAX_DESC_CACHE));
+                /* the same clip the parser applied - see MAX_DESC: a second,
+                   shorter one here served a different description from the
+                   saved catalogue than from the network */
+                w.name("desc").value(clip(a.description, MAX_DESC));
                 w.name("icon").value(nz(a.icon));
                 w.name("cat").value(nz(a.category));
                 w.name("lic").value(nz(a.license));
