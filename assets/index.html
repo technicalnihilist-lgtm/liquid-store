@@ -1534,12 +1534,34 @@ function onReady(){
    5 KB of JSON that nothing read, on the thread that is also trying to paint
    the rows. Handle those three first and read the snapshot only for the
    events that actually use it. S.lastPhase is only ever read by onReady()'s
-   refresh toast, and the catalogue events below are what set it. */
+   refresh toast, and the catalogue events below are what set it.
+
+   It records how the load went, so it must not record that the load is over.
+   onReady() reads it to tell "Already up to date" from "Catalogue updated" -
+   i.e. it asks whether the load it is finishing ended on a not-modified reply
+   (phase "cache", see IndexLoader.fetch) or on a real download. But "ready"
+   is not a way a load went, it is the fact that it finished, and the bridge
+   writes it before it pushes: load() sets phase="ready" and then calls
+   push("ready"), and every state() a page reads from that moment on says
+   "ready". So this line overwrote the answer with "ready" on the very event
+   that was about to read it, and the "cache" branch below could never be
+   reached. Measured on this page, driving a refresh exactly as the bridge
+   does - probe, then phase "cache" with "already up to date", then the apps
+   publish, then ready - the toast read "Catalogue updated", and it read the
+   same for a real download, so the store had one message for two opposite
+   outcomes and told the reader their catalogue had changed when the server
+   had answered 304 and nothing had.
+
+   Recording only the phases that describe the work keeps the last one that
+   did: "cache" for a not-modified refresh and for a saved catalogue served
+   whole, "download"/"parse"/"apps" for a real one. Nothing else reads this
+   field, so no other path changes, and the cold start is untouched - its
+   onReady() has S.refreshing false and shows no toast at all. */
 window.__store=function(type,arg){
   if(type==='image'){applyImages(arg||null);return}
   if(type==='progress'){pollInstall();return}
   if(type==='installed'){refreshVisible();return}
-  const st=B.state(); S.lastPhase=st.phase;
+  const st=B.state(); if(st.phase!=='ready') S.lastPhase=st.phase;
   if(type==='state'){
     if(st.phase==='ready'){onReady();return}
     if(st.phase==='error'){if(S.ready){refreshFailed(st);return}showError(st);return}
