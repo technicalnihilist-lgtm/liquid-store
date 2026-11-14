@@ -1413,10 +1413,32 @@ function showError(st){
 
    The card is for "nothing to show" only. With a catalogue in hand the failure
    is reported the way every other transient failure is - a toast - the
-   progress strip goes away, and the store stays exactly where it was. */
+   progress strip goes away, and the store stays exactly where it was.
+
+   "Exactly where it was" was still not true of the two halves of this the
+   page cannot see. A refresh streams the new catalogue in batches, and every
+   batch is published as it parses - so by the time the mirror dropped, the
+   bridge was serving the prefix of the new catalogue rather than the one the
+   reader had, and it was flagged partial. That flag is what getBtnHtml()
+   draws as the greyed-out "..." placeholder on every Get button that is not
+   already installed, and renderSheetActions() draws the same thing on an app
+   page, so one failed refresh left the store readable and unable to install
+   anything at all: measured on this page, a refresh that failed after the
+   first batch left all 40 rows in place and 40 of 40 Get buttons dead, and
+   nothing brings them back but a load that succeeds - which needs the
+   connection that just failed.
+
+   Both halves are undone now. The bridge puts the last complete catalogue
+   back before it reports the failure (see StoreBridge.restoreComplete), which
+   republishes it as a whole one, and this clears the flag and redraws so the
+   buttons the reader can see match it. refreshVisible() keeps the loaded
+   pages and the scroll position, so the list is the list they were reading -
+   the same call the streaming batches and the 'installed' event already use. */
 function refreshFailed(st){
   $('#strip').classList.remove('on');
   S.refreshing=false;
+  S.partial=false;
+  refreshVisible();
   toast('Could not refresh \u2014 '+(st.error||'the catalogue could not be reached.'));
 }
 function applyPartial(st){

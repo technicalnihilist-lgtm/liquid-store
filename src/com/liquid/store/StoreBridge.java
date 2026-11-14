@@ -133,6 +133,24 @@ public class StoreBridge {
     /** GitHub-release apps, merged into the live index on every publish */
     private volatile Map<String, AppEntry> ghApps = new HashMap<String, AppEntry>();
     private volatile List<AppEntry> lastApps = new ArrayList<AppEntry>();
+    /**
+     * The last catalogue that was published complete, so a load that dies
+     * halfway can be undone - see restoreComplete().
+     *
+     * A streaming load does not fill a second buffer and swap it in at the
+     * end: every batch is published as it is parsed, which replaces the index
+     * the store is serving (see publish()). That is what makes the store fill
+     * in during a cold start, and it is why a refresh that loses its mirror
+     * halfway leaves the store holding the prefix of the new catalogue rather
+     * than the one the reader was reading - measured from a good catalogue of
+     * 6,000 apps, a refresh that failed after the second batch left 500 apps
+     * reachable, and the saved copy on disk still held all 6,000.
+     *
+     * It is a reference to a list the Repo already owns, never a copy: no
+     * entry is duplicated and nothing new is retained for the life of the
+     * session. Guarded by publishLock, like the map it is restored into.
+     */
+    private List<AppEntry> lastComplete;
     private volatile String phase = "idle";
     private volatile int pct = 0;
     private volatile String detail = "not loaded";
@@ -322,6 +340,9 @@ public class StoreBridge {
                     } catch (Exception ex) {
                         boolean wasCancelled = cancelRequested;
                         cancelRequested = false;
+                        /* whatever streamed in before this is not the
+                           catalogue - see restoreComplete() */
+                        restoreComplete();
                         if (wasCancelled) {
                             phase = index.isEmpty() ? "idle" : "ready";
                             detail = index.isEmpty() ? "cancelled" : index.size() + " apps";
@@ -460,8 +481,40 @@ public class StoreBridge {
             m.putAll(ghApps);
             index = m;
             partial = isPartial;
+            /* only a complete, non-empty catalogue is worth going back to: an
+               empty one is what a cold start publishes before it has anything
+               (applyGithub republishes lastApps, which is empty until the
+               first batch), and restoring that would throw away the prefix a
+               failing cold start has already streamed */
+            if (!isPartial && !apps.isEmpty()) lastComplete = apps;
         }
         push("apps");
+    }
+
+    /**
+     * Put the last complete catalogue back, after a load that did not finish.
+     *
+     * Nothing else undoes a partial publish. load()'s failure path described
+     * the catalogue as untouched and the page reported the failure as a toast
+     * - but the index had already been replaced by the batch that streamed in
+     * before the mirror dropped, and `partial` was still true. So the store
+     * kept serving the prefix, and every Get button on it stayed the greyed
+     * out placeholder the page draws while partial is set (see getBtnHtml in
+     * index.html): the reader could still read, and could not install
+     * anything at all until a load happened to succeed. Publishing the last
+     * complete catalogue again makes both true statements again - the store
+     * is the one that was there before the refresh, and it is whole.
+     *
+     * Guarded, and skipped when there is nothing to go back to (a cold start
+     * that has never published a complete catalogue) or when the index was
+     * never replaced (the load failed before its first batch).
+     */
+    private void restoreComplete() {
+        synchronized (publishLock) {
+            if (lastComplete == null) return;
+            if (!partial) return;
+            publish(lastComplete, false);
+        }
     }
 
     /** swap in the GitHub catalogue and republish without a full reload */
