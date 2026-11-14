@@ -1,6 +1,7 @@
 package com.liquid.store;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -194,7 +195,7 @@ public class GitHubSource {
 
         JsonArray assets = rel.has("assets") && rel.get("assets").isJsonArray()
                 ? rel.getAsJsonArray("assets") : new JsonArray();
-        JsonObject apk = pickApk(assets);
+        JsonObject apk = pickApk(assets, deviceAbis());
         if (apk == null) return null;
 
         String owner = repo.indexOf('/') > 0 ? repo.substring(0, repo.indexOf('/')) : repo;
@@ -230,8 +231,90 @@ public class GitHubSource {
         return a;
     }
 
-    /** prefers an arm64 or universal build, skips debug and emulator-only assets */
+    /** The ABIs this device can install, best first. Empty if the platform cannot say. */
+    static String[] deviceAbis() {
+        try {
+            String[] a = Build.SUPPORTED_ABIS;
+            return a == null ? new String[0] : a;
+        } catch (Throwable t) {
+            return new String[0];
+        }
+    }
+
+    /**
+     * The ABI one release asset is built for, or "" when it fits any device.
+     *
+     * Read from the file name, which is the only thing the release API gives
+     * us: the projects that split their builds name them after the ABI
+     * (arm64-v8a, armeabi-v7a, x86, x86_64) and the ones that do not publish a
+     * single universal APK. Checked longest-first, because "x86_64" contains
+     * "x86" and "armeabi-v7a" contains neither "arm64" nor "aarch64".
+     */
+    static String assetAbi(String name) {
+        String n = name.toLowerCase(Locale.US);
+        if (n.contains("arm64") || n.contains("aarch64")) return "arm64-v8a";
+        if (n.contains("armeabi") || n.contains("armv7") || n.contains("arm-v7a")) return "armeabi-v7a";
+        if (n.contains("x86_64") || n.contains("x86-64") || n.contains("x64")) return "x86_64";
+        if (n.contains("x86") || n.contains("i686") || n.contains("i386")) return "x86";
+        return "";
+    }
+
+    /**
+     * How well one asset fits this device: higher is better, and anything
+     * below 0 cannot be installed here at all.
+     *
+     * The device's own ABI list is ordered by preference (Build.SUPPORTED_ABIS
+     * puts the primary ABI first), so the rank is simply its position, counted
+     * backwards. A universal build - and an asset whose name says nothing
+     * about an ABI - fits everywhere and ranks 0, which is below any ABI the
+     * device actually lists. An unknown device (an empty list, which is what
+     * the JVM test and a stub android.jar see) ranks everything 0, so the
+     * name score alone decides exactly as it always did.
+     */
+    static int abiRank(String abi, String[] deviceAbis) {
+        if (deviceAbis == null || deviceAbis.length == 0) return 0;   /* device unknown */
+        if (abi == null || abi.length() == 0) return 0;               /* universal */
+        for (int i = 0; i < deviceAbis.length; i++) {
+            if (abi.equals(deviceAbis[i])) return deviceAbis.length - i;
+        }
+        return -1000;                                                 /* wrong ABI for this device */
+    }
+
+    /**
+     * The APK to install, preferring one this device can actually run.
+     *
+     * The pick used to be a fixed ranking of the file names: arm64 beat
+     * universal beat everything else, and x86 was penalised as "emulator
+     * only". That is right for most phones and wrong for every device that is
+     * not arm64, because the ranking never asked what the device was:
+     *
+     *   - AnkiDroid publishes AnkiDroid-2.25.3-arm64-v8a.apk next to
+     *     AnkiDroid-2.25.3-full-universal.apk, so every armeabi-v7a phone was
+     *     handed the arm64 build and got INSTALL_FAILED_NO_MATCHING_ABIS - a
+     *     "Install failed" with no way to see why, while a build that installs
+     *     on every device sat in the same release.
+     *   - Element, Element X, Fossify Gallery, InnerTune and Obtainium all
+     *     publish a per-ABI split and were served as their arm64 half to
+     *     x86_64 devices (Chromebooks, and every emulator), even though the
+     *     same release carries an x86_64 build.
+     *
+     * So the ABI the device can run now decides first and the name score only
+     * breaks ties inside it. On a 64-bit phone nothing moves: arm64 is that
+     * device's primary ABI, so every one of the six picks above still resolves
+     * to the same file it did before - checked against the real release asset
+     * lists of all 36 curated repositories. What changes is the case that was
+     * broken: a 32-bit device now takes the armeabi-v7a or universal build,
+     * and an x86 device takes the x86 build.
+     *
+     * A release with nothing this device can run still yields its best-named
+     * asset rather than nothing at all: the app stays in the catalogue exactly
+     * as it was before, and the install fails the way it already did.
+     */
     static JsonObject pickApk(JsonArray assets) {
+        return pickApk(assets, null);
+    }
+
+    static JsonObject pickApk(JsonArray assets, String[] deviceAbis) {
         JsonObject best = null;
         int bestScore = Integer.MIN_VALUE;
         for (JsonElement e : assets) {
@@ -246,6 +329,9 @@ public class GitHubSource {
             if (n.contains("free")) score += 2;
             if (n.contains("debug")) score -= 6;
             if (n.contains("x86") || n.contains("emu")) score -= 4;
+            /* the ABI the device can run outweighs any name bonus, so an
+               installable build always beats a better-named one that is not */
+            score += abiRank(assetAbi(n), deviceAbis) * 100;
             if (score > bestScore) { bestScore = score; best = o; }
         }
         return best;
