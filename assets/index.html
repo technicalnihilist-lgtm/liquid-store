@@ -946,6 +946,7 @@ function renderToday(){
   $('#todayUpdated').innerHTML=colScroll(B.list('','','updated',0,9).apps);
   $('#todayNew').innerHTML=colScroll(B.list('','','new',0,9).apps);
   /* the cards above are new nodes with no --sy of their own - see stampSy() */
+  syCardsLast=null;
   stampSy();
 }
 function renderArcade(keep){
@@ -2264,15 +2265,55 @@ let syLast=null, syRaf=0, syEl=null, syStage=null;
    scrolled frame. The stage and the cards are stamped with the identical value
    at the identical moment - checked at ten scroll positions across the whole
    0-400px range, byte for byte - so nothing about the motion changes. */
-let syToday=null;
+/* The offset stamped on Today's cards is Today's own, and it is written once
+   per change rather than once per scroll frame of every other tab.
+
+   --sy is one number for two different things. On .stage it is the offset of
+   the view on screen, and switchTab() hands it the incoming view's scrollTop
+   for exactly that reason. On .bigcard it is the offset of the list those
+   cards are in - and they are only ever in Today. Stamping syLast on both made
+   those two disagree the moment the reader left Today, in the one window where
+   the disagreement can be seen: Today is the only view that keeps its scroll
+   position when you leave it (see switchTab - the paged views are reset to
+   their top), and .fading keeps the view we just left painting for 600 ms
+   while the new one fades in over it. So the cards were drawn at Today's
+   offset, and 0 ms later - on the same switchTab() call - they were rewritten
+   with the incoming view's offset of 0 and slid up to 20px (400 * -0.05)
+   under the reader in the middle of the cross-fade. Measured on this page:
+   scroll Today to 400, tap Apps, read --sy on the two .bigcard elements -
+   400 before the switch, 0 on the very next sample, with #view-today still
+   carrying .fading for another 600 ms.
+
+   Everywhere else it was the other half of the same line: the cards are not
+   painted at all while another tab is on screen (Today is .view:not(.on):
+   not(.fading), so content-visibility:hidden - see the stylesheet), yet
+   stampSy() ran its query and rewrote both of them on every parallax frame of
+   every scroll in Apps, Games, Arcade and Search, invalidating two
+   3D-transformed layers that produce nothing. setScrollOffset() is 13% of the
+   JavaScript on a scrolled frame in this harness; the card half of it is dead
+   work on four tabs out of five.
+
+   So the cards keep Today's offset and are only written when it changes. The
+   motion is untouched wherever it can be seen: while Today is on screen syLast
+   *is* Today's offset and the cards are stamped with it, on the same frames as
+   before, and a view that is fading out keeps the value it was already drawn
+   with. syCardsLast is cleared by renderToday(), because the cards it rebuilds
+   are new nodes with no --sy of their own. */
+let syToday=null, syCards=null, syCardsLast=null;
 function stampSy(){
   if(syLast===null) return;
   if(!syStage) syStage=document.querySelector('.stage');
   if(syStage) syStage.style.setProperty('--sy',syLast);
   if(!syToday) syToday=document.getElementById('view-today');
   if(!syToday) return;
+  /* Today's own offset, which is syLast exactly while Today is the view on
+     screen - and is left alone while it fades out, so the cards hold the value
+     they are being painted with */
+  if(syToday.classList.contains('on')) syCards=syLast;
+  if(syCards===null||syCards===syCardsLast) return;
+  syCardsLast=syCards;
   const cards=syToday.querySelectorAll('.bigcard');
-  for(let i=0;i<cards.length;i++) cards[i].style.setProperty('--sy',syLast);
+  for(let i=0;i<cards.length;i++) cards[i].style.setProperty('--sy',syCards);
 }
 function setScrollOffset(v){
   const sy=String(Math.min(v?Math.max(0,v.scrollTop):0,400));
