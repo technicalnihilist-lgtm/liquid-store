@@ -1071,11 +1071,46 @@ public class StoreBridge {
                                 }
                             }
                         }
+                        session.fsync(out);
+                        out.close();
+                        out = null;   /* closed - the guard below has nothing to do */
                     } finally {
                         try { in.close(); } catch (IOException ignored) { }
+                        /* Close the write stream on every path, not just the one
+                           that finishes.
+
+                           out is the client end of the pipe into the installer
+                           service - a ParcelFileDescriptor dup, not a heap object
+                           the collector can reclaim - and it was closed exactly
+                           once, three lines after the loop. Everything that
+                           leaves the loop early skipped it: a read timeout, a
+                           connection reset mid-download, a full disk on
+                           out.write, a failing fsync. Each of those lands in the
+                           catch below, which abandons the session and reports
+                           the failure, so the install is over and the descriptor
+                           is still open - for the rest of the process's life.
+
+                           Mobile downloads fail exactly this way, and the ring
+                           invites a retry each time, so this is not a rare path:
+                           every failed or abandoned install leaked one
+                           descriptor, and a process has a hard limit of about a
+                           thousand. Once it is reached openWrite() itself fails
+                           and every later install is dead until the app is
+                           restarted - a store that cannot install anything, with
+                           no error that points at the cause.
+
+                           The success path is untouched: fsync, then close, then
+                           the checksum, in that order, and a failure at any of
+                           them still fails the install as it did before. The
+                           finally only picks up what that path left open.
+
+                           Checked with a JVM harness driving this exact shape
+                           against a stream that throws on its third read: the
+                           old code left the stream open, this one closes it. */
+                        if (out != null) {
+                            try { out.close(); } catch (Throwable ignored) { }
+                        }
                     }
-                    session.fsync(out);
-                    out.close();
 
                     String want = a.hash == null ? "" : a.hash.trim();
                     if (want.length() > 0 && "sha256".equalsIgnoreCase(a.hashType)) {
