@@ -355,42 +355,88 @@ public class IndexLoader {
 
         if (pr.notModified && cache.isFile()) {
             p.onPhase("cache", 100, "already up to date");
-            Repo r = readCache(cache, p);
-            /* "Not modified" says the saved catalogue is current - it says
-               nothing about the host that saved it. baseUrl is whatever mirror
-               wrote the cache, and the reason we are probing the others is
-               that this one may have stopped answering. Keeping it meant the
-               store loaded a perfectly good catalogue while every icon, every
-               screenshot and every APK was built from a host that no longer
-               replies - and Refresh could not dig it out, because a
-               not-modified reply never rewrites the cache, so the dead address
-               survived until the index itself changed upstream. The mirror
-               that just answered is the one to fetch the files from, which is
-               exactly what the download path below already does.
-
-               Fixing it in memory was only half of it. The corrected address
-               was never written back, so it lasted exactly one session: the
-               next cold start reads the saved catalogue - which still names
-               the dead mirror - and serves it without probing anything (see
-               load(): a good cache is returned before any mirror is asked),
-               so the store drew letter placeholders and every Get failed
-               until the reader thought to tap Refresh, every launch, for as
-               long as that mirror stayed down. A 304 means the apps are
-               current, not that the address is; when the address changed,
-               write the catalogue back once so the repair outlives the
-               session. It is a single write, only on the run that found a
-               different mirror, and the bytes are the ones already in hand. */
-            if (pr.base != null && pr.base.length() > 0 && !pr.base.equals(r.baseUrl)) {
-                r.baseUrl = pr.base;
-                try {
-                    writeCache(cache, r);
-                } catch (IOException ignored) {
-                    /* a cache we cannot rewrite is still a catalogue we can
-                       serve - the next launch just pays for the probe again */
-                }
+            /* A saved catalogue that cannot be read is not a catalogue.
+             *
+             * "Not modified" is the mirror's answer about the *index*, and this
+             * branch turned it into "read the saved copy" without allowing for
+             * the copy not being readable: readCache() throws for a file it
+             * cannot parse and for one written by an older format (see the
+             * version test at the end of it), and that IOException came out of
+             * fetch(), out of load()'s mirror loop, and out of load() - as
+             * "could not load the catalogue".
+             *
+             * Every mirror in that loop is asked with the same If-None-Match
+             * and If-Modified-Since (readMeta, below), so every one of them
+             * answers 304 and every one of them throws: the loop cannot
+             * recover, and the store cannot either. It is the state load()'s
+             * own cache branch already knows how to leave - it wraps exactly
+             * this read in a try/catch and falls through to the network
+             * ("fall through and fetch a fresh copy") - and the two branches
+             * have to agree, because this one runs on the same file.
+             *
+             * What the reader saw: the full-screen "Could not load" card, on
+             * every launch and on every Retry, until the index changed upstream
+             * (the one thing that stops the 304) or they picked a different
+             * source. Measured on this class against a local mirror that
+             * answers 304 with the meta it was given: a v1 catalog.json beside
+             * its catalog.meta - the shape a format bump leaves behind - gave
+             * "FAILED: catalogue cache is from an older version", one 304 and
+             * zero downloads; the same directory with the cache deleted loaded
+             * three apps. So the download that would have fixed it was the one
+             * thing this branch never tried.
+             *
+             * Falling through is that download: fetchStreaming() asks for the
+             * whole file with no conditional headers, so the mirror answers
+             * 200, and the write below replaces the unreadable cache with one
+             * that can be read. Nothing changes for a cache that does parse -
+             * the same catalogue is served from disk at the same moment. */
+            Repo r = null;
+            try {
+                r = readCache(cache, p);
+            } catch (Exception unreadable) {
+                /* treated exactly as load()'s cache branch treats it */
+                r = null;
             }
-            p.onApps(r.apps);
-            return r;
+            if (r != null) {
+                /* "Not modified" says the saved catalogue is current - it says
+                   nothing about the host that saved it. baseUrl is whatever mirror
+                   wrote the cache, and the reason we are probing the others is
+                   that this one may have stopped answering. Keeping it meant the
+                   store loaded a perfectly good catalogue while every icon, every
+                   screenshot and every APK was built from a host that no longer
+                   replies - and Refresh could not dig it out, because a
+                   not-modified reply never rewrites the cache, so the dead address
+                   survived until the index itself changed upstream. The mirror
+                   that just answered is the one to fetch the files from, which is
+                   exactly what the download path below already does.
+
+                   Fixing it in memory was only half of it. The corrected address
+                   was never written back, so it lasted exactly one session: the
+                   next cold start reads the saved catalogue - which still names
+                   the dead mirror - and serves it without probing anything (see
+                   load(): a good cache is returned before any mirror is asked),
+                   so the store drew letter placeholders and every Get failed
+                   until the reader thought to tap Refresh, every launch, for as
+                   long as that mirror stayed down. A 304 means the apps are
+                   current, not that the address is; when the address changed,
+                   write the catalogue back once so the repair outlives the
+                   session. It is a single write, only on the run that found a
+                   different mirror, and the bytes are the ones already in hand. */
+                if (pr.base != null && pr.base.length() > 0 && !pr.base.equals(r.baseUrl)) {
+                    r.baseUrl = pr.base;
+                    try {
+                        writeCache(cache, r);
+                    } catch (IOException ignored) {
+                        /* a cache we cannot rewrite is still a catalogue we can
+                           serve - the next launch just pays for the probe again */
+                    }
+                }
+                p.onApps(r.apps);
+                return r;
+            }
+            /* nothing to serve from disk: download it, exactly as the
+               unreadable-cache branch of load() does */
+            p.onPhase("download", 4, "saved catalogue unreadable, downloading");
         }
 
         long total = pr.size;
