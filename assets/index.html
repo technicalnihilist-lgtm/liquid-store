@@ -1185,8 +1185,46 @@ function openSheet(pkg){
   renderSheetActions(a);
   $('#sheet').classList.add('on');
 }
+/* The actions row of an app page, drawn from that app's catalogue entry.
+ *
+ * "That app's catalogue entry" is the part that was missing. The entry comes
+ * from B.detail(S.sheetPkg), and detail() answers "{}" for a package the
+ * catalogue being served does not hold - which is not a rare state. A refresh
+ * does not build a second catalogue and swap it in at the end: every batch is
+ * published as it parses (see publish() in StoreBridge), so for the whole
+ * length of a refresh the store is serving the *prefix* of the new index. An
+ * app page opened on an entry that is parsed later than that prefix is an app
+ * the catalogue momentarily does not have, and refreshVisible() - which runs
+ * on every one of those batches, and on every 'installed' event - patched the
+ * open page from that empty answer.
+ *
+ * What it drew from it: a.pkg was undefined, so esc(a.pkg) was the empty
+ * string and every branch below fell through to the last one. The reader's
+ * Get/Open/Update button became <button data-install="">Get</button> - a
+ * button that looks exactly like a working one, and whose tap runs
+ * beginInstall('') and comes back "That app is not in the catalogue." - and
+ * the Uninstall button beside it, which is drawn only when a.installed is
+ * true, disappeared entirely: an installed app's own page lost the one
+ * control that removes it. Measured on this page with a 300-app catalogue:
+ * open an installed app, publish a batch that does not contain it, call
+ * refreshVisible() - #sheetActions goes from "Update + Uninstall" to a single
+ * dead "Get", and back again only when a later batch happens to include it.
+ *
+ * Returning early draws nothing, which is the right answer: the page still
+ * describes the app the reader opened, and the buttons already in the row are
+ * keyed on its package name, which is still valid on the device whatever the
+ * catalogue currently holds - so Open and Uninstall go on working. The row is
+ * patched again as soon as detail() can answer for the app, which is the same
+ * moment the rest of the page's data becomes current.
+ *
+ * Nothing changes for a real entry: openSheet() only reaches this line after
+ * detail() has given it a.pkg, and every other caller passes what detail()
+ * returned, so the guard is false on exactly the answers that drew the dead
+ * row.
+ */
 function renderSheetActions(a){
   const box=$('#sheetActions'); if(!box) return;
+  if(!a||!a.pkg) return;              /* no catalogue entry - see above */
   const inst=S.installing[a.pkg];
   let primary;
   if(inst) primary=`<button class="pill" data-busy="${esc(a.pkg)}"><span class="fill" style="width:${inst.pct}%"></span><span>${inst.pct}%</span></button>`;
