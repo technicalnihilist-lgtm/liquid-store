@@ -20,10 +20,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -73,8 +75,12 @@ public class GitHubSource {
             if (c != null) return c;
         }
         try {
-            List<AppEntry> fresh = fetchAll(ctx);
-            List<AppEntry> merged = mergeWithPrevious(ctx.getFilesDir(), fresh);
+            /* the list is parsed once and used twice: for the lookups, and for
+               the set of packages this build still curates - see
+               mergeWithPrevious() */
+            List<JsonObject> specs = parseCurated(ctx.getAssets().open(CURATED));
+            List<AppEntry> fresh = fetchAll(specs);
+            List<AppEntry> merged = mergeWithPrevious(ctx.getFilesDir(), fresh, curatedPackages(specs));
             writeCache(ctx, merged);
             return new Result(merged, false, "");
         } catch (Throwable t) {
@@ -106,14 +112,59 @@ public class GitHubSource {
     /**
      * A refresh that only partly succeeds (rate limit, one repo down) must not
      * shrink the catalogue - anything we knew before and did not re-fetch stays.
+     *
+     * "Anything we knew" has to mean anything this build still curates.
+     * assets/github_apps.json is the editorial list: the store offers exactly
+     * the projects that are in it, and it ships with the APK, so an update can
+     * add a project *or take one away*. The merge below only ever added, so a
+     * package that left the list could not leave the catalogue: the entry
+     * stayed in github_cache.json, mergeWithPrevious() put it back on every
+     * refresh, and it went on being listed, searched and offered for install -
+     * with its last known release URL, which the project's own GitHub still
+     * serves - for the life of the install. Uninstalling and reinstalling the
+     * store was the only thing that removed it. A project that renames its
+     * package (or a repo that changes hands and is replaced by a differently
+     * named entry) left a second ghost entry beside the real one, both
+     * installable, the old one frozen at the release it had when it was
+     * dropped.
+     *
+     * Measured on this class with a three-entry cache and a two-entry list:
+     * one entry removed from the list, one refresh - the catalogue came back
+     * with all three, and stayed at three for every refresh after that.
+     *
+     * The kept entries are the ones whose package is still curated, so a
+     * partial fetch still keeps every stale-but-wanted entry, and a package
+     * that has just been added has no old entry to keep. Nothing else about
+     * the merge changes, and a list that has not changed merges exactly what it
+     * merged before.
+     *
+     * An empty set is never used to prune: parseCurated() answers an empty list
+     * for an asset it could not read, and pruning everything on that would turn
+     * one unreadable file into an empty catalogue written back over a good one.
      */
-    static List<AppEntry> mergeWithPrevious(File dir, List<AppEntry> fresh) {
+    static List<AppEntry> mergeWithPrevious(File dir, List<AppEntry> fresh, Set<String> curated) {
         List<AppEntry> old = readCacheApps(dir, false);
         if (old.isEmpty()) return fresh;
+        boolean prune = curated != null && !curated.isEmpty();
         Map<String, AppEntry> byPkg = new LinkedHashMap<String, AppEntry>();
-        for (AppEntry a : old) if (a.pkg != null && a.pkg.length() > 0) byPkg.put(a.pkg, a);
+        for (AppEntry a : old) {
+            if (a.pkg == null || a.pkg.length() == 0) continue;
+            if (prune && !curated.contains(a.pkg)) continue;      /* no longer curated */
+            byPkg.put(a.pkg, a);
+        }
         for (AppEntry a : fresh) if (a.pkg != null && a.pkg.length() > 0) byPkg.put(a.pkg, a);
         return new ArrayList<AppEntry>(byPkg.values());
+    }
+
+    /** The package names the shipped list still curates - see mergeWithPrevious(). */
+    static Set<String> curatedPackages(List<JsonObject> specs) {
+        Set<String> out = new HashSet<String>();
+        if (specs == null) return out;
+        for (JsonObject spec : specs) {
+            String p = str(spec, "package");
+            if (p.length() > 0) out.add(p);
+        }
+        return out;
     }
 
     /**
@@ -134,10 +185,6 @@ public class GitHubSource {
     }
 
     // ---------- network ----------
-
-    private static List<AppEntry> fetchAll(Context ctx) throws IOException {
-        return fetchAll(parseCurated(ctx.getAssets().open(CURATED)));
-    }
 
     /** package-private so the JVM test can drive it without a Context */
     static List<AppEntry> fetchAll(List<JsonObject> specs) throws IOException {
