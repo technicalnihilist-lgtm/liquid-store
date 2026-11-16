@@ -681,6 +681,42 @@ function requestImage(url){
   IMG_REQ[url]=1;IMG_REQ_N++;
   try{Android.fetchImage(url)}catch(e){}
 }
+/* An icon that finishes loading after its list has been re-drawn.
+
+   The onload below hands the finished image to its wrapper - it drops the
+   "waiting" marker, shows the bytes, and adds .has so the letter placeholder
+   underneath gives way to the icon. It reached the wrapper through
+   this.parentNode without asking whether the image still had one, and it does
+   not always.
+
+   imgTagFor() gives every icon it draws the WebView's own network request, on
+   purpose - the first candidate URL stays in src until the native cache hands
+   over a data URI (see applyImages). The views, meanwhile, are rebuilt
+   wholesale with innerHTML=: once per publish of a streaming catalogue
+   (throttled to one per PAINT_GAP), on every 'installed' event, on every tab
+   switch, on every keystroke in search. An icon whose request was still in
+   flight when its view was replaced therefore finishes loading into an element
+   that is no longer in the document - and the engine still fires onload on it,
+   because an element is not collected while it is loading.
+
+   What that cost: an uncaught TypeError, "Cannot read properties of null
+   (reading 'classList')", on every such image. This page reports any uncaught
+   error as a toast (see the window error listener near the bottom), so the
+   reader was told "Something went wrong: Cannot read properties of null
+   (reading 'classList')" while looking at a list that had drawn perfectly -
+   and on a cold start, where the catalogue streams in a batch at a time, that
+   is the normal path rather than an edge one.
+
+   Reproduced in Chromium with the exact markup below and a mirror that
+   answered the icon in 400 ms while the list was re-drawn at 80 ms: one
+   uncaught TypeError, caught by the page's own error handler. With the guard,
+   the same run reports none.
+
+   The guard is the one applyImages() and imgFail() already apply to this same
+   element for this same reason. Nothing on screen changes: a detached image
+   has no wrapper to mark and no placeholder to hide, so the skipped call had
+   nothing to do, and an image that is still in the document takes the
+   identical path it took before. */
 function imgTagFor(cands,cls){
   if(!cands||!cands.length) return '';
   const cached=imgCacheGet(cands[0]);
@@ -700,7 +736,7 @@ function imgTagFor(cands,cls){
      the class). */
   const k=(cls?cls+' ':'')+(cached||dead?'':'iw');
   return '<img'+(k?' class="'+k+'"':'')+' data-cand="'+esc(cands.join('|'))+'" data-i="0" src="'+esc(cached||cands[0])+'" alt="" decoding="async"'+
-    ' onload="this.style.opacity=1;this.classList.remove(\'iw\');this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
+    ' onload="this.style.opacity=1;this.classList.remove(\'iw\');if(this.parentNode)this.parentNode.classList.add(\'has\')" onerror="imgFail(this)">';
 }
 function imgTag(a){return imgTagFor(imgCandidates(a),'')}
 function imgFail(el){
