@@ -1258,14 +1258,33 @@ public class StoreBridge {
                         if (c instanceof java.net.HttpURLConnection) {
                             ((java.net.HttpURLConnection) c).setRequestProperty("User-Agent", "LiquidStore/2.2");
                         }
+                        /* The connection's stream and the temp file are opened
+                           inside the same try/finally, and the stream is closed
+                           there on every path.
+
+                           The stream used to be opened one line above the temp
+                           file and closed only by the finally below it, so a
+                           File.createTempFile() that threw - a full data
+                           partition, a cache directory the system has just
+                           cleared out from under us - left the response open
+                           for good: the socket, its input buffer and the
+                           HttpURLConnection that owns them. That is one leak
+                           per icon the page asks for, and it asks for one per
+                           image it draws, so a reader on a full disk leaked
+                           their way through a scrolled catalogue and then saw
+                           every later icon and every install fail with no
+                           explanation. Nothing else about the fetch changes:
+                           the same bytes, the same temp file, the same rename,
+                           and the same delete when the store did not happen. */
                         InputStream in = new BufferedInputStream(c.getInputStream(), 1 << 15);
-                        /* A temp file per fetch, not one shared name per URL: two
-                           downloads of the same image used to write the same path at
-                           once, and whichever renamed first left a truncated file in
-                           the cache that was then served forever. */
-                        File tmp = File.createTempFile("img", ".part", f.getParentFile());
+                        File tmp = null;
                         boolean stored = false;
                         try {
+                            /* A temp file per fetch, not one shared name per URL: two
+                               downloads of the same image used to write the same path at
+                               once, and whichever renamed first left a truncated file in
+                               the cache that was then served forever. */
+                            tmp = File.createTempFile("img", ".part", f.getParentFile());
                             OutputStream out = new FileOutputStream(tmp);
                             try {
                                 byte[] buf = new byte[1 << 15];
@@ -1288,7 +1307,7 @@ public class StoreBridge {
                             images.stored(f.length());
                         } finally {
                             try { in.close(); } catch (IOException ignored) { }
-                            if (!stored) { try { tmp.delete(); } catch (Throwable ignored) { } }
+                            if (!stored && tmp != null) { try { tmp.delete(); } catch (Throwable ignored) { } }
                         }
                     }
                 } catch (Throwable ignored) {
