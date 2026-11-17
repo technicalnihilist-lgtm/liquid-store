@@ -1371,9 +1371,43 @@ function closeSheet(){
 }
 
 /* ---------- install ---------- */
+/* Starting an install changes the same two controls a progress tick does.
+ *
+ * beginInstall() rebuilt the whole visible view for it - refreshVisible() -
+ * which is the call paintProgress() was written to replace. That fix covered
+ * every tick of a download and left the first one on the old path, so the
+ * most expensive frame of the whole install was the one the reader paid by
+ * tapping Get: the list was thrown away and re-created from a fresh bridge
+ * query, to turn one button into its ring.
+ *
+ * Measured on this page with 320 rows scrolled into Apps, tapping Get on one
+ * of them: refreshVisible() re-queried the catalogue once for all 320 rows,
+ * shipped them back as JSON, parsed them, and wrote 225 KB of HTML over a
+ * view that was already correct - one list() call, two innerHTML writes and
+ * 320 rows rebuilt, on the thread that is also starting the download. The
+ * ring it drew is byte for byte the markup getBtnHtml() produces from
+ * S.installing alone, which is exactly what paintProgress() patches in.
+ *
+ * So patch the two controls and nothing else. The list keeps every row it
+ * had (and its scroll position, which the rebuild used to clamp to 0 and put
+ * back), and the app page keeps its pill - renderSheetActions() draws that
+ * from the same S.installing entry, so it reads the same as it did. Nothing
+ * that was drawn changes: the same ring appears on the same buttons at the
+ * same moment, and the rows around them were never different.
+ *
+ * The other paths that answer "an install started" are untouched - the
+ * progress ticks still go through paintProgress() (see there), and the end of
+ * an install still redraws the view through refreshVisible(), because that
+ * one really does change every row it touches: the button becomes Open, the
+ * badge appears and the size line is rewritten. */
 function beginInstall(pkg){
   const r=B.install(pkg);
-  if(r&&r.ok){S.installing[pkg]={pct:0};refreshVisible();pollStart();return}
+  if(r&&r.ok){
+    S.installing[pkg]={pct:0};
+    paintProgress(pkg);
+    if(S.sheetPkg===pkg) renderSheetActions(B.detail(pkg));
+    pollStart();return
+  }
   const msg=(r&&r.error)||'Could not start the install.';
   if(msg==='permission') showPermission(); else toast(msg);
 }
