@@ -2140,9 +2140,42 @@ function depthApply(){
      the two values depthActive() reads, on every path that can change them */
   r.classList.toggle('flat', !depthActive());
   r.style.setProperty('--amt', D.on ? String(D.amt) : '0');
-  if(!D.on){
-    r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');D.dx=0;D.dy=0;
-    setScrollOffset(null);
+  /* Resolve the tilt spring whenever the effect is not active, not only when
+     the switch is off.
+
+     depthActive() is "switched on AND strength above zero", and the spring is
+     gated on it from every side: depthPoint() and the sensor handler return
+     before they touch the target, depthFrame() returns before it writes, so
+     while the strength sits at 0 the two values the last gesture left behind
+     are frozen - D.dx/D.dy at up to a full tilt, and the same numbers still
+     written on :root as --dx/--dy.
+
+     Nothing shows them at strength 0, because --amt is 0 and every layer
+     multiplies by it. The panel's own advice is "turn it down if it feels
+     busy", so the way back up is a path readers take, and the moment the
+     slider leaves 0 the stale values are live again: --dx jumps from 0 to the
+     angle of a gesture that ended minutes ago, and depthKick() then eases it
+     the rest of the way to the stale target with no finger on the screen.
+
+     Measured on this page: depth on, drag to the bottom-right corner, Strength
+     0 - D.dx/D.dy 0.5296, --dx/--dy still "0.5296" - then Strength 80 and
+     --dx/--dy read "0.5296" on the very next sample, the whole screen already
+     tilted, where the spring should have started from rest. The same round
+     trip through the Enable depth switch was fixed for exactly this reason;
+     the slider branch was left out.
+
+     Zeroing the spring, the target and the two properties together keeps all
+     four in step, so whichever of the two ways in the reader leaves by, coming
+     back starts level and the tilt follows the next real move. setScrollOffset
+     stays tied to the switch alone: the parallax is gated on D.on, not on the
+     strength, so at strength 0 it is still live and must keep its offset.
+     Nothing that is drawn changes - at strength 0 the pixels were already
+     flat, and at any strength above 0 with the effect active this branch is
+     not reached. */
+  if(!depthActive()){
+    r.style.setProperty('--dx','0');r.style.setProperty('--dy','0');
+    D.dx=0;D.dy=0;D.tx=0;D.ty=0;
+    if(!D.on) setScrollOffset(null);
   }
 }
 function depthFrame(){
