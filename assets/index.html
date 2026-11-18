@@ -1482,6 +1482,38 @@ function pollInstall(){
   if(p.phase==='download'||p.phase==='installing'){S.installing[p.pkg]={pct:p.pct};paintProgress(p.pkg)}
   else if(p.phase==='success'){delete S.installing[p.pkg];toast('Installed - open it any time');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
   else if(p.phase==='failed'){delete S.installing[p.pkg];toast(p.error||'Install failed');refreshVisible();if(S.sheetPkg===p.pkg)openSheet(p.pkg);pollStop()}
+  else if(p.phase!=='confirm'){
+    /* An install that ended without a result.
+
+       The bridge reports six phases: download and installing while it works,
+       confirm while the installer is waiting for the reader, success and
+       failed when it is over - and idle, which is what cancel() writes when a
+       session is abandoned. This loop had a branch for four of them, so the
+       fifth fell straight through and nothing ended the install the page was
+       drawing.
+
+       What that left: S.installing[pkg] was never deleted, so every copy of
+       that app's Get button - the row, the card, the app page - kept drawing
+       the progress ring, and getBtnHtml() draws the ring *instead of* the Get
+       button, so the app could not be installed again from any of them for
+       the rest of the session. pollStop() was never reached either, so the
+       500 ms interval went on calling progress() - a synchronous bridge call
+       across the WebView, building its JSON on the JavaScript thread - for
+       ever, for an install that had been over since the first tick.
+
+       Reproduced by driving the poller exactly as the bridge does - a live
+       install, then phase "idle" - with the fix reverted: three rings still on
+       screen, no Get button left on the app, S.installing holding the entry,
+       pollTimer still set, and three progress() calls in the next 1.6 s. With
+       the branch below: none of those, and the button is back.
+
+       confirm is the one non-terminal phase outside the live pair - the
+       installer is waiting for the reader to accept the package - so it keeps
+       its ring and keeps the poller running, exactly as it did before.
+       Nothing visual changes for any install that finishes or fails: those
+       two branches above are untouched. */
+    delete S.installing[p.pkg];refreshVisible();pollStop()
+  }
 }
 /* The install poll belongs to an install, and only to an install.
 
