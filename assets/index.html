@@ -1861,17 +1861,50 @@ function moveLens(instant){
   ],{duration:540,easing:'cubic-bezier(.22,1.12,.36,1)'});
   lensAnim.onfinish=function(){lensAnim=null};
 }
-/* drag the lens across the bar, release to snap to the nearest tab */
+/* drag the lens across the bar, release to snap to the nearest tab.
+ *
+ * The drag belongs to the pointer that started it, and it ends when that
+ * pointer is released - wherever that release happens. Both halves of that
+ * were missing. `down` and `drag` were set from a pointerdown on the bar and
+ * cleared only by a pointerup or pointercancel delivered *to the bar*, and the
+ * bar is a 66px strip at the bottom of the frame. A press that leaves it
+ * before the 8px drag threshold - the ordinary way to change your mind about a
+ * tap - takes the release with it, and nothing else ever clears the flag, so
+ * the bar stays "pressed" for the rest of the session. The same happens to any
+ * gesture the system interrupts rather than completes: the app goes to the
+ * background under a finger, or the pointer is taken away. That is the way a
+ * reader on a phone reaches it.
+ *
+ * What it costs is the navigation itself. With `down` still true, the next
+ * pointermove over the bar is read as a drag: the lens slides and the .on
+ * highlight follows the pointer with no button held, so a tab is selected by
+ * hovering, and a tap on it afterwards switches to whatever the pointer
+ * happened to be over. The lens is also left in the drag pose - scale(1.1,.96)
+ * - because the only code that settles it back to scale(1,1) is moveLens(),
+ * which runs from end(). It stays squashed and off its tab until the reader
+ * switches tabs again.
+ *
+ * Measured on this page: press the tab bar, move up 6px, release above the
+ * bar, then move the pointer across the bar without pressing - the lens went
+ * translateX(9px) to translateX(163px) scale(1.1,0.96) and .tab.on moved from
+ * "today" to "apps" on hover alone, and stayed there.
+ *
+ * The release is listened for on window now, so it arrives however the gesture
+ * ends, and the pointerId is carried through so a second finger lifting does
+ * not end the first finger's drag. Nothing about a normal drag changes: the
+ * same pointerdown, the same 8px threshold, the same capture, the same snap on
+ * release - and a plain tap still falls through to the click handler, because
+ * end() returns before it touches the highlight when no drag had started. */
 (function(){
   const bar=$('#tabbar'), lens=$('#tabLens');
-  let down=false, drag=false, sx=0, sl=0;
+  let down=false, drag=false, sx=0, sl=0, pid=null;
   bar.addEventListener('pointerdown',function(e){
-    down=true;drag=false;sx=e.clientX;tgCache=null;   /* fresh geometry for this drag */
+    down=true;drag=false;pid=e.pointerId;sx=e.clientX;tgCache=null;   /* fresh geometry for this drag */
     const act=bar.querySelector('.tab.on');
     sl=lensX!=null?lensX:(act?act.offsetLeft+3:0);
   });
   bar.addEventListener('pointermove',function(e){
-    if(!down) return;
+    if(!down||e.pointerId!==pid) return;
     const dx=e.clientX-sx;
     if(!drag&&Math.abs(dx)>8){
       drag=true;
@@ -1889,17 +1922,21 @@ function moveLens(instant){
     g.forEach(function(t){const d=Math.abs(t.x+t.w/2-c);if(d<bd){bd=d;best=t}});
     bar.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.view===best.view)});
   });
-  function end(){
+  function end(e){
     if(!down) return;
-    down=false;
+    /* a second finger lifting is not the end of the first one's drag */
+    if(e&&e.pointerId!==undefined&&e.pointerId!==pid) return;
+    down=false;pid=null;
     if(!drag) return;
     drag=false;tabDragged=true;setTimeout(function(){tabDragged=false},120);
     const act=bar.querySelector('.tab.on');
     if(act&&act.dataset.view!==S.view) switchTab(act.dataset.view);
     else moveLens(false);
   }
-  bar.addEventListener('pointerup',end);
-  bar.addEventListener('pointercancel',end);
+  /* on window, not on the bar: the release has to be seen wherever the gesture
+     ends - see the note above */
+  window.addEventListener('pointerup',end);
+  window.addEventListener('pointercancel',end);
 })();
 window.addEventListener('resize',function(){lensX=null;tgCache=null;moveLens(true)});
 
