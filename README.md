@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="assets/icon.png" width="96" height="96" alt="Android app store with a Liquid Glass interface, built on F-Droid&#x27;s public repository index icon">
+<img src="assets/icon.png" width="96" height="96" alt="Liquid Store icon">
 
-<img src="assets/banner.svg" alt="Android app store with a Liquid Glass interface, built on F-Droid&#x27;s public repository index">
+<img src="assets/banner.svg" alt="Liquid Store">
 
 <a href="https://github.com/technicalnihilist-lgtm/liquid-store/stargazers"><img src="https://img.shields.io/badge/stars-2-5A31F4?style=for-the-badge&logo=github&logoColor=white" alt="stars: 2"></a>&nbsp;<a href="https://github.com/technicalnihilist-lgtm/liquid-store/network/members"><img src="https://img.shields.io/badge/forks-0-3FB950?style=for-the-badge" alt="forks: 0"></a>
 
-<a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest"><img src="https://img.shields.io/badge/DOWNLOAD-APK-6D5AE6?style=for-the-badge&logo=android&logoColor=white" alt="Download APK"></a>
+<a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest/download/LiquidStore.apk"><img src="https://img.shields.io/badge/DOWNLOAD-APK-6D5AE6?style=for-the-badge&logo=android&logoColor=white" alt="Download APK"></a> <a href="https://technicalnihilist-lgtm.github.io/apps-site/apps/liquid-store.html"><img src="https://img.shields.io/badge/WEBSITE-OPEN-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website"></a>
 
 <b>Support the work</b>
 
