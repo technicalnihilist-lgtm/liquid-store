@@ -1,10 +1,10 @@
 <div align="center">
 
+<img src="assets/icon.png" width="96" height="96" alt="Android app store with a Liquid Glass interface, built on F-Droid&#x27;s public repository index icon">
+
+<img src="assets/banner.svg" alt="Android app store with a Liquid Glass interface, built on F-Droid&#x27;s public repository index">
+
 <a href="https://github.com/technicalnihilist-lgtm/liquid-store/stargazers"><img src="https://img.shields.io/badge/stars-2-5A31F4?style=for-the-badge&logo=github&logoColor=white" alt="stars: 2"></a>&nbsp;<a href="https://github.com/technicalnihilist-lgtm/liquid-store/network/members"><img src="https://img.shields.io/badge/forks-0-3FB950?style=for-the-badge" alt="forks: 0"></a>
-
-<h3>Android app store with a Liquid Glass interface, built on F-Droid&#x27;s public repository index</h3>
-
-<img src="https://img.shields.io/badge/HTML-5865F2?style=flat-square" alt="HTML"> <img src="https://img.shields.io/badge/Android-3B3F4A?style=flat-square" alt="Android"> <img src="https://img.shields.io/badge/APK-3FB950?style=flat-square" alt="APK"> <img src="https://img.shields.io/badge/App%20Store-EC4899?style=flat-square" alt="App Store">
 
 <a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest"><img src="https://img.shields.io/badge/DOWNLOAD-APK-6D5AE6?style=for-the-badge&logo=android&logoColor=white" alt="Download APK"></a>
 
@@ -16,13 +16,7 @@
 
 <a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest"><img src="https://img.shields.io/badge/VERSION-v12.2-6D5AE6?style=for-the-badge" alt="VERSION: v12.2"></a> <img src="https://img.shields.io/badge/DOWNLOADS-406-3FB950?style=for-the-badge" alt="DOWNLOADS: 406"> <a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases"><img src="https://img.shields.io/badge/RELEASES-GITHUB-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="RELEASES: GITHUB"></a>
 
-<h4>Get it from</h4>
-
-<a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases"><img src="https://img.shields.io/badge/GitHub-Releases-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Releases"></a> <a href="https://github.com/technicalnihilist-lgtm/liquid-store/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/Source-ZIP-0EA5E9?style=for-the-badge&logo=github&logoColor=white" alt="Source ZIP"></a>
-
 </div>
-
----
 
 ---
 
