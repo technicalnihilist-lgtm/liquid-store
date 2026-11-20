@@ -380,12 +380,163 @@ input{font-family:inherit}
 /* ---- bounce: JS drives the spring via the independent `scale` property ---- */
 .press:active,.get:active,.bigcard:active{transform:none}
 button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.avatar,.row{-webkit-tap-highlight-color:transparent;will-change:scale}
+
+/* =====================================================================
+   Liquid Glass 2 - material, motion and transitions.
+   Layered on top of the existing store: nothing above is removed, and the
+   bridge / catalogue logic is untouched. Everything here is progressive:
+   if a browser lacks a feature it falls back to the blur glass above.
+   ===================================================================== */
+@property --glow{syntax:'<number>';inherits:false;initial-value:0}
+:root{
+  --spring:cubic-bezier(.34,1.45,.64,1);          /* replaced at runtime by a real spring, see lg.js */
+  --spring-soft:cubic-bezier(.22,1,.36,1);
+  --glass-lo:rgba(255,255,255,.30);
+  --hl:1;                                          /* highlight strength */
+  --ang:215deg;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--glass-lo:rgba(70,70,82,.34);--hl:.55}}
+:root[data-theme="dark"]{--glass-lo:rgba(70,70,82,.34);--hl:.55}
+
+/* ---------- ambient orbs: give the glass something to refract ---------- */
+.orbs{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orbs i{position:absolute;width:86%;aspect-ratio:1;border-radius:50%;}
+.orbs i:nth-child(1){left:-30%;top:-8%;background:radial-gradient(circle,rgba(80,140,255,.42),transparent 66%)}
+.orbs i:nth-child(2){right:-38%;top:30%;background:radial-gradient(circle,rgba(255,100,170,.34),transparent 66%);animation-duration:29s;animation-delay:-9s}
+.orbs i:nth-child(3){left:-14%;bottom:-22%;background:radial-gradient(circle,rgba(50,220,190,.34),transparent 66%);animation-duration:27s;animation-delay:-15s}
+@keyframes orb{to{transform:translate3d(18%,12%,0) scale(1.2)}}
+:root[data-theme="dark"] .orbs i{opacity:1.2}
+@media (min-width:640px){.phone{background:var(--stage),var(--bg)}}
+
+/* ---------- the material ---------- */
+.g{
+  background:var(--glass-lo);
+  backdrop-filter:blur(14px) saturate(185%) brightness(1.06);-webkit-backdrop-filter:blur(14px) saturate(185%) brightness(1.06);
+  border:0;
+  box-shadow:
+    inset 0 1.5px 2px -.5px rgba(255,255,255,calc(.95*var(--hl))),
+    inset 0 -2px 5px -2px rgba(255,255,255,calc(.40*var(--hl))),
+    0 10px 26px var(--shadow);
+  transition:--glow .8s ease;
+}
+/* pressed light: a soft glow that follows the finger */
+.g::before{
+  background:
+    radial-gradient(130px circle at var(--px,50%) var(--py,0%),rgba(255,255,255,calc(var(--glow)*.55*var(--hl))),transparent 70%),
+    linear-gradient(150deg,rgba(255,255,255,calc(.38*var(--hl))) 0%,rgba(255,255,255,0) 38%,rgba(255,255,255,0) 62%,rgba(255,255,255,calc(.16*var(--hl))) 100%);
+}
+.g.lit{--glow:1;transition-duration:.12s}
+/* specular rim: a bright edge that leans toward the light */
+.g::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;pointer-events:none;
+  background:conic-gradient(from var(--ang) at 50% 50%,
+    rgba(255,255,255,calc(.95*var(--hl))),rgba(255,255,255,.06) 20%,rgba(255,255,255,0) 42%,
+    rgba(255,255,255,calc(.60*var(--hl))) 56%,rgba(255,255,255,.06) 76%,rgba(255,255,255,calc(.95*var(--hl))));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+}
+.press{transition:--glow .8s ease}
+
+/* ---------- dock: bar + orb, minimises while you scroll down ---------- */
+.dock{transition:transform .6s var(--spring-soft),opacity .35s ease}
+#tabbar{transition:height .4s cubic-bezier(.22,1,.36,1),--glow .8s ease}
+.fab{transition:width .4s cubic-bezier(.22,1,.36,1),height .4s cubic-bezier(.22,1,.36,1),flex-basis .4s cubic-bezier(.22,1,.36,1),--glow .8s ease}
+.tab span{display:block;height:12px;line-height:12px;overflow:hidden;transition:opacity .3s ease,height .45s var(--spring-soft),margin .45s var(--spring-soft)}
+.dock.mini #tabbar{height:54px}
+.dock.mini .fab{flex-basis:54px;width:54px;height:54px}
+.dock.mini .tab span{opacity:0;height:0;margin-top:-3px}
+.lens{
+  background:linear-gradient(180deg,rgba(255,255,255,.66),rgba(255,255,255,.24));
+  border:0;
+  box-shadow:inset 0 1px 1.5px rgba(255,255,255,.95),inset 0 -3px 7px rgba(255,255,255,.45),0 6px 18px rgba(30,40,90,.16);
+  scale:1;transition:scale .6s var(--spring),background .35s,box-shadow .35s,opacity .25s;
+}
+:root[data-theme="dark"] .lens{background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.08))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lens{background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,.08))}}
+/* lifted: the lens swells into clear glass while you hold or drag it */
+#tabbar.lifted .lens{
+  scale:1.17 1.15;
+  background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.06));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.75),inset 0 2px 3px rgba(255,255,255,.95),inset 0 -10px 18px rgba(255,255,255,.30),0 12px 28px rgba(30,40,90,.28);
+}
+.tab.on svg{transform:translateY(-1px) scale(1.1)}
+#tabbar.lifted .tab.on svg{transform:translateY(-1px) scale(1.22)}
+
+/* ---------- screens: directional, springy, staggered ---------- */
+.view{
+  opacity:0;transform:translate3d(var(--vx,0px),0,0);
+  transition:opacity .3s ease,transform .55s cubic-bezier(.22,1,.36,1),visibility .55s;
+}
+.view.on{transform:none}
+.view.enter .lt,.view.enter .bigcard,.view.enter .sec,.view.enter .hcard,.view.enter .row,.view.enter .chip,.view.enter .searchbar,.view.enter .arc{
+  animation:rise .6s cubic-bezier(.22,1,.36,1) backwards;animation-delay:calc(var(--i,0)*42ms);
+}
+@keyframes rise{from{opacity:0;translate:0 18px}}
+
+/* ---------- app page: grows out of the thing you tapped ---------- */
+.sheet{transform:none;transition:none;visibility:hidden;box-shadow:none}
+.sheet.on{visibility:visible}
+.sheet.dragging{box-shadow:-18px 0 44px rgba(0,0,0,.2)}
+.sheet .edge{position:absolute;left:0;top:0;bottom:0;width:22px;z-index:9;touch-action:pan-y}
+.phone.sheet-open .navbar{opacity:0}
+.phone.sheet-open .dock{transform:translateY(130%) scale(.92);opacity:0}
+.phone.dragging .dock{transition:none}
+.scrim{position:absolute;inset:0;z-index:65;background:#000;opacity:0;pointer-events:none;transition:opacity .5s ease}
+.phone.sheet-open .scrim{opacity:.22}
+.phone.dragging .scrim{transition:none}
+.pagebar .iconbtn{animation:none}
+
+/* ---------- menu ---------- */
+.menu{animation:none;transform-origin:top right}
+.menuwrap.on .menu{animation:menuIn .55s var(--spring) both}
+.menuwrap.out .menu{animation:menuOut .22s ease-in both}
+.menuwrap.on .mi{animation:miIn .5s var(--spring-soft) backwards}
+.menuwrap.on .mi:nth-child(1){animation-delay:.04s}.menuwrap.on .mi:nth-child(2){animation-delay:.08s}
+.menuwrap.on .mi:nth-child(3){animation-delay:.12s}.menuwrap.on .mi:nth-child(4){animation-delay:.16s}
+@keyframes menuIn{from{opacity:0;transform:scale(.4,.3);border-radius:34px}to{opacity:1;transform:none}}
+@keyframes menuOut{to{opacity:0;transform:scale(.6,.5)}}
+@keyframes miIn{from{opacity:0;translate:0 -8px}}
+.toast{transition:opacity .3s ease,transform .6s var(--spring),--glow .8s ease;transform:translate(-50%,28px) scale(.85)}
+.toast.on{transform:translate(-50%,0)}
+
+/* ---------- controls in the same material ---------- */
+.chip{transition:background .35s ease,color .35s ease,transform .3s var(--spring)}
+.chip.act{background:linear-gradient(180deg,rgba(80,160,255,.95),rgba(0,122,255,.95));box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 6px 16px rgba(0,122,255,.35)}
+.get{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 2px rgba(255,255,255,.18);transition:transform .3s var(--spring),background .3s}
+.pill{background:linear-gradient(180deg,#4fa6ff,#007aff);box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 8px 18px rgba(0,122,255,.38)}
+.sw{width:54px;height:32px;border-radius:16px;box-shadow:inset 0 1px 3px rgba(0,0,0,.15);transition:background .35s ease}
+.sw i{width:36px;height:26px;top:3px;left:3px;border-radius:13px;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(240,240,245,.92));
+  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 1px #fff;
+  transition:transform .55s var(--spring),width .35s var(--spring)}
+.sw.on i{transform:translateX(12px)}
+.sw:active i{width:44px}.sw.on:active i{transform:translateX(4px)}
+.rng::-webkit-slider-thumb{width:38px;height:26px;border-radius:13px;background:linear-gradient(180deg,#fff,#f1f1f6);
+  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 1px #fff;transition:transform .3s var(--spring)}
+.rng:active::-webkit-slider-thumb{transform:scale(1.18)}
+.hcard,.bigcard{transition:transform .5s var(--spring),box-shadow .4s}
+
+
+@media (prefers-reduced-motion:reduce){.orbs i{animation:none !important}}
+
+/* ---------- stability: no tilted glass, no blur inside moving layers ----------
+   backdrop-filter inside a 3D-transformed or animating parent is what makes
+   WebView tile and flash. These surfaces keep their look but drop the tilt,
+   and the ones that sit on flat colour use plain translucency instead. */
+.bigcard,.pagebar,.avatar,.searchbar,.arc,.loadcard,.bc-foot{transform:none !important}
+.bc-foot,.avatar.g{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.bc-foot{background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.14))}
+.avatar.g{background:var(--glass-hi)}
+.bc-foot::after,.avatar::after,.strip::after,.loadcard::after,.bigget::after{display:none}
+.hcard,.bigcard{transition:box-shadow .3s}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="lgDefs"></defs></svg>
 <div class="stage"></div>
 
 <div class="phone">
+  <div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="navbar" id="navbar"><b id="navTitle">Today</b></div>
 
 
@@ -434,6 +585,7 @@ button,.press,[data-detail],.tab,.chip,.mi,.get,.pill,.pill2,.bigget,.iconbtn,.a
 
   <div class="toast g" id="toast"></div>
 
+  <div class="scrim" id="scrim"></div>
   <div class="sheet" id="sheet">
     <div class="pagebar">
       <button class="iconbtn g press" id="sheetClose" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -491,7 +643,11 @@ const DEMO = [
 ];
 function demoApp(a){
   return {pkg:a[0], name:a[1], sum:a[2], cat:a[3], ver:'1.0', sizeText:a[4], icon:'',
-          installed:false, installedVer:0, hasUpdate:false, iconAlt:'', iconCand:[], shots:[],
+          installed:false, installedVer:0, hasUpdate:false, iconAlt:'',
+          /* browser-only preview: no Android bridge here, so point the <img> tags at the
+             public F-Droid repo directly. Inside the app the native side supplies these. */
+          iconCand:['https://f-droid.org/repo/'+a[0]+'/en-US/icon.png','https://cloudflare.f-droid.org/repo/'+a[0]+'/en-US/icon.png'],
+          shots:[1,2,3].map(function(n){return ['https://f-droid.org/repo/'+a[0]+'/en-US/phoneScreenshots/'+n+'.png','https://f-droid.org/repo/'+a[0]+'/en-US/phoneScreenshots/'+n+'.jpg']}),
           description:a[2]+'\n\nThis is demo content shown because the store is running outside Android. Inside the app this page is filled from the live repository index.',
           license:a[5], author:'', source:'', issues:'', web:'', version:'1.0', versionCode:1,
           size:0, minSdk:24, updated:Date.now(), apkUrl:''};
@@ -1357,7 +1513,7 @@ function sheetApp(pkg){ S.sheetPkg=pkg||null }
    the one moment it is visible; 420 ms clears the .38s transform even when
    the transition starts late. The guard covers a sheet reopened inside that
    window, which must keep the page it has just been given. */
-const SHEET_RELEASE_MS=420;
+const SHEET_RELEASE_MS=520;
 function closeSheet(){
   const sh=$('#sheet');
   sh.classList.remove('on');
@@ -2802,6 +2958,310 @@ window.addEventListener('load',()=>moveLens(true));
     if(b)waterSound();
   },true);
 })();
+
+/* =====================================================================
+   Liquid Glass 2 - runtime: real springs, refraction, interactive light,
+   shared-element transitions, edge-swipe back, minimising dock.
+   ===================================================================== */
+(function(){
+  var root=document.documentElement, phone=document.querySelector('.phone');
+  var NOANIM=!root.animate, still=function(){return REDUCED.matches||NOANIM};
+
+  /* ---------- springs: sampled from a damped oscillator into linear() ---------- */
+  function spring(zeta,omega,n){
+    var pts=[],wd=omega*Math.sqrt(1-zeta*zeta);
+    for(var i=0;i<=n;i++){
+      var t=i/n;
+      var v=1-Math.exp(-zeta*omega*t)*(Math.cos(wd*t)+zeta*omega/wd*Math.sin(wd*t));
+      pts.push(i===n?1:Math.round(v*1000)/1000);
+    }
+    return 'linear('+pts.join(',')+')';
+  }
+  var SPRING='cubic-bezier(.34,1.45,.64,1)', SOFT='cubic-bezier(.22,1,.36,1)';
+  try{
+    if(window.CSS&&CSS.supports('transition-timing-function','linear(0,1)')){
+      SPRING=spring(.6,15,48);          /* lively, a clear overshoot  */
+      SOFT=spring(.9,13,40);            /* damped, a hint of settle   */
+      root.style.setProperty('--spring',SPRING);
+      root.style.setProperty('--spring-soft',SOFT);
+    }
+  }catch(e){}
+
+  /* ---------- refraction (Chromium / Android WebView) ---------- */
+  var NS='http://www.w3.org/2000/svg', XL='http://www.w3.org/1999/xlink';
+  var cm=/Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent);
+  var CAN_REFRACT=false&&!!(cm&&+cm[1]>=110&&window.CSS&&CSS.supports&&CSS.supports('backdrop-filter','url(#a)')&&window.ResizeObserver);
+  if(CAN_REFRACT){
+    var defs=document.getElementById('lgDefs'),uid=0;
+    var mapURL=function(w,h,r,bw){
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      var x=c.getContext('2d'),im=x.createImageData(w,h),d=im.data,hx=w/2,hy=h/2,rx=hx-r,ry=hy-r;
+      for(var j=0;j<h;j++)for(var i=0;i<w;i++){
+        var px=i+.5-hx,py=j+.5-hy,qx=Math.abs(px)-rx,qy=Math.abs(py)-ry;
+        var ox=Math.max(qx,0),oy=Math.max(qy,0),len=Math.sqrt(ox*ox+oy*oy);
+        var depth=r-(len+Math.min(Math.max(qx,qy),0)+r)+0;   /* distance to the edge, >0 inside */
+        depth=-(len+Math.min(Math.max(qx,qy),0)-r);
+        var vx=0,vy=0;
+        if(depth>0&&depth<bw){
+          var nx,ny;
+          if(qx>0&&qy>0){nx=ox/len*(px<0?-1:1);ny=oy/len*(py<0?-1:1)}
+          else if(qx>qy){nx=px<0?-1:1;ny=0}else{nx=0;ny=py<0?-1:1}
+          var m=Math.pow(1-depth/bw,1.7);
+          vx=-nx*m;vy=-ny*m;                                   /* sample from just inside the rim */
+        }
+        var k=(j*w+i)*4;d[k]=128+vx*127;d[k+1]=128+vy*127;d[k+2]=128;d[k+3]=255;
+      }
+      x.putImageData(im,0,0);return c.toDataURL('image/png');
+    };
+    var chan=function(f,r,g,b){
+      var m=document.createElementNS(NS,'feColorMatrix');m.setAttribute('type','matrix');
+      m.setAttribute('values',[r,0,0,0,0,0,g,0,0,0,0,0,b,0,0,0,0,0,1,0].join(' '));return m;
+    };
+    var build=function(el,o){
+      var id='lgf'+(++uid),f=document.createElementNS(NS,'filter');
+      f.setAttribute('id',id);f.setAttribute('color-interpolation-filters','sRGB');
+      f.setAttribute('x','0');f.setAttribute('y','0');f.setAttribute('width','100%');f.setAttribute('height','100%');
+      defs.appendChild(f);
+      var st={f:f,w:0,h:0,id:id};
+      el.__lg=st;return st;
+    };
+    var fill=function(st,w,h,r,o){
+      var f=st.f;while(f.firstChild)f.removeChild(f.firstChild);
+      var im=document.createElementNS(NS,'feImage');
+      im.setAttribute('href',mapURL(w,h,r,o.bw));im.setAttributeNS(XL,'xlink:href',mapURL(w,h,r,o.bw));
+      im.setAttribute('x','0');im.setAttribute('y','0');im.setAttribute('width',w);im.setAttribute('height',h);
+      im.setAttribute('preserveAspectRatio','none');im.setAttribute('result','map');f.appendChild(im);
+      /* chromatic dispersion: red, green and blue bend by slightly different amounts */
+      var S=o.px*2,chs=[[1.06,1,0,0],[1,0,1,0],[.94,0,0,1]];
+      chs.forEach(function(c,i){
+        var dm=document.createElementNS(NS,'feDisplacementMap');
+        dm.setAttribute('in','SourceGraphic');dm.setAttribute('in2','map');dm.setAttribute('scale',S*c[0]);
+        dm.setAttribute('xChannelSelector','R');dm.setAttribute('yChannelSelector','G');dm.setAttribute('result','d'+i);
+        f.appendChild(dm);
+        var cmx=chan(f,c[1],c[2],c[3]);cmx.setAttribute('in','d'+i);cmx.setAttribute('result','c'+i);f.appendChild(cmx);
+      });
+      var b1=document.createElementNS(NS,'feBlend');b1.setAttribute('in','c0');b1.setAttribute('in2','c1');b1.setAttribute('mode','screen');b1.setAttribute('result','b1');f.appendChild(b1);
+      var b2=document.createElementNS(NS,'feBlend');b2.setAttribute('in','b1');b2.setAttribute('in2','c2');b2.setAttribute('mode','screen');f.appendChild(b2);
+    };
+    var refract=function(el,o){
+      var st=el.__lg||build(el,o);
+      var run=function(){
+        var w=Math.round(el.offsetWidth),h=Math.round(el.offsetHeight);
+        if(w<4||h<4||(w===st.w&&h===st.h))return;
+        st.w=w;st.h=h;
+        var cs=getComputedStyle(el),rr=cs.borderTopLeftRadius,r=rr.indexOf('%')>0?h*parseFloat(rr)/100:parseFloat(rr)||0;
+        r=Math.min(r,h/2,w/2);
+        fill(st,w,h,r,{bw:Math.min(o.bw,h*.34),px:o.px});
+        var v='url(#'+st.id+') blur('+o.blur+'px) saturate(1.7) brightness(1.08)';
+        el.style.backdropFilter=v;el.style.webkitBackdropFilter=v;
+      };
+      new ResizeObserver(run).observe(el);run();
+    };
+    var go=function(){
+      var q=function(s,o){document.querySelectorAll(s).forEach(function(e){refract(e,o)})};
+      q('#tabbar',{bw:20,px:22,blur:5});
+      q('.fab',{bw:18,px:20,blur:5});
+      q('.pagebar .iconbtn',{bw:12,px:12,blur:4});
+      q('.menu',{bw:18,px:16,blur:8});
+      q('.toast',{bw:14,px:12,blur:6});
+    };
+    if(document.readyState==='complete')go();else addEventListener('load',go);
+  }
+
+  /* ---------- interactive light: the glass lights up under your finger ---------- */
+  var lit=new Map();
+  function light(g,e){
+    var r=g.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    g.style.setProperty('--px',x+'px');g.style.setProperty('--py',y+'px');
+    g.style.setProperty('--ang',(Math.atan2(y-r.height/2,x-r.width/2)*180/Math.PI+90)+'deg');
+  }
+  document.addEventListener('pointerdown',function(e){
+    var g=e.target.closest&&e.target.closest('.g'); if(!g)return;
+    light(g,e);g.classList.add('lit');lit.set(e.pointerId,g);
+  },true);
+  document.addEventListener('pointermove',function(e){var g=lit.get(e.pointerId);if(g)light(g,e)},{passive:true});
+  function unlit(e){var g=lit.get(e.pointerId);if(g){g.classList.remove('lit');lit.delete(e.pointerId)}}
+  document.addEventListener('pointerup',unlit,true);document.addEventListener('pointercancel',unlit,true);
+
+  /* ---------- lens lifts while the tab bar is held ---------- */
+  var bar=document.getElementById('tabbar');
+  bar.addEventListener('pointerdown',function(){bar.classList.add('lifted')});
+  function drop(){bar.classList.remove('lifted')}
+  addEventListener('pointerup',drop);addEventListener('pointercancel',drop);
+
+  /* ---------- dock minimises on scroll down, returns on scroll up ---------- */
+  var dock=document.querySelector('.dock'),lastTop=new WeakMap();
+  document.addEventListener('scroll',function(e){
+    var t=e.target;if(!t||!t.classList||!t.classList.contains('view')||!t.classList.contains('on'))return;
+    var y=t.scrollTop,p=lastTop.get(t)||0,dy=y-p;
+    if(Math.abs(dy)<6)return;
+    lastTop.set(t,y);
+    if(y<40||dy<0)dock.classList.remove('mini');else if(y>90)dock.classList.add('mini');
+  },true);
+  bar.addEventListener('click',function(){dock.classList.remove('mini')});
+
+  /* ---------- screens: direction-aware transitions + staggered entrance ---------- */
+  try{ambientStop();ambientStart=function(){}}catch(e){}
+  var ORDER=['today','games','apps','arcade','search'];
+  function stagger(view){
+    var n=0;
+    view.querySelectorAll('.lt,.bigcard,.sec,.hcard,.row,.chip,.searchbar,.arc').forEach(function(el){
+      if(n>8)return;
+      var r=el.getBoundingClientRect();if(r.top>innerHeight+40)return;
+      el.style.setProperty('--i',n++);
+    });
+    view.classList.add('enter');
+    clearTimeout(view.enterT);
+    view.enterT=setTimeout(function(){view.classList.remove('enter')},1300);
+  }
+  var _switch=switchTab;
+  switchTab=function(v){
+    var cur=ORDER.indexOf(S.view),tgt=ORDER.indexOf(v);
+    if(still()||cur===tgt||cur<0||tgt<0){_switch(v);return}
+    var dir=tgt>cur?1:-1,views=ORDER.map(function(k){return document.getElementById('view-'+k)});
+    var incoming=views[tgt];
+    incoming.style.transition='none';incoming.style.setProperty('--vx',(dir*34)+'px');
+    void incoming.offsetWidth;incoming.style.transition='';
+    views.forEach(function(el,i){if(i!==tgt)el.style.setProperty('--vx',(i===cur?-dir*34:(i<tgt?-34:34))+'px')});
+    _switch(v);
+    setTimeout(function(){if(S.view===v)stagger(incoming)},110);
+  };
+  /* first paint of Today */
+  (function(){
+    var t=document.getElementById('view-today');
+    var mo=new MutationObserver(function(){
+      if(t.querySelector('.row,.bigcard')){mo.disconnect();stagger(t)}
+    });mo.observe(t,{childList:true});
+  })();
+
+  /* ---------- menu: spring in, shrink out ---------- */
+  var _closeMenu=closeMenu;
+  closeMenu=function(){
+    var w=document.getElementById('menuwrap');
+    if(still()||!w.classList.contains('on')||w.classList.contains('out')){_closeMenu();return}
+    w.classList.add('out');
+    setTimeout(function(){w.classList.remove('on','out')},200);
+  };
+
+  /* ---------- app page: shared-element transition ---------- */
+  var sheet=document.getElementById('sheet'),scrim=document.getElementById('scrim'),origin=null;
+  function radiusOf(el){var r=parseFloat(getComputedStyle(el).borderTopLeftRadius);return isNaN(r)?20:Math.min(r,44)}
+  document.addEventListener('click',function(e){
+    var el=e.target.closest&&e.target.closest('[data-detail]');
+    if(!el){origin=null;return}
+    var ic=el.querySelector('.ic');
+    origin={rect:el.getBoundingClientRect(),r:radiusOf(el),icon:ic?ic.getBoundingClientRect():null};
+  },true);
+  function inset(r,ph,rad){
+    return 'inset('+(r.top-ph.top)+'px '+(ph.right-r.right)+'px '+(ph.bottom-r.bottom)+'px '+(r.left-ph.left)+'px round '+rad+'px)';
+  }
+  var FULL='inset(0px 0px 0px 0px round 0px)';
+  var _open=openSheet;
+  openSheet=function(pkg){
+    var was=sheet.classList.contains('on');
+    _open(pkg);
+    if(was||!sheet.classList.contains('on'))return;
+    phone.classList.add('sheet-open');
+    if(still())return;
+    sheet.getAnimations().forEach(function(a){a.cancel()});
+    var body=document.getElementById('sheetBody');body.getAnimations().forEach(function(a){a.cancel()});
+    var o=origin;
+    sheet.animate({opacity:[0,1],transform:['translateY(36px) scale(.965)','none']},{duration:480,easing:'cubic-bezier(.22,1,.36,1)'});
+    body.animate({opacity:[0,1],transform:['translateY(18px)','none']},{duration:520,delay:60,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+    var pb=sheet.querySelector('.pagebar');
+    if(pb)pb.animate({opacity:[0,1],transform:['translateY(-14px)','none']},{duration:520,delay:200,easing:SOFT,fill:'backwards'});
+    /* the icon travels from its place in the list to its place on the page */
+    var big=body.querySelector('.ic.xl');
+    if(big&&o&&o.icon){
+      var b=big.getBoundingClientRect(),s=o.icon.width/b.width;
+      big.animate({
+        translate:[((o.icon.left+o.icon.width/2)-(b.left+b.width/2))+'px '+((o.icon.top+o.icon.height/2)-(b.top+b.height/2))+'px','0px 0px'],
+        scale:[s,1]
+      },{duration:620,easing:'cubic-bezier(.22,1,.36,1)'});
+    }
+  };
+  function backTarget(pkg){
+    if(!pkg)return null;
+    var els=document.querySelectorAll('.view.on [data-detail]');
+    for(var i=0;i<els.length;i++){
+      if(els[i].getAttribute('data-detail')!==pkg)continue;
+      var r=els[i].getBoundingClientRect();
+      if(r.bottom>60&&r.top<innerHeight-60)return{rect:r,r:radiusOf(els[i])};
+    }
+    return null;
+  }
+  var quiet=false,_close=closeSheet;
+  closeSheet=function(){
+    var was=sheet.classList.contains('on');
+
+    sheet.getAnimations().forEach(function(a){if(!sheet.__drag)a.cancel()});
+    _close();
+    phone.classList.remove('sheet-open');
+    if(!was||still()||quiet)return;
+    sheet.animate([{opacity:1,transform:'none',visibility:'visible'},{opacity:0,transform:'translateY(30px) scale(.97)',visibility:'visible'}],{duration:320,easing:'cubic-bezier(.4,0,.6,1)'});
+  };
+
+  /* ---------- edge swipe back, following the finger ---------- */
+  (function(){
+    var edge=document.createElement('div');edge.className='edge';sheet.appendChild(edge);
+    var down=false,drag=false,pid=null,sx=0,sy=0,lx=0,lt=0,vel=0,w=1;
+    edge.addEventListener('pointerdown',function(e){
+      down=true;drag=false;pid=e.pointerId;sx=lx=e.clientX;sy=e.clientY;lt=performance.now();vel=0;w=sheet.offsetWidth||1;
+    });
+    edge.addEventListener('pointermove',function(e){
+      if(!down||e.pointerId!==pid)return;
+      var dx=e.clientX-sx,dy=e.clientY-sy;
+      if(!drag){
+        if(dx>8&&dx>Math.abs(dy)*1.2){drag=true;sheet.__drag=true;try{edge.setPointerCapture(pid)}catch(_){ }
+          phone.classList.add('dragging');sheet.classList.add('dragging');
+          sheet.getAnimations().forEach(function(a){a.cancel()})}
+        else if(Math.abs(dy)>12){down=false;return}
+        else return;
+      }
+      var x=Math.max(0,dx),p=Math.min(1,x/w),now=performance.now();
+      vel=(e.clientX-lx)/Math.max(1,now-lt);lx=e.clientX;lt=now;
+      sheet.style.transform='translateX('+x+'px)';
+            scrim.style.opacity=.22*(1-p);
+    });
+    function end(e){
+      if(!down||(e&&e.pointerId!==pid))return;
+      down=false;if(!drag)return;drag=false;
+      var dx=Math.max(0,(e?e.clientX:lx)-sx),commit=dx>w*.38||vel>.55;
+      phone.classList.remove('dragging');
+      var done=function(){
+        sheet.classList.remove('dragging');sheet.style.transform='';sheet.__drag=false;
+        scrim.style.opacity='';
+      };
+      if(commit){
+        var a=sheet.animate({transform:['translateX('+dx+'px)','translateX(104%)']},{duration:300,easing:'cubic-bezier(.3,.8,.3,1)',fill:'forwards'});
+        a.onfinish=function(){
+          sheet.__drag=false;a.cancel();
+          sheet.style.transform='';sheet.classList.remove('dragging');
+          quiet=true;closeSheet();quiet=false;
+          scrim.style.opacity='';
+        };
+      }else{
+        sheet.animate({transform:['translateX('+dx+'px)','none']},{duration:520,easing:SPRING}).onfinish=done;
+        scrim.style.opacity='';
+        sheet.style.transform='';
+      }
+    }
+    edge.addEventListener('pointerup',end);edge.addEventListener('pointercancel',end);
+  })();
+})();
+
+/* hide screenshot slots whose image never loads, so a missing shot leaves no empty box */
+document.addEventListener('error',function(e){
+  var im=e.target;if(!im||im.tagName!=='IMG')return;
+  var par=im.parentNode;if(!par||!par.classList||!par.classList.contains('shot'))return;
+  setTimeout(function(){
+    if(par.querySelector('img'))return;
+    par.style.display='none';
+    var row=par.parentNode;if(!row)return;
+    var any=[].some.call(row.children,function(c){return c.style.display!=='none'});
+    if(!any){row.style.display='none';var pv=row.previousElementSibling;if(pv&&pv.classList.contains('eyebrow'))pv.style.display='none'}
+  },0);
+},true);
 </script>
 </body>
 </html>
