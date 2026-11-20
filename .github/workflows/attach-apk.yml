@@ -1,0 +1,27 @@
+name: attach-apk
+
+# Uploads the built APK in dist/ to the v12.3 release as a release asset, so
+# releases/latest/download/LiquidStore.apk resolves again.
+on:
+  repository_dispatch:
+    types: [attach-apk]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach dist/LiquidStore.apk to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v12.3
+        run: |
+          set -euo pipefail
+          ls -l dist/LiquidStore.apk
+          gh release upload "$TAG" dist/LiquidStore.apk --clobber
+          echo "assets now:"
+          gh release view "$TAG" --json assets -q '.assets[] | .name + " " + (.size|tostring) + "B"'
