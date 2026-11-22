@@ -1,0 +1,63 @@
+{
+  "name": "@shayxo.dev/liquidglass",
+  "version": "0.0.0",
+  "private": true,
+  "description": "<liquid-glass>: a framework-independent custom element for the liquidglass material. Refracts live HTML (Chromium) or draws the production shaders through CanvasKit.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shayann07/liquidglass.git",
+    "directory": "ports/npm"
+  },
+  "homepage": "https://liquidglass.shayxo.dev/web-component/",
+  "keywords": ["liquid glass", "glass", "web component", "custom element", "backdrop-filter", "canvaskit"],
+  "types": "./index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./index.d.mts",
+      "default": "./index.mjs"
+    },
+    "./element": {
+      "types": "./element.d.mts",
+      "default": "./element.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": ["./index.mjs"],
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "element.mjs",
+    "element.d.mts",
+    "engine.mjs",
+    "material.mjs",
+    "optics.mjs",
+    "canvaskit.mjs",
+    "canvas-engine.mjs",
+    "vendor/skia/",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "scripts": {
+    "vendor": "node vendor-skia.mjs",
+    "test": "node vendor-skia.mjs --check && node --test test/*.test.mjs && npm run test:types",
+    "test:types": "tsc -p tsconfig.types.json",
+    "test:browser": "playwright test",
+    "serve": "node serve.mjs"
+  },
+  "peerDependencies": {
+    "canvaskit-wasm": "0.42.0"
+  },
+  "peerDependenciesMeta": {
+    "canvaskit-wasm": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "canvaskit-wasm": "0.42.0",
+    "typescript": "7.0.2"
+  }
+}

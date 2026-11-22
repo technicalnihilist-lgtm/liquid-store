@@ -1,0 +1,11 @@
+{
+  "note": "Install counts published by Google Play, for apps whose F-Droid listing has no download count of its own (F-Droid publishes none). Keyed by package; the value is Play's bucket, verbatim. The app shows it labelled 'on Play' so it is never mistaken for a count from this store or from GitHub. Extend by adding a package.",
+  "installs": {
+    "de.markusfisch.android.binaryeye": "100K+",
+    "me.zhanghai.android.files": "1M+",
+    "com.keylesspalace.tusky": "500K+",
+    "com.unciv.app": "1M+",
+    "org.fossify.musicplayer": "100K+",
+    "org.sufficientlysecure.keychain": "500K+"
+  }
+}

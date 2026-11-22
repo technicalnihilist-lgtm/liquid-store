@@ -1,11 +1,17 @@
 name: attach-apk
 
-# Uploads the built APK in dist/ to the v12.3 release as a release asset, so
-# releases/latest/download/LiquidStore.apk resolves again.
+# Uploads the built APK in dist/ to a release as a release asset, so
+# releases/latest/download/LiquidStore.apk resolves again. Defaults to the
+# current version's tag; pass another one when re-attaching an older build.
 on:
   repository_dispatch:
     types: [attach-apk]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the APK to
+        required: false
+        default: v14.5
 
 permissions:
   contents: write
@@ -18,7 +24,7 @@ jobs:
       - name: Attach dist/LiquidStore.apk to the release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v12.3
+          TAG: ${{ github.event.inputs.tag || 'v14.5' }}
         run: |
           set -euo pipefail
           ls -l dist/LiquidStore.apk

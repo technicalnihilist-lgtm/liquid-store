@@ -1,0 +1,10 @@
+{
+  "note": "Repositories that must never appear in Liquid Store's catalogue. The apps stay on GitHub - this file only keeps them out of this store, so the curated list in github_apps.json (or a later release of it) cannot put them back. Matched case-insensitively, by owner/repo and by package name.",
+  "repos": [
+    "technicalnihilist-lgtm/youtube-thumbnail-maker",
+    "technicalnihilist-lgtm/liquid-store",
+    "technicalnihilist-lgtm/LiquidTubeX",
+    "technicalnihilist-lgtm/paisa-path"
+  ],
+  "packages": []
+}

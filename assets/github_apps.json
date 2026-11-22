@@ -4,251 +4,1486 @@
   "package": "com.beemdevelopment.aegis",
   "name": "Aegis",
   "category": "Security",
-  "summary": "Two-factor authentication with encrypted, exportable backups."
+  "summary": "Two-factor authentication with encrypted, exportable backups.",
+  "version": "v3.4.3",
+  "downloads": 59013
  },
  {
   "repo": "ankidroid/Anki-Android",
   "package": "com.ichi2.anki",
   "name": "AnkiDroid",
   "category": "Education",
-  "summary": "Flashcards with spaced repetition, synced with Anki on the desktop."
+  "summary": "Flashcards with spaced repetition, synced with Anki on the desktop.",
+  "version": "v2.25.3",
+  "downloads": 35437
  },
  {
   "repo": "bitwarden/android",
   "package": "com.x8bit.bitwarden",
   "name": "Bitwarden",
   "category": "Security",
-  "summary": "An open-source password manager with self-hosting support."
+  "summary": "An open-source password manager with self-hosting support.",
+  "version": "v2026.11.1-bwpm",
+  "downloads": 19715
  },
  {
   "repo": "duckduckgo/Android",
   "package": "com.duckduckgo.mobile.android",
   "name": "DuckDuckGo",
   "category": "Internet",
-  "summary": "A browser that blocks trackers and clears data with one tap."
+  "summary": "A browser that blocks trackers and clears data with one tap.",
+  "version": "5.304.0",
+  "downloads": 8068
  },
  {
   "repo": "element-hq/element-android",
   "package": "im.vector.app",
   "name": "Element",
   "category": "Internet",
-  "summary": "A Matrix client for encrypted chat on an open network."
+  "summary": "A Matrix client for encrypted chat on an open network.",
+  "version": "v1.6.66",
+  "downloads": 13200
  },
  {
   "repo": "element-hq/element-x-android",
   "package": "io.element.android.x",
   "name": "Element X",
   "category": "Internet",
-  "summary": "A fast Matrix messenger built on the new Rust SDK."
+  "summary": "A fast Matrix messenger built on the new Rust SDK.",
+  "version": "v26.11.0",
+  "downloads": 10276
  },
  {
   "repo": "florisboard/florisboard",
   "package": "dev.florisboard",
   "name": "FlorisBoard",
   "category": "Utility",
-  "summary": "A keyboard focused on privacy, with theming and glide typing."
+  "summary": "A keyboard focused on privacy, with theming and glide typing.",
+  "version": "v0.5.2",
+  "downloads": 60540
  },
  {
   "repo": "FossifyOrg/Calendar",
   "package": "org.fossify.calendar",
   "name": "Fossify Calendar",
   "category": "Productivity",
-  "summary": "A calendar with day, week and month views and no account required."
+  "summary": "A calendar with day, week and month views and no account required.",
+  "version": "1.12.2",
+  "downloads": 13469
  },
  {
   "repo": "FossifyOrg/Camera",
   "package": "org.fossify.camera",
   "name": "Fossify Camera",
   "category": "Multimedia",
-  "summary": "A simple camera for photos and video with no tracking."
+  "summary": "A simple camera for photos and video with no tracking.",
+  "version": "1.5.0",
+  "downloads": 17657
  },
  {
   "repo": "FossifyOrg/Clock",
   "package": "org.fossify.clock",
   "name": "Fossify Clock",
   "category": "Utility",
-  "summary": "Alarms, timers and a world clock, all local to the device."
+  "summary": "Alarms, timers and a world clock, all local to the device.",
+  "version": "1.6.0",
+  "downloads": 16109
  },
  {
   "repo": "FossifyOrg/Contacts",
   "package": "org.fossify.contacts",
   "name": "Fossify Contacts",
   "category": "Utility",
-  "summary": "A contacts app that reads your own address books."
+  "summary": "A contacts app that reads your own address books.",
+  "version": "1.6.0",
+  "downloads": 26805
  },
  {
   "repo": "FossifyOrg/File-Manager",
   "package": "org.fossify.filemanager",
   "name": "Fossify File Manager",
   "category": "Utility",
-  "summary": "A file manager with root support and no advertising."
+  "summary": "A file manager with root support and no advertising.",
+  "version": "1.6.5",
+  "downloads": 4378
  },
  {
   "repo": "FossifyOrg/Gallery",
   "package": "org.fossify.gallery",
   "name": "Fossify Gallery",
   "category": "Multimedia",
-  "summary": "A photo gallery that works on folders, with no account and no cloud."
+  "summary": "A photo gallery that works on folders, with no account and no cloud.",
+  "version": "1.14.3",
+  "downloads": 9187
  },
  {
   "repo": "FossifyOrg/Notes",
   "package": "org.fossify.notes",
   "name": "Fossify Notes",
   "category": "Productivity",
-  "summary": "Quick notes with checklists and colour labels, stored on the device."
+  "summary": "Quick notes with checklists and colour labels, stored on the device.",
+  "version": "1.7.0",
+  "downloads": 16935
  },
  {
   "repo": "HeliBorg/HeliBoard",
   "package": "helium314.keyboard.latin",
   "name": "HeliBoard",
   "category": "Utility",
-  "summary": "An offline keyboard you can shape yourself, with no network permission."
+  "summary": "An offline keyboard you can shape yourself, with no network permission.",
+  "version": "v4.2",
+  "downloads": 45862
  },
  {
   "repo": "z-huang/InnerTune",
   "package": "com.zionhuang.music",
   "name": "InnerTune",
   "category": "Multimedia",
-  "summary": "A YouTube Music client with no account and no ads."
+  "summary": "A YouTube Music client with no account and no ads.",
+  "version": "v0.5.10",
+  "downloads": 511623
  },
  {
   "repo": "jellyfin/jellyfin-android",
   "package": "org.jellyfin.mobile",
   "name": "Jellyfin",
   "category": "Multimedia",
-  "summary": "Stream your own media server to the phone, no subscription."
+  "summary": "Stream your own media server to the phone, no subscription.",
+  "version": "v2.7.3",
+  "downloads": 40258
  },
  {
   "repo": "Kunzisoft/KeePassDX",
   "package": "com.kunzisoft.keepass.libre",
   "name": "KeePassDX",
   "category": "Security",
-  "summary": "A password manager that keeps the database on your device."
+  "summary": "A password manager that keeps the database on your device.",
+  "version": "4.5.8",
+  "downloads": 15405
  },
  {
   "repo": "libre-tube/LibreTube",
   "package": "com.github.libretube",
   "name": "LibreTube",
   "category": "Multimedia",
-  "summary": "A YouTube client that talks to privacy-friendly instances."
+  "summary": "A YouTube client that talks to privacy-friendly instances.",
+  "version": "v32.1",
+  "downloads": 114813
  },
  {
   "repo": "NeoApplications/Neo-Store",
   "package": "com.machiav3lli.fdroid",
   "name": "Neo Store",
   "category": "Utility",
-  "summary": "An F-Droid client with a modern interface and multiple repositories."
+  "summary": "An F-Droid client with a modern interface and multiple repositories.",
+  "version": "1.3.3",
+  "downloads": 19784
  },
  {
   "repo": "TeamNewPipe/NewPipe",
   "package": "org.schabi.newpipe",
   "name": "NewPipe",
   "category": "Multimedia",
-  "summary": "A lightweight streaming front end with background play and no account."
+  "summary": "A lightweight streaming front end with background play and no account.",
+  "version": "v0.29.3",
+  "downloads": 70801
  },
  {
   "repo": "nextcloud/android",
   "package": "com.nextcloud.client",
   "name": "Nextcloud",
   "category": "Internet",
-  "summary": "Files, calendar and contacts on your own Nextcloud server."
+  "summary": "Files, calendar and contacts on your own Nextcloud server.",
+  "version": "35.1.0",
+  "downloads": 5754
  },
  {
   "repo": "ImranR98/Obtainium",
   "package": "dev.imranr.obtainium",
   "name": "Obtainium",
   "category": "Utility",
-  "summary": "Install and update apps straight from their own release pages."
+  "summary": "Install and update apps straight from their own release pages.",
+  "version": "v1.7.4",
+  "downloads": 216532
  },
  {
   "repo": "organicmaps/organicmaps",
   "package": "app.organicmaps",
   "name": "Organic Maps",
   "category": "Navigation",
-  "summary": "Offline maps and navigation built on OpenStreetMap, with no tracking."
+  "summary": "Offline maps and navigation built on OpenStreetMap, with no tracking.",
+  "version": "2026.11.11-39-android",
+  "downloads": 23555
  },
  {
   "repo": "OuterTune/OuterTune",
   "package": "com.dd3boh.outertune",
   "name": "OuterTune",
   "category": "Multimedia",
-  "summary": "A music player that also streams from YouTube Music."
+  "summary": "A music player that also streams from YouTube Music.",
+  "version": "v0.10.1",
+  "downloads": 627418
  },
  {
   "repo": "owncloud/android",
   "package": "com.owncloud.android",
   "name": "ownCloud",
   "category": "Internet",
-  "summary": "Sync your files to your own ownCloud server."
+  "summary": "Sync your files to your own ownCloud server.",
+  "version": "v4.8.4",
+  "downloads": 951
  },
  {
   "repo": "shadowsocks/shadowsocks-android",
   "package": "com.github.shadowsocks",
   "name": "Shadowsocks",
   "category": "Internet",
-  "summary": "A fast, encrypted SOCKS5 proxy client."
+  "summary": "A fast, encrypted SOCKS5 proxy client.",
+  "version": "v5.3.5-nightly",
+  "downloads": 68482
  },
  {
   "repo": "RikkaApps/Shizuku",
   "package": "moe.shizuku.privileged.api",
   "name": "Shizuku",
   "category": "Utility",
-  "summary": "Use system APIs directly with adb or root privileges, without root on every app."
+  "summary": "Use system APIs directly with adb or root privileges, without root on every app.",
+  "version": "v13.6.0",
+  "downloads": 3905394
  },
  {
   "repo": "signalapp/Signal-Android",
   "package": "org.thoughtcrime.securesms",
   "name": "Signal",
   "category": "Internet",
-  "summary": "End-to-end encrypted messaging and calls, published by Signal themselves."
+  "summary": "End-to-end encrypted messaging and calls, published by Signal themselves.",
+  "version": "v8.36.3",
+  "downloads": 20869
  },
  {
   "repo": "syncthing/syncthing-android",
   "package": "com.nutomic.syncthingandroid",
   "name": "Syncthing",
   "category": "Utility",
-  "summary": "Continuous file sync between your devices, peer to peer, no cloud."
+  "summary": "Continuous file sync between your devices, peer to peer, no cloud.",
+  "version": "1.28.1",
+  "downloads": 52244
  },
  {
   "repo": "tailscale/tailscale-android",
   "package": "com.tailscale.ipn",
   "name": "Tailscale",
   "category": "Utility",
-  "summary": "A mesh VPN built on WireGuard for reaching your own devices."
+  "summary": "A mesh VPN built on WireGuard for reaching your own devices.",
+  "version": "1.104.7-tfb3b9b296-g226f029a3",
+  "downloads": 15519
  },
  {
   "repo": "tasks/tasks",
   "package": "org.tasks",
   "name": "Tasks",
   "category": "Productivity",
-  "summary": "To-do lists that sync with CalDAV, Google Tasks and more."
+  "summary": "To-do lists that sync with CalDAV, Google Tasks and more.",
+  "version": "15.14.1",
+  "downloads": 2427
  },
  {
   "repo": "termux/termux-app",
   "package": "com.termux",
   "name": "Termux",
   "category": "Development",
-  "summary": "A terminal emulator and Linux environment that runs entirely on the phone."
+  "summary": "A terminal emulator and Linux environment that runs entirely on the phone.",
+  "version": "v0.118.3",
+  "downloads": 2262568
  },
  {
   "repo": "thunderbird/thunderbird-android",
   "package": "com.fsck.k9",
   "name": "Thunderbird",
   "category": "Internet",
-  "summary": "An email client that supports multiple accounts and OpenPGP."
+  "summary": "An email client that supports multiple accounts and OpenPGP.",
+  "version": "K9MAIL_25_0",
+  "downloads": 37930
  },
  {
   "repo": "2dust/v2rayNG",
   "package": "com.v2ray.ang",
   "name": "v2rayNG",
   "category": "Internet",
-  "summary": "A client for the V2Ray proxy protocol."
+  "summary": "A client for the V2Ray proxy protocol.",
+  "version": "2.3.15",
+  "downloads": 415348
  },
  {
   "repo": "Mygod/VPNHotspot",
   "package": "be.mygod.vpnhotspot",
   "name": "VPN Hotspot",
   "category": "Utility",
-  "summary": "Share a VPN connection over the phone's hotspot."
+  "summary": "Share a VPN connection over the phone's hotspot.",
+  "version": "v3.0.8",
+  "downloads": 37038
+ },
+ {
+  "repo": "technicalnihilist-lgtm/age-scanner",
+  "package": "com.technicalnihilist.agescanner",
+  "name": "Age Scanner",
+  "category": "AI",
+  "summary": "Offline face-age estimator — drop a photo, it finds the face and estimates the age. Landmark-aligned crops, 5-view ensemble, everything on-device…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/age-scanner/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/age-scanner/HEAD/screenshots/overview.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/age-scanner/HEAD/screenshots/ready.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/age-scanner/HEAD/screenshots/result.jpg"
+  ],
+  "version": "v1.0",
+  "downloads": 29
+ },
+ {
+  "repo": "technicalnihilist-lgtm/AnimeWalls",
+  "package": "com.animewalls.app.debug",
+  "name": "Anime Walls",
+  "category": "Wallpapers",
+  "summary": "AnimeWalls — premium anime wallpaper app for Android. Live Wikimedia Commons artwork, AMOLED glass UI, verified CC0/PD/CC BY/CC BY-SA licensing…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/screenshots/01-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/screenshots/02-category.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/screenshots/03-detail.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/screenshots/04-search.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AnimeWalls/HEAD/screenshots/05-credits.jpg"
+  ],
+  "version": "v1.0.1",
+  "downloads": 9
+ },
+ {
+  "repo": "technicalnihilist-lgtm/anygrab",
+  "package": "com.anygrab.downloader",
+  "name": "Anygrab",
+  "category": "Video",
+  "summary": "AnyGrab - paste any URL, download any format. Real working Android APK built on-device with the Android SDK.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/anygrab/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/anygrab/HEAD/docs/screenshots/1-grab.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/anygrab/HEAD/docs/screenshots/2-formats.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/anygrab/HEAD/docs/screenshots/3-browse.png"
+  ],
+  "version": "v1.2.0",
+  "downloads": 7
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ArtistWalls",
+  "package": "com.artistwalls.app",
+  "name": "Artist Walls",
+  "category": "Wallpapers",
+  "summary": "ArtistWalls — premium music artist wallpaper app for Android. Live photography from the Wikimedia Commons API with verified CC0/PD/CC BY/CC BY-SA…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/02-artist.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/03-wallpaper.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/04-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/05-library.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ArtistWalls/HEAD/docs/screenshots/06-credits.png"
+  ],
+  "version": "v1.0.6",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/aura-liquid-glass",
+  "package": "ai.aura.liquidglass",
+  "name": "Aura",
+  "category": "System",
+  "summary": "Premium Liquid Glass music player UI for Android — layered glass material, 4D depth, spring motion, live glass studio. UI prototype (APK + source).",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/02-home-discovery.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/03-now-playing.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/04-lyrics.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/05-queue.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/06-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/07-search-results.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/aura-liquid-glass/HEAD/screenshots/08-library-grid.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 15
+ },
+ {
+  "repo": "technicalnihilist-lgtm/AutoWalls",
+  "package": "com.autowalls.app.debug",
+  "name": "Auto Walls",
+  "category": "Wallpapers",
+  "summary": "AutoWalls — premium vehicle wallpaper app for Android. Live Wikimedia Commons photography, 42 vehicle categories, verified free licensing and full…",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/01-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/02-detail.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/03-search.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/04-category.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/05-saved.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/AutoWalls/HEAD/screenshots/06-credits.jpg"
+  ],
+  "version": "v1.0.2",
+  "downloads": 9
+ },
+ {
+  "repo": "technicalnihilist-lgtm/camera",
+  "package": "app.liquidglass.camera",
+  "name": "Camera",
+  "category": "Photos",
+  "summary": "Liquid Glass Camera — a liquid-glass camera app (photo, video, square, best-shot burst, detail boost, tap-to-focus) shipped as a real signed…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/camera/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/camera/HEAD/screenshots/engine.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/camera/HEAD/screenshots/main.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/camera/HEAD/screenshots/settings.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/camera/HEAD/screenshots/viewer.jpg"
+  ],
+  "version": "v1.19",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ChemSearch",
+  "package": "com.chemsearch.app",
+  "name": "ChemSearch",
+  "category": "Education",
+  "summary": "Liquid-glass chemistry explorer for Android — structures, properties, GHS safety, bioassays, spectra and literature, powered by the PubChem API.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/about.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/elements.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/home2.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/overview.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/props.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChemSearch/HEAD/screenshots/safety.png"
+  ],
+  "version": "v1.1.0",
+  "downloads": 5
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ChineseCompactKeyboard",
+  "package": "com.example.chinesecompactkeyboard.debug",
+  "name": "Chinese Keyboard",
+  "category": "Keyboard",
+  "summary": "Offline Chinese (Pinyin) keyboard for Android — 190k-entry dictionary, Simplified/Traditional conversion, Room clipboard history, compact canvas UI",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChineseCompactKeyboard/HEAD/docs/screenshots/keyboard-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChineseCompactKeyboard/HEAD/docs/screenshots/keyboard-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ChineseCompactKeyboard/HEAD/docs/screenshots/settings.png"
+  ],
+  "version": "v2.1",
+  "downloads": 9
+ },
+ {
+  "repo": "technicalnihilist-lgtm/citywalls",
+  "package": "com.citywalls.app",
+  "name": "Citywalls",
+  "category": "Wallpapers",
+  "summary": "CityWalls — premium AMOLED city wallpaper app for Android. Live Wikimedia Commons photography with verified CC0/PD/CC BY/CC BY-SA licensing and…",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/00-all-screens.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/02-explore.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/03-city-detail.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/04-wallpaper-detail.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/05-favorites.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/citywalls/HEAD/docs/screenshots/06-settings.png"
+  ],
+  "version": "v1.0.6",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/diller",
+  "package": "com.diller.app",
+  "name": "Diller",
+  "category": "System",
+  "summary": "Diller — an iOS-style Android dialer with on-device scam/spam call screening, a theft guard, and a liquid-glass call screen. No ads, no account,…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/add-contact.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/ai.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/call-screen.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/calls.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/contacts.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/device/diller-v1-1.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/device/diller-v1-2.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/diller/HEAD/screenshots/device/diller-v1-3.jpg"
+  ],
+  "version": "v3.2.90",
+  "downloads": 0
+ },
+ {
+  "repo": "technicalnihilist-lgtm/dubstudio",
+  "package": "com.rajok.dubstudio",
+  "name": "DubStudio",
+  "category": "Video",
+  "summary": "Dub any video into 10 Indian languages or English — on your phone. Native Android, Sarvam AI, signed APK.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/screenshots/02-providers.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/screenshots/03-progress.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/screenshots/04-results.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dubstudio/HEAD/screenshots/icon-512.png"
+  ],
+  "version": "v1.4",
+  "downloads": 13
+ },
+ {
+  "repo": "technicalnihilist-lgtm/duo-learning",
+  "package": "com.duolearning.app",
+  "name": "Duo Learning",
+  "category": "Education",
+  "summary": "Duo Learning for Android.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/duo-learning/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/duo-learning/HEAD/docs/screenshots/mockup-learn.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/duo-learning/HEAD/docs/screenshots/mockup-practice.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/duo-learning/HEAD/docs/screenshots/mockup-progress.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/duo-learning/HEAD/docs/screenshots/mockup-translate.png"
+  ],
+  "version": "v1.0.10",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/dynamic-island",
+  "package": "com.hubclue.dynamicisland",
+  "name": "Dynamic Island",
+  "category": "System",
+  "summary": "A liquid-glass Dynamic Island you can actually poke: spring-driven morphs, incoming/ongoing call and music states. Single-file web app + signed…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/app-call.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/app-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/app-incoming.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/app-music.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/app-sysmode.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/over-call.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/over-idle.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/dynamic-island/HEAD/screenshots/over-music.jpg"
+  ],
+  "version": "v1.7.48",
+  "downloads": 11
+ },
+ {
+  "repo": "technicalnihilist-lgtm/free-music-player-android",
+  "package": "com.freemusic.player",
+  "name": "Free Music Player Android",
+  "category": "Music",
+  "summary": "Android music player (Kotlin + Compose + Media3) that streams Creative Commons licensed music from Jamendo. Prebuilt APK included.",
+  "version": "v1.7",
+  "downloads": 5
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-alarm-android",
+  "package": "com.rajok.glassalarm",
+  "name": "Glass Alarm",
+  "category": "Time",
+  "summary": "Glass Alarm — a liquid-glass alarm clock web app, packaged as a native Android APK (WebView shell, offline, signed). Source, build script and APK…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-alarm-android/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-alarm-android/HEAD/docs/screenshots/01-home-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-alarm-android/HEAD/docs/screenshots/02-alarms-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-alarm-android/HEAD/docs/screenshots/03-new-alarm-dark.png"
+  ],
+  "version": "v1.2.0",
+  "downloads": 9
+ },
+ {
+  "repo": "technicalnihilist-lgtm/GlassAudio",
+  "package": "com.glassaudio.app",
+  "name": "Glass Audio",
+  "category": "Music",
+  "summary": "Glassmorphism audio converter for Android - MP3/WAV export, on-device. Real installable APK + source.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/02-library.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/03-results.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/04-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/05-converter.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassAudio/HEAD/docs/screenshots/hero.png"
+  ],
+  "version": "v1.0",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-browser-ios",
+  "package": "com.glass.browser",
+  "name": "Glass Browser",
+  "category": "Browsers",
+  "summary": "iOS app shell for Glass Browser — a native WKWebView wrapper around the Glass Browser HTML UI (tabs, private mode, bookmarks, history, settings).",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/01-start.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/02-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/03-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/04-tabs.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/05-site.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/06-private.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/07-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser-ios/HEAD/screenshots/08-motion.png"
+  ],
+  "version": "v2.3.0",
+  "downloads": 3
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-browser",
+  "package": "com.rajok.glassbrowser",
+  "name": "Glass Browser",
+  "category": "Browsers",
+  "summary": "A complete, working Android web browser with a liquid-glass interface — single-file HTML chrome over a real WebView. Tabs, private mode,…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/02-browsing.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/03-tabs.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/04-address-bar.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/05-screenshot-saved.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/06-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-browser/HEAD/screenshots/icon-512.png"
+  ],
+  "version": "v1.1",
+  "downloads": 242
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-camera",
+  "package": "com.glasscamera.app",
+  "name": "Glass Camera",
+  "category": "Photos",
+  "summary": "iOS-style liquid-glass camera app for Android - single-file HTML UI with WebGL glass shaders, packaged as a native APK",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-camera/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-camera/HEAD/screenshots/camera.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-camera/HEAD/screenshots/gallery.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-camera/HEAD/screenshots/settings.png"
+  ],
+  "version": "v1.0",
+  "downloads": 18
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-enhancer-4k",
+  "package": "com.hubclue.glassenhancer4k",
+  "name": "Glass Enhancer 4K",
+  "category": "Photos",
+  "summary": "Android app: upscale photos to 4K on-device, inside a glassmorphism UI with real 4D depth and parallax tilt.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/02-enhance.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/03-glass.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/04-depth-left.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/05-depth-right.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/06-motion.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/07-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-enhancer-4k/HEAD/screenshots/banner.png"
+  ],
+  "version": "v1.1.0",
+  "downloads": 13
+ },
+ {
+  "repo": "technicalnihilist-lgtm/GlassInstaller",
+  "package": "com.glass.installer",
+  "name": "Glass Installer",
+  "category": "System",
+  "summary": "APK inspector & installer — permissions, SDK, signature aur virus check, install se pehle. Kotlin + Compose glassmorphism UI.",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassInstaller/HEAD/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassInstaller/HEAD/screenshots/permissions.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassInstaller/HEAD/screenshots/report.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassInstaller/HEAD/screenshots/scan.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/GlassInstaller/HEAD/screenshots/settings.png"
+  ],
+  "version": "v2.0",
+  "downloads": 13
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glass-launcher",
+  "package": "com.glass.launcher",
+  "name": "Glass Launcher",
+  "category": "System",
+  "summary": "iOS 26 style Liquid Glass home screen for Android — a real launcher APK whose UI is one HTML file, fully adaptive to screen size, insets, density…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-launcher/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-launcher/HEAD/docs/screenshots/apps.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-launcher/HEAD/docs/screenshots/glass.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glass-launcher/HEAD/docs/screenshots/home.jpg"
+  ],
+  "version": "v2.6",
+  "downloads": 51
+ },
+ {
+  "repo": "technicalnihilist-lgtm/glasscut",
+  "package": "com.glasscut.app",
+  "name": "GlassCut",
+  "category": "Photos",
+  "summary": "GlassCut — liquid-glass background remover for Android. Single-file web app + signed APK. Real cutout, real gallery save, fully on-device.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/01-empty.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/02-photo.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/03-cutout.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/04-background.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/05-gradient.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/06-refine.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/07-options.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/glasscut/HEAD/screenshots/08-final.jpg"
+  ],
+  "version": "v1.1",
+  "downloads": 10
+ },
+ {
+  "repo": "technicalnihilist-lgtm/HeroWalls",
+  "package": "com.herowalls.app.debug",
+  "name": "Hero Walls",
+  "category": "Wallpapers",
+  "summary": "HeroWalls - premium superhero wallpaper app for Android. Live artwork from Wikimedia Commons with verified CC0/PD/CC BY/CC BY-SA licensing, full…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/docs/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/docs/screenshots/02-detail.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/docs/screenshots/03-collections.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/docs/screenshots/04-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HeroWalls/HEAD/docs/screenshots/05-spiderman.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/HOWVERSE",
+  "package": "com.howverse.app",
+  "name": "HOWVERSE",
+  "category": "Games",
+  "summary": "HOWVERSE — Kotlin + Jetpack Compose AI learning app. Learn anything. Understand everything.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/01-home-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/02-catalogue-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/03-section-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/04-ai-chat-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/05-languages-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/06-downloads-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/banner.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/HOWVERSE/HEAD/screenshots/dark-and-light.png"
+  ],
+  "version": "v2.7.0",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/icreateappmusic",
+  "package": "com.icreate.music",
+  "name": "Icreateappmusic",
+  "category": "Music",
+  "summary": "Offline AI song generator - unlimited tracks with instruments and a singing voice, fully local (Python + numpy)",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/icreateappmusic/HEAD/docs/screenshots/desktop.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/icreateappmusic/HEAD/docs/screenshots/mobile.png"
+  ],
+  "version": "apk-latest",
+  "downloads": 25
+ },
+ {
+  "repo": "technicalnihilist-lgtm/image-guesser",
+  "package": "com.imageguesser.app",
+  "name": "Image Guesser",
+  "category": "Games",
+  "summary": "IMAGE GUESSER — five quiz games in one app: image, sound, spot-the-difference, colour sort and math. One shared coin wallet, reward shop, daily…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/awards.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/boxes.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/coloursort.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/difference.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/home-hindi.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/home-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/image-guesser/HEAD/screenshots/image-answered.png"
+  ],
+  "version": "v2.0.0",
+  "downloads": 15
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ios-gallery",
+  "package": "com.hubclub.iosgallery",
+  "name": "ios Gallery",
+  "category": "Photos",
+  "summary": "A simple, private, fully offline photo and video gallery for Android, inspired by iOS and macOS Photos. No account, no ads, no internet permission.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/01-library-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/02-library-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/03-albums.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/04-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/05-viewer.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/06-selection.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/07-launch-animation.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-gallery/HEAD/docs/screenshots/08-customize.png"
+  ],
+  "version": "v1.7",
+  "downloads": 420
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ios-phone-dialer",
+  "package": "com.phone.dialer",
+  "name": "ios Phone Dialer",
+  "category": "System",
+  "summary": "A pixel-faithful iOS Phone app for Android — real contacts, real call log, real calls, and a native in-call screen with speaker, mute, hold and…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/screenshots/1-keypad-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/screenshots/2-keypad-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/screenshots/3-call.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/screenshots/4-favorites.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios-phone-dialer/HEAD/screenshots/5-recents.png"
+  ],
+  "version": "v2.3",
+  "downloads": 765
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ios26-messages-liquid-glass",
+  "package": "com.liquidglass.messages",
+  "name": "Ios26 Messages Liquid Glass",
+  "category": "System",
+  "summary": "iOS 26 Messages with Apple's Liquid Glass aesthetic — rebuilt as a real, installable Android APK. Single-file HTML UI in an offline WebView shell,…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/02-messages.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/03-thread.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/04-typing.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/05-reply.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/06-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/07-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ios26-messages-liquid-glass/HEAD/screenshots/08-new-message.png"
+  ],
+  "version": "v2.19",
+  "downloads": 13
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-clock",
+  "package": "com.liquidclock.app",
+  "name": "Liquid Clock",
+  "category": "Time",
+  "summary": "Glassy liquid-blob clock for Android — analog clock, world clock, stopwatch and timer in one offline app",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/1-clock-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/2-clock-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/3-stopwatch.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/4-timer.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/5-glass-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-clock/HEAD/screenshots/hero.png"
+  ],
+  "version": "v1.2.0",
+  "downloads": 317
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-glass-keyboard",
+  "package": "com.liquidglass.keyboard",
+  "name": "Liquid Glass Keyboard",
+  "category": "Keyboard",
+  "summary": "A real offline Android keyboard with a glassy, colour-shifting keypad — native InputMethodService, no internet permission, signed APK included.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/01-keyboard.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/02-shift.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/03-numbers.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/04-accent.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/05-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/06-setup.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-keyboard/HEAD/screenshots/icon-512.png"
+  ],
+  "version": "v3.0.2",
+  "downloads": 18
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-glass-photos",
+  "package": "com.liquidglass.photos",
+  "name": "Liquid Glass Photos",
+  "category": "Photos",
+  "summary": "Liquid Glass Photos - a real native Android gallery app built from a single HTML file. Liquid-glass UI, reads your actual device photos and…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/01-library.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/02-albums.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/03-album-camera.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/04-search.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/05-viewer.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/06-select.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-glass-photos/HEAD/docs/screenshots/07-settings.jpg"
+  ],
+  "version": "v1.5.33",
+  "downloads": 7
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-notes",
+  "package": "app.liquidnotes",
+  "name": "Liquid Notes",
+  "category": "Writing",
+  "summary": "Liquid Notes — an installable, offline-first liquid-glass notes PWA, plus a native Android WebView APK built by GitHub Actions.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-notes/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-notes/HEAD/screenshots/desktop-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-notes/HEAD/screenshots/desktop-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-notes/HEAD/screenshots/desktop.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-notes/HEAD/screenshots/mobile.png"
+  ],
+  "version": "v1.3.0",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-reminders",
+  "package": "com.liquid.reminders",
+  "name": "Liquid Reminders",
+  "category": "Time",
+  "summary": "Liquid-glass reminders app for Android — HTML UI wrapped in a native shell with real alarms, notifications and reboot persistence.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/01-today.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/02-today-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/03-upcoming.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/04-add-sheet.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/05-done.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/06-add-sheet-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/07-today-parallax.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-reminders/HEAD/docs/screenshots/08-settings.png"
+  ],
+  "version": "build-8",
+  "downloads": 95
+ },
+ {
+  "repo": "technicalnihilist-lgtm/LiquidTube",
+  "package": "com.liquidtube.app",
+  "name": "Liquid Tube",
+  "category": "Video",
+  "summary": "Liquid-glass YouTube client for Android — single-file HTML UI in a native WebView shell. Signed APK included.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/00-splash.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/02-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/03-channel.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/04-player.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/05-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/06-suggestions-off.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/LiquidTube/HEAD/screenshots/07-dark.png"
+  ],
+  "version": "v7.6",
+  "downloads": 844
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-weather",
+  "package": "com.liquidweather.app",
+  "name": "Liquid Weather",
+  "category": "Weather",
+  "summary": "Liquid Weather — glassy animated weather app with live forecasts for any city or country worldwide. No ads, no account. Single-file HTML + signed…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/screenshots/icon.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/screenshots/rain.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/screenshots/search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-weather/HEAD/screenshots/settings.png"
+  ],
+  "version": "v1.15",
+  "downloads": 14
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquidflow-ui",
+  "package": "dev.liquidflow.sample.debug",
+  "name": "LiquidFlow",
+  "category": "Development",
+  "summary": "LiquidFlow UI — liquid glass Android UI framework (Kotlin + Jetpack Compose)",
+  "version": "v1.0.0-apk",
+  "downloads": 4
+ },
+ {
+  "repo": "technicalnihilist-lgtm/lumen-files",
+  "package": "com.lumen.files",
+  "name": "Lumen Files",
+  "category": "Files",
+  "summary": "Lumen Files — liquid-glass file manager. Single-file web app + Android APK (WebView shell). Same UI, no demo data.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-1-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-2-folder.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-3-grid.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-4-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-5-import.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-6-depth.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/lumen-files/HEAD/screenshots/screenshot-7-depth.png"
+  ],
+  "version": "v1.4",
+  "downloads": 332
+ },
+ {
+  "repo": "technicalnihilist-lgtm/liquid-lyrics-generator",
+  "package": "com.lyricsstudio.app",
+  "name": "Lyrics Studio",
+  "category": "Music",
+  "summary": "Glassy offline lyrics generator for Android and the web - 28 languages, 14 genres, 10 moods, native script or Roman letters. Built-in lyric engine…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/liquid-lyrics-generator/HEAD/icon.png",
+  "version": "v1.4",
+  "downloads": 14
+ },
+ {
+  "repo": "technicalnihilist-lgtm/naturewalls",
+  "package": "com.naturewalls.app.debug",
+  "name": "Naturewalls",
+  "category": "Wallpapers",
+  "summary": "NatureWalls — premium AMOLED nature & landscape wallpaper app for Android. Live photography from the Wikimedia Commons API with verified CC0/PD/CC…",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/02-home-collections.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/03-wallpaper-detail.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/04-wallpaper-credits.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/05-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/06-favourites.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/07-downloads.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/naturewalls/HEAD/docs/screenshots/08-category-browse.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/NATURIA",
+  "package": "com.naturia.app",
+  "name": "NATURIA",
+  "category": "Tools",
+  "summary": "NATURIA — premium Android nature sounds app: 127 licence-verified recordings A–Z, 6-layer mixing studio, offline downloads, Media3 background…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/screenshots/02-explore.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/screenshots/03-player.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/screenshots/04-mix-studio.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/NATURIA/HEAD/screenshots/05-library.png"
+  ],
+  "version": "v1.2.0",
+  "downloads": 7
+ },
+ {
+  "repo": "technicalnihilist-lgtm/nexa-browser",
+  "package": "com.nexabrowser.app.debug",
+  "name": "Nexa Browser",
+  "category": "Browsers",
+  "summary": "A complete, working Android web browser with a Safari-inspired liquid-glass interface. Kotlin, Jetpack Compose, real WebView rendering, tabs,…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/02-browsing.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/03-tabs.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/04-address-bar.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/05-screenshot-saved.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/06-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/glass-browser/screenshots/icon-512.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nexa-browser/HEAD/screenshots/01-start-page.png"
+  ],
+  "version": "v1.3.59",
+  "downloads": 7
+ },
+ {
+  "repo": "technicalnihilist-lgtm/nova-city",
+  "package": "com.novacity.game",
+  "name": "Nova City",
+  "category": "Games",
+  "summary": "NOVA CITY — open-world hero + driving game (WebGL) with a signed Android APK",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/01-chase.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/02-cockpit.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/03-night-rain.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/04-city-aerial.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/05-street-traffic.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/nova-city/HEAD/docs/screenshots/06-plaza.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 688
+ },
+ {
+  "repo": "technicalnihilist-lgtm/OceanWalls",
+  "package": "com.oceanwalls.app.debug",
+  "name": "Ocean Walls",
+  "category": "Wallpapers",
+  "summary": "OceanWalls - premium live ocean wallpaper app for Android (Kotlin, Jetpack Compose, Wikimedia Commons API)",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/01-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/02-home-collections.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/03-search.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/04-search-results.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/05-wallpaper-detail.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/06-wallpaper-credits.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/07-credits.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/OceanWalls/HEAD/docs/screenshots/08-category.jpg"
+  ],
+  "version": "v1.0.1",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/offline-maps",
+  "package": "com.offlinemaps.app.debug",
+  "name": "Offline Maps",
+  "category": "Tools",
+  "summary": "Offline-first 3D world map & navigation for Android — MapLibre vector 3D maps, downloadable regions, on-device GraphHopper routing, turn-by-turn…",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/offline-maps/HEAD/docs/screenshots/downloads.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/offline-maps/HEAD/docs/screenshots/explore.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/offline-maps/HEAD/docs/screenshots/navigate.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/offline-maps/HEAD/docs/screenshots/route.png"
+  ],
+  "version": "v1.0.93",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/pehchan-ai",
+  "package": "com.rajok.pehchanai",
+  "name": "Pehchan AI",
+  "category": "AI",
+  "summary": "Pehchan AI - offline on-device image identifier for Android. Two TFLite models find and name every object in a photo. No internet, no account, no…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/02-photo-picked.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/03-objects.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/04-result.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/05-details.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pehchan-ai/HEAD/screenshots/06-pizza.png"
+  ],
+  "version": "v1.6",
+  "downloads": 511
+ },
+ {
+  "repo": "technicalnihilist-lgtm/photos-android",
+  "package": "com.nihao.photos",
+  "name": "Photos",
+  "category": "Photos",
+  "summary": "Photos — a native Android APK wrapping a self-contained HTML photo-gallery UI (WebView shell, offline, procedural canvas artwork).",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/01-library.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/02-collections.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/03-search.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/04-library-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/05-collections-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/photos-android/HEAD/screenshots/06-search-dark.png"
+  ],
+  "version": "v1.3",
+  "downloads": 18
+ },
+ {
+  "repo": "technicalnihilist-lgtm/pixelmind-ai",
+  "package": "ai.pixelmind",
+  "name": "PixelMind AI",
+  "category": "AI",
+  "summary": "PixelMind AI — offline, on-device AI image generator for Android. Kotlin, Compose, ONNX Runtime. No APIs, no cloud, no INTERNET permission.",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pixelmind-ai/HEAD/design/01-home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pixelmind-ai/HEAD/design/02-studio.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pixelmind-ai/HEAD/design/03-gallery.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pixelmind-ai/HEAD/design/04-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/pixelmind-ai/HEAD/design/05-sample-output.png"
+  ],
+  "version": "v1.6.0",
+  "downloads": 7
+ },
+ {
+  "repo": "technicalnihilist-lgtm/prismal-player",
+  "package": "com.prismal.player",
+  "name": "Prismal Player",
+  "category": "Video",
+  "summary": "A glassy, gesture-driven mobile video player — single-file HTML wrapped as a signed Android APK.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/prismal-player/HEAD/assets/icon.png",
+  "version": "v1.0.0",
+  "downloads": 10
+ },
+ {
+  "repo": "technicalnihilist-lgtm/PulseForge-AI",
+  "package": "com.pulseforge.ai.debug",
+  "name": "PulseForge AI",
+  "category": "Games",
+  "summary": "PulseForge AI - universal APK security analyzer and optimizer for Android (Kotlin, Compose, on-device static analysis)",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/assistant.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/dashboard-dark.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/dashboard-empty.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/device-overview.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/installed-apps.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/optimize.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/report-overview.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/PulseForge-AI/HEAD/screenshots/report-security.png"
+  ],
+  "version": "ci-latest",
+  "downloads": 3
+ },
+ {
+  "repo": "technicalnihilist-lgtm/SpaceWalls",
+  "package": "com.spacewalls.app.debug",
+  "name": "Space Walls",
+  "category": "Wallpapers",
+  "summary": "Premium space & galaxy wallpaper app — Kotlin, Jetpack Compose, Material 3. Live imagery from Wikimedia Commons and the NASA Image and Video…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/collection.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/credits.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/detail.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/explore.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/saved.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/SpaceWalls/HEAD/docs/screenshots/search.png"
+  ],
+  "version": "v1.0.1",
+  "downloads": 5
+ },
+ {
+  "repo": "technicalnihilist-lgtm/squeeze-compressor",
+  "package": "com.squeeze.compressor",
+  "name": "Squeeze",
+  "category": "Files",
+  "summary": "Target-size file compressor for Android — any format into 150 MB, lossless where the format allows, fully on-device.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/compressing.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/done.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/home.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/icon.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/selftest.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/squeeze-compressor/HEAD/screenshots/settings.png"
+  ],
+  "version": "v1.7",
+  "downloads": 149
+ },
+ {
+  "repo": "technicalnihilist-lgtm/ultimate-guard",
+  "package": "com.ultimateguard",
+  "name": "Ultimate Guard",
+  "category": "Security",
+  "summary": "Offline DNS filter for Android — real DNS packet engine, PIN lock, Device Owner app blocking. Signed APK included.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/ultimate-guard/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ultimate-guard/HEAD/docs/screenshots/apps.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ultimate-guard/HEAD/docs/screenshots/domains.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ultimate-guard/HEAD/docs/screenshots/settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/ultimate-guard/HEAD/docs/screenshots/status.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 405
+ },
+ {
+  "repo": "technicalnihilist-lgtm/verify-device-info",
+  "package": "com.verifydeviceinfo.debug",
+  "name": "Verify Device Info",
+  "category": "Security",
+  "summary": "Verify Device Info — honest Android device inspection: specs, authenticity indicators, parts analysis, device age, hardware diagnostics and…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/01-dashboard.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/02-authenticity.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/03-parts.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/04-specifications.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/05-security.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/06-battery.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/verify-device-info/HEAD/docs/screenshots/07-diagnostics.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 708
+ },
+ {
+  "repo": "technicalnihilist-lgtm/video-player",
+  "package": "com.glassplayer.app",
+  "name": "Video Player",
+  "category": "Video",
+  "summary": "Glass Player — a glassmorphism video player for Android, packaged as an APK",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/01-empty.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/02-library.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/03-player.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/04-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/05-light.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/video-player/HEAD/docs/screenshots/06-landscape.png"
+  ],
+  "version": "v1.0.10",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/vinyl-player",
+  "package": "com.hubclue.vinylplayer",
+  "name": "Vinyl Player",
+  "category": "Music",
+  "summary": "A liquid-glass music player for Android that plays the songs already on your phone. Offline, no account, no ads.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/01-your-library.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/03-liked-tab.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/03-now-playing.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/07-style-panel.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/08-background-moods.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/10-liked-filter.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/12-search.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/vinyl-player/HEAD/docs/screenshots/14-vinyl-focus.jpg"
+  ],
+  "version": "v162.0",
+  "downloads": 9
+ },
+ {
+  "repo": "technicalnihilist-lgtm/Voxel-Racing",
+  "package": "com.voxelracing.game",
+  "name": "Voxel Racing",
+  "category": "Games",
+  "summary": "Single-file 3D racing game — dynamic weather, day/night cycle, PBR graphics and an Android APK. No build step.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/01-storm-night.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/02-rain-dusk.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/03-fog-dawn.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/04-snow-dawn.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/05-clear-dusk.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Voxel-Racing/HEAD/screenshots/06-hood-cam.jpg"
+  ],
+  "version": "v2.1",
+  "downloads": 576
+ },
+ {
+  "repo": "technicalnihilist-lgtm/waifu-world",
+  "package": "world.waifu.companion",
+  "name": "Waifu World",
+  "category": "Games",
+  "summary": "Room-first 3D AI companion for Android — Godot 4, persistent character profiles, replaceable GLB avatars, day/night rooms. Signed debug APK.",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/01-companion-room.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/02-wave-gesture.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/03-companions.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/04-editor.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/05-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/waifu-world/HEAD/docs/screenshots/06-living-room-morning.png"
+  ],
+  "version": "v0.2.1",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/wiki-wallpaper-4d",
+  "package": "net.wikiwallpapers.app",
+  "name": "Wiki Wallpaper 4D",
+  "category": "Wallpapers",
+  "summary": "2,322 free Wikimedia Commons wallpapers with full credits — liquid glass 4D UI, live updates, fullscreen viewer, Android APK",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/01-desktop-4d-grid.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/02-mobile-feed.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/03-fullscreen-viewer.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/04-credits.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/05-settings-4d.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/06-light-theme.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/07-languages.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wiki-wallpaper-4d/HEAD/screenshots/app-icon.png"
+  ],
+  "version": "v5.4.5",
+  "downloads": 6
+ },
+ {
+  "repo": "technicalnihilist-lgtm/wikipedia-2.0",
+  "package": "com.wikipedia20.app",
+  "name": "Wikipedia 2.0",
+  "category": "Reading",
+  "summary": "Wikipedia 2.0 — a live reading interface for Wikipedia, web + Android APK",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/01-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/02-featured.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/03-life.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/04-category.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/05-article.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/06-image-viewer.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/07-dark.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/wikipedia-2.0/HEAD/screenshots/08-glass-panel.jpg"
+  ],
+  "version": "v1.0.3",
+  "downloads": 430
+ },
+ {
+  "repo": "technicalnihilist-lgtm/WildWalls",
+  "package": "com.wildwalls.app",
+  "name": "Wild Walls",
+  "category": "Wallpapers",
+  "summary": "WildWalls — premium AMOLED wildlife wallpaper app for Android. Live Wikimedia Commons photography with a newest-first feed, verified CC0/PD/CC…",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/WildWalls/HEAD/screenshots/detail.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/WildWalls/HEAD/screenshots/downloads.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/WildWalls/HEAD/screenshots/explore.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/WildWalls/HEAD/screenshots/home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/WildWalls/HEAD/screenshots/settings.jpg"
+  ],
+  "version": "v1.2.0",
+  "downloads": 4
+ },
+ {
+  "repo": "technicalnihilist-lgtm/world-product-word-hunt",
+  "package": "com.worldproduct.wordhunt",
+  "name": "Word Hunt",
+  "category": "Games",
+  "summary": "WORLD PRODUCT WORD HUNT — offline-first worldwide product-name word-search game: 282 real products, 17 categories, 6 modes, 5 languages, Android…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/01-home.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/02-modes.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/03-game-easy.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/04-game-expert.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/05-pause.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/07-settings-dark.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/08-settings-light-hindi.jpg",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/world-product-word-hunt/HEAD/screenshots/09-credits.jpg"
+  ],
+  "version": "v1.0.1",
+  "downloads": 57
+ },
+ {
+  "repo": "technicalnihilist-lgtm/World-Frontier-3D",
+  "package": "com.worldfrontier.game3d",
+  "name": "World Frontier 3D",
+  "category": "Games",
+  "summary": "WORLD FRONTIER — 3D open-world game for Android: procedural world, 10 vehicles, NPC AI, day/night, weather, 4 graphics presets. Signed APK included.",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/01-main-menu.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/02-city-low.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/03-city-high.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/04-night-ultra.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/05-night-rain.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/06-driving.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/07-coast-forest.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/World-Frontier-3D/HEAD/docs/screenshots/08-snow-mountains.png"
+  ],
+  "version": "v1.0.1",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/youtube-x",
+  "package": "com.youtubex.app",
+  "name": "Youtube X",
+  "category": "Video",
+  "summary": "YouTube X — Kotlin Android YouTube client built on NewPipeExtractor (search, feed, ExoPlayer playback)",
+  "version": "v1.8",
+  "downloads": 8
+ },
+ {
+  "repo": "technicalnihilist-lgtm/Chinese-Password-Generator",
+  "package": "com.fuyun.password",
+  "name": "福运密码",
+  "category": "Security",
+  "summary": "福运密码 · Fortune Password — an offline password generator for Android and the web with Chinese 福, Hindi अ and Latin character sets. Real CSPRNG,…",
+  "icon": "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/assets/icon.png",
+  "screenshots": [
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/01-main-english.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/02-features-settings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/03-features-animation.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/04-language-hindi.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/05-language-chinese.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/06-dark-mode.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/07-fortune-meanings.png",
+   "https://raw.githubusercontent.com/technicalnihilist-lgtm/Chinese-Password-Generator/HEAD/docs/screenshots/08-recent-history.png"
+  ],
+  "version": "v1.0.0",
+  "downloads": 15
  }
 ]

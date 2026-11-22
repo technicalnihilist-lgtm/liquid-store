@@ -25,6 +25,11 @@ public class AppEntry {
     public String versionName = "";
     public long versionCode;
     public long size;
+
+    /** Downloads of the release this entry points at - GitHub reports it per
+     *  asset; an F-Droid index carries no such number, so it stays 0 there and
+     *  the UI simply does not draw the figure. */
+    public long downloads;
     public String hash = "";
     public String hashType = "";
 

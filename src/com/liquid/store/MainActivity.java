@@ -43,7 +43,11 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        web.setBackgroundColor(0xFF070C14);
+        /* Transparent, so the window behind the WebView is what shows: the app is a
+       sheet of glass over the wallpaper (see AppTheme - windowIsTranslucent and
+       windowShowWallpaper). The page's own scrim, the last stop of --stage, is
+       what keeps text readable over a bright wallpaper. */
+    web.setBackgroundColor(0x00000000);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.setVerticalScrollBarEnabled(false);
         web.setHorizontalScrollBarEnabled(false);

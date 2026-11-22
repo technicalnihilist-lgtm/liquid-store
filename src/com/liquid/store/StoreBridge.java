@@ -818,6 +818,8 @@ public class StoreBridge {
             w.name("web").value(nz(a.web));
             w.name("version").value(nz(a.versionName));
             w.name("versionCode").value(a.versionCode);
+            w.name("downloads").value(a.downloads);
+            if (a.downloads == 0) w.name("play").value(playInstallsFor(a.pkg));
             w.name("size").value(a.size);
             w.name("sizeText").value(IndexLoader.human(a.size));
             w.name("minSdk").value(a.minSdk);
@@ -842,6 +844,43 @@ public class StoreBridge {
         return sw.toString();
     }
 
+    /**
+     * Play's install bucket per package, for the apps whose own catalogue has no
+     * download count. F-Droid publishes none at all, so without this an F-Droid
+     * app shows nothing where a GitHub app shows a number - and the reader cannot
+     * tell "nobody downloaded it" from "nobody counted it". The figure is Play's,
+     * so the page labels it "on Play"; a package that is not on Play stays absent.
+     */
+    private volatile java.util.Map<String, String> playInstalls;
+
+    private String playInstallsFor(String pkg) {
+        if (pkg == null || pkg.length() == 0) return "";
+        java.util.Map<String, String> m = playInstalls;
+        if (m == null) {
+            m = new java.util.HashMap<String, String>();
+            java.io.InputStream in = null;
+            try {
+                in = ctx.getAssets().open("play_installs.json");
+                java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+                byte[] b = new byte[1 << 12];
+                int n;
+                while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+                com.google.gson.JsonObject root = com.google.gson.JsonParser
+                        .parseString(bo.toString("UTF-8")).getAsJsonObject();
+                if (root.has("installs") && root.get("installs").isJsonObject()) {
+                    for (java.util.Map.Entry<String, com.google.gson.JsonElement> e
+                            : root.getAsJsonObject("installs").entrySet()) {
+                        m.put(e.getKey(), e.getValue().getAsString());
+                    }
+                }
+            } catch (Throwable ignored) {
+            } finally { try { if (in != null) in.close(); } catch (java.io.IOException ignored) { } }
+            playInstalls = m;
+        }
+        String v = m.get(pkg);
+        return v == null ? "" : v;
+    }
+
     private String writeApps(List<AppEntry> page, int total) {
         refreshInstalled(false);
         StringWriter sw = new StringWriter();
@@ -858,6 +897,8 @@ public class StoreBridge {
                 w.name("cat").value(nz(a.category));
                 w.name("ver").value(nz(a.versionName));
                 w.name("sizeText").value(IndexLoader.human(a.size));
+                w.name("downloads").value(a.downloads);
+                if (a.downloads == 0) w.name("play").value(playInstallsFor(a.pkg));
                 w.name("icon").value(iconUrl(a));
                 writeStrings(w, "iconCand", iconCandidates(a));
                 w.name("updated").value(a.lastUpdated);
@@ -921,12 +962,36 @@ public class StoreBridge {
         return iconCandidates(a.absIconUrl, a.icon, a.pkg, base(), canonical());
     }
 
+    /**
+     * Where a screenshot might be. The index gives the file name the developer
+     * chose - "01-latest.png", "p1.png", and in the current index a hashed
+     * name - relative to the repo root, so "base/file" is the one that answers.
+     * A repo is also allowed to publish the bare name, which lives under the
+     * app's own en-US/phoneScreenshots/; that shape used to be skipped, so a
+     * screenshot the index named without a directory was drawn from the
+     * numbered guess below, which is a 404 for every app that does not happen
+     * to number its files 1.png, 2.png. The numbered guess stays last: it costs
+     * one request that is only made when the real names are missing.
+     */
     private List<String> shotCandidates(AppEntry a, int index, String file) {
         List<String> out = new ArrayList<String>(4);
         String b = base(), c = canonical();
+        /* A GitHub entry carries the screenshot's full URL already - the project
+           publishes it in its own repo, so there is no mirror to build a path
+           against and nothing to guess. */
+        if (file != null && (file.startsWith("https://") || file.startsWith("http://"))) {
+            out.add(file);
+            return out;
+        }
         if (file != null && file.length() > 0) {
-            out.add(b + "/" + file);
-            if (!c.equals(b)) out.add(c + "/" + file);
+            if (file.indexOf('/') >= 0) {
+                out.add(b + "/" + file);
+                if (!c.equals(b)) out.add(c + "/" + file);
+            } else {
+                String dir = a.pkg + "/en-US/phoneScreenshots/" + file;
+                out.add(b + "/" + dir);
+                if (!c.equals(b)) out.add(c + "/" + dir);
+            }
         }
         out.add(b + "/" + a.pkg + "/en-US/phoneScreenshots/" + (index + 1) + ".png");
         if (!c.equals(b)) out.add(c + "/" + a.pkg + "/en-US/phoneScreenshots/" + (index + 1) + ".png");

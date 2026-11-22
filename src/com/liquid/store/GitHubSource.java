@@ -45,9 +45,88 @@ import java.util.concurrent.ThreadFactory;
 public class GitHubSource {
 
     private static final String CURATED = "github_apps.json";
+    private static final String EXCLUDE = "github_exclude.json";
     private static final String CACHE = "github_cache.json";
     private static final long TTL = 12L * 60 * 60 * 1000;     // twelve hours
     private static final String UA = "LiquidStore/3.4";
+
+    /**
+     * Repos that must never reach the catalogue.
+     *
+     * The curated list is editorial, so taking a project out of it should be
+     * enough - and for a project that has already been fetched it is not: the
+     * saved cache is merged back on every refresh (see mergeWithPrevious), and a
+     * later release of github_apps.json can put an entry back by accident. So
+     * the exclusion is its own shipped asset, applied in all three places an
+     * entry can enter: the specs before anything is fetched, the merged result,
+     * and the cache the store draws before a refresh finishes.
+     *
+     * The apps themselves are untouched - they stay on GitHub, and on any other
+     * store. This file only decides what *this* catalogue lists.
+     */
+    static final class Excluded {
+        final Set<String> repos = new HashSet<String>();
+        final Set<String> packages = new HashSet<String>();
+        boolean isEmpty() { return repos.isEmpty() && packages.isEmpty(); }
+
+        /** An entry is excluded if its package is listed, or its APK URL points at a listed repo. */
+        boolean matches(AppEntry a) {
+            if (a == null) return false;
+            if (a.pkg != null && packages.contains(a.pkg.toLowerCase(Locale.US))) return true;
+            String u = a.absApkUrl == null ? "" : a.absApkUrl.toLowerCase(Locale.US);
+            for (String r : repos) if (u.indexOf("/" + r + "/") >= 0) return true;
+            return false;
+        }
+
+        boolean matches(JsonObject spec) {
+            if (spec == null) return false;
+            String repo = str(spec, "repo").toLowerCase(Locale.US);
+            if (repo.length() > 0 && repos.contains(repo)) return true;
+            String pkg = str(spec, "package").toLowerCase(Locale.US);
+            return pkg.length() > 0 && packages.contains(pkg);
+        }
+    }
+
+    /** Read the shipped exclusion list; an unreadable file excludes nothing. */
+    static Excluded loadExcluded(Context ctx) {
+        Excluded ex = new Excluded();
+        InputStream in = null;
+        try {
+            in = ctx.getAssets().open(EXCLUDE);
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            byte[] b = new byte[1 << 12];
+            int n;
+            while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+            JsonObject root = JsonParser.parseString(bo.toString("UTF-8")).getAsJsonObject();
+            readInto(root, "repos", ex.repos);
+            readInto(root, "packages", ex.packages);
+        } catch (Throwable ignored) {
+        } finally { try { if (in != null) in.close(); } catch (IOException ignored) { } }
+        return ex;
+    }
+
+    private static void readInto(JsonObject root, String key, Set<String> out) {
+        if (root == null || !root.has(key) || !root.get(key).isJsonArray()) return;
+        for (JsonElement e : root.getAsJsonArray(key)) {
+            if (e == null || e.isJsonNull()) continue;
+            String v = e.getAsString();
+            if (v != null && v.trim().length() > 0) out.add(v.trim().toLowerCase(Locale.US));
+        }
+    }
+
+    static List<JsonObject> dropExcluded(List<JsonObject> specs, Excluded ex) {
+        if (specs == null || ex == null || ex.isEmpty()) return specs;
+        List<JsonObject> out = new ArrayList<JsonObject>(specs.size());
+        for (JsonObject spec : specs) if (!ex.matches(spec)) out.add(spec);
+        return out;
+    }
+
+    static List<AppEntry> dropExcludedApps(List<AppEntry> in, Excluded ex) {
+        if (in == null || ex == null || ex.isEmpty()) return in;
+        List<AppEntry> out = new ArrayList<AppEntry>(in.size());
+        for (AppEntry a : in) if (!ex.matches(a)) out.add(a);
+        return out;
+    }
 
     public static class Result {
         public final List<AppEntry> apps;
@@ -78,14 +157,16 @@ public class GitHubSource {
             /* the list is parsed once and used twice: for the lookups, and for
                the set of packages this build still curates - see
                mergeWithPrevious() */
-            List<JsonObject> specs = parseCurated(ctx.getAssets().open(CURATED));
+            Excluded ex = loadExcluded(ctx);
+            List<JsonObject> specs = dropExcluded(parseCurated(ctx.getAssets().open(CURATED)), ex);
             List<AppEntry> fresh = fetchAll(specs);
-            List<AppEntry> merged = mergeWithPrevious(ctx.getFilesDir(), fresh, curatedPackages(specs));
+            List<AppEntry> merged = dropExcludedApps(
+                    mergeWithPrevious(ctx.getFilesDir(), fresh, curatedPackages(specs), ex), ex);
             writeCache(ctx, merged);
             return new Result(merged, false, "");
         } catch (Throwable t) {
             Result c = readCache(ctx.getFilesDir(), false);
-            if (c != null) return c;                       // stale beats nothing
+            if (c != null) return new Result(dropExcludedApps(c.apps, loadExcluded(ctx)), c.fromCache, c.error);
             return new Result(new ArrayList<AppEntry>(), false, msg(t));
         }
     }
@@ -143,6 +224,10 @@ public class GitHubSource {
      * one unreadable file into an empty catalogue written back over a good one.
      */
     static List<AppEntry> mergeWithPrevious(File dir, List<AppEntry> fresh, Set<String> curated) {
+        return mergeWithPrevious(dir, fresh, curated, null);
+    }
+
+    static List<AppEntry> mergeWithPrevious(File dir, List<AppEntry> fresh, Set<String> curated, Excluded ex) {
         List<AppEntry> old = readCacheApps(dir, false);
         if (old.isEmpty()) return fresh;
         boolean prune = curated != null && !curated.isEmpty();
@@ -150,6 +235,7 @@ public class GitHubSource {
         for (AppEntry a : old) {
             if (a.pkg == null || a.pkg.length() == 0) continue;
             if (prune && !curated.contains(a.pkg)) continue;      /* no longer curated */
+            if (ex != null && ex.matches(a)) continue;            /* excluded on purpose */
             byPkg.put(a.pkg, a);
         }
         for (AppEntry a : fresh) if (a.pkg != null && a.pkg.length() > 0) byPkg.put(a.pkg, a);
@@ -177,7 +263,7 @@ public class GitHubSource {
      */
     public static List<AppEntry> cached(Context ctx) {
         Result c = readCache(ctx.getFilesDir(), false);
-        return c == null ? new ArrayList<AppEntry>() : c.apps;
+        return c == null ? new ArrayList<AppEntry>() : dropExcludedApps(c.apps, loadExcluded(ctx));
     }
 
     private static String msg(Throwable t) {
@@ -238,6 +324,12 @@ public class GitHubSource {
         String repo = str(spec, "repo");
         if (repo.length() == 0) return null;
         JsonObject rel = getJson("https://api.github.com/repos/" + repo + "/releases/latest");
+        return fromRelease(spec, rel);
+    }
+
+    /** The entry for one spec and its release JSON - split out so a JVM test can drive it offline. */
+    static AppEntry fromRelease(JsonObject spec, JsonObject rel) throws IOException {
+        String repo = str(spec, "repo");
         if (rel == null || !rel.has("tag_name")) return null;
 
         JsonArray assets = rel.has("assets") && rel.get("assets").isJsonArray()
@@ -261,9 +353,40 @@ public class GitHubSource {
         a.versionName = str(rel, "tag_name");
         a.size = apk.has("size") ? apk.get("size").getAsLong() : 0;
         a.absApkUrl = str(apk, "browser_download_url");
-        a.absIconUrl = "https://github.com/" + owner + ".png?size=200";
+        /* The icon is the project's own, not the owner's avatar: the curated
+           entry names a file in the repo (icon.png, assets/icon.png, the
+           launcher PNG - see the list), and raw.githubusercontent serves it.
+           The avatar is only the fallback, and it is the same picture for every
+           app by one author, which is exactly what a catalogue must not show. */
+        String icon = str(spec, "icon");
+        a.absIconUrl = icon.startsWith("https://")
+                ? icon
+                : "https://github.com/" + owner + ".png?size=200";
+        /* Screenshots are absolute URLs too - a repo's own screenshots/ folder,
+           not a path inside an F-Droid repo. They are stored as written and
+           passed through untouched by StoreBridge.shotCandidates(). */
+        if (spec.has("screenshots") && spec.get("screenshots").isJsonArray()) {
+            for (JsonElement x : spec.getAsJsonArray("screenshots")) {
+                if (x == null || x.isJsonNull()) continue;
+                String u = x.getAsString();
+                if (u != null && u.startsWith("https://")) a.shots.add(u);
+            }
+        }
         a.lastUpdated = when(str(rel, "published_at"));
         a.added = a.lastUpdated;
+
+        /* Downloads, counted the way a reader means it: every APK asset on the
+           release this entry points at. GitHub reports the figure per asset and
+           never sums it for us. */
+        long downloads = 0;
+        for (JsonElement x : assets) {
+            if (x == null || !x.isJsonObject()) continue;
+            JsonObject asset = x.getAsJsonObject();
+            String name = str(asset, "name").toLowerCase(Locale.US);
+            if (!name.endsWith(".apk")) continue;
+            if (asset.has("download_count")) downloads += asset.get("download_count").getAsLong();
+        }
+        a.downloads = downloads;
 
         String digest = str(apk, "digest");                 // "sha256:abc..." when present
         if (digest.startsWith("sha256:")) {
@@ -490,6 +613,8 @@ public class GitHubSource {
                     a.source = str(o, "source"); a.issues = str(o, "issues");
                     a.versionName = str(o, "versionName"); a.apkName = str(o, "apkName");
                     a.absApkUrl = str(o, "absApkUrl"); a.absIconUrl = str(o, "absIconUrl");
+                    if (o.has("downloads")) a.downloads = o.get("downloads").getAsLong();
+                    for (String u : str(o, "shots").split("\n")) if (u.length() > 0) a.shots.add(u);
                     a.hash = str(o, "hash"); a.hashType = str(o, "hashType");
                     a.size = o.has("size") ? o.get("size").getAsLong() : 0;
                     a.lastUpdated = o.has("lastUpdated") ? o.get("lastUpdated").getAsLong() : 0;
@@ -532,9 +657,11 @@ public class GitHubSource {
                 field(sb, "apkName", a.apkName, false);
                 field(sb, "absApkUrl", a.absApkUrl, false);
                 field(sb, "absIconUrl", a.absIconUrl, false);
+                field(sb, "shots", String.join("\n", a.shots), false);
                 field(sb, "hash", a.hash, false);
                 field(sb, "hashType", a.hashType, false);
                 sb.append(",\"size\":").append(a.size);
+                sb.append(",\"downloads\":").append(a.downloads);
                 sb.append(",\"lastUpdated\":").append(a.lastUpdated);
                 sb.append('}');
             }

@@ -14,7 +14,7 @@
 
 <sub>Donations aren't live yet — Paytm, UPI, PayPal and Buy&nbsp;Me&nbsp;a&nbsp;Coffee all show <b>coming soon</b>. Until then, a ⭐ star is the best support.</sub>
 
-<a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest"><img src="https://img.shields.io/badge/VERSION-v12.2-6D5AE6?style=for-the-badge" alt="VERSION: v12.2"></a> <img src="https://img.shields.io/badge/DOWNLOADS-406-3FB950?style=for-the-badge" alt="DOWNLOADS: 406"> <a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases"><img src="https://img.shields.io/badge/RELEASES-GITHUB-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="RELEASES: GITHUB"></a>
+<a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases/latest"><img src="https://img.shields.io/badge/VERSION-v14.5-6D5AE6?style=for-the-badge" alt="VERSION: v14.5"></a> <img src="https://img.shields.io/badge/DOWNLOADS-406-3FB950?style=for-the-badge" alt="DOWNLOADS: 406"> <a href="https://github.com/technicalnihilist-lgtm/liquid-store/releases"><img src="https://img.shields.io/badge/RELEASES-GITHUB-EC4899?style=for-the-badge&logo=github&logoColor=white" alt="RELEASES: GITHUB"></a>
 
 </div>
 
@@ -48,6 +48,12 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 - **Saved catalogue.** Later launches open instantly from a local copy, and
   refreshes send `If-Modified-Since` / `ETag` so an unchanged index costs one
   round trip instead of a full download.
+- **Real glass, not a blur.** Every floating surface — the tab bar, the lens that
+  travels along it, the menu, the toast, the search field, the loader — refracts
+  the page behind it through a displacement filter built from the shader's own
+  geometry, so the content under the glass bends at the rim the way iOS 26 does.
+  This is [LiquidGlass](https://github.com/shayann07/liquidglass) 1.0.0, vendored
+  in `web/liquidglass/` and inlined into the page. See [Liquid Glass](#liquid-glass).
 - **Light and dark.** Light glass by default, following the system preference, with a
   toggle in the toolbar. Both are driven from the same set of colour tokens.
 - **Arcade.** A curated games page — newest first, then the full list.
@@ -57,6 +63,20 @@ Android will ask you to allow "install unknown apps" the first time you open it.
   hours to stay well inside GitHub's unauthenticated rate limit, and the asset's SHA-256
   from the GitHub API is verified on install where the project publishes one.
   The list lives in `assets/github_apps.json` - add a repo there to include it.
+  It now carries the apps this store is built by as well: 67 of the author's own
+  repositories, each one added only because it publishes a signed APK on its
+  releases page, alongside 36 third-party projects (103 entries in all). Each
+  entry names the icon and the screenshots the project publishes in its own repo
+  (`raw.githubusercontent.com/...`), so a GitHub app shows its own artwork and
+  not the author's avatar, and its **download count** — the APK assets of the
+  release it points at, summed — with the release's version beside it. F-Droid
+  publishes no download counts, so an F-Droid app takes Play's install bucket
+  instead, labelled **on Play** (`assets/play_installs.json` — Play's number, not
+  this store's), and an app that is on neither still shows nothing rather than a
+  number nobody measured.
+  `assets/github_exclude.json` is the other direction: repos that must never
+  appear in this catalogue, whatever the curated list says. They stay on GitHub
+  and on other stores; this file only keeps them out of this one.
 - **Sources screen.** Pin a specific mirror, or enter your own repository address.
 - **No account, no login, no ads.** There is nothing to sign into.
 
@@ -70,9 +90,57 @@ Android will ask you to allow "install unknown apps" the first time you open it.
 | --- | --- | --- |
 | ![Arcade](screenshots/04-arcade.png) | ![Search](screenshots/05-search.png) | ![Dark](screenshots/06-dark.png) |
 
+| Menu (the three dots) | Black background | Today's rails |
+| --- | --- | --- |
+| ![Menu](screenshots/07-menu.png) | ![Black](screenshots/08-black.png) | ![Rails](screenshots/09-rails.png) |
+
+| One of the author's apps, with its own icon and screenshots | The dock, away |
+| --- | --- |
+| ![Age Scanner](screenshots/10-own-app.png) | ![Dock away](screenshots/11-dock-away.png) |
+
 > The screenshots above were captured from the bundled UI running against a
 > small demo catalogue, so the app names are placeholders. The interface, layout
 > and behaviour are the real ones.
+
+## Liquid Glass
+
+The glass is the [`<liquid-glass>`](https://github.com/shayann07/liquidglass) web
+component from **LiquidGlass 1.0.0** (Apache-2.0), bundled to one file and
+inlined into `assets/index.html`. Nothing is fetched at runtime and the app stays
+offline-first.
+
+Ten surfaces use it, all floating chrome: the navbar, the tab bar, the lens that
+slides under the selected tab, the search button, the menu, the toast, the loader
+card, the two buttons on the detail page bar and the search field.
+
+All of them are **`variant="clear"`** — Glass.Clear, the material's transparent
+variant: a 4% tint with no lift, a wider refraction band than the regular
+material (28 dp against 14), dispersion and the rim. The page behind the glass is
+seen, not covered; what makes a fully see-through pane still read as glass is the
+bend at the rim and the light on the edge. The three surfaces that carry text —
+the menu, the toast, the loader — add a 10–18% tint on top so their own labels
+still win against the content behind them; set `--lg-menu` and `--lg-panel` to 0
+in the stylesheet for a completely bare pane. Each is a
+*backplate* — the glass is a child that fills the control's own box from behind —
+so no control moved, no hit target changed and no focus order changed.
+
+Two decisions worth knowing:
+
+- **`engine="html"`, never `engine="canvas"`.** The HTML engine refracts the live
+  page through an SVG displacement filter in Chromium (every Android WebView this
+  app runs in) and frosts elsewhere, for ~78 kB of JavaScript. The canvas engine
+  is exact but needs CanvasKit — 7.3 MB of WebAssembly — to draw the same glass in
+  an APK that is under 400 kB.
+- **Cards, rows and chips keep the cheaper translucency.** They sit under the 3D
+  depth transform, and a `backdrop-filter` inside a transformed layer is what
+  makes WebView tile and flash. Those surfaces are excluded from the tilt
+  instead.
+
+The material has a light and a dark tint chosen from `prefers-color-scheme`, while
+this app's Appearance switch writes `data-theme` on `<html>`; a small sync script
+hands the resolved scheme to every glass surface so the two never disagree.
+
+Vendored source, licence and the exact rebuild command: [`web/liquidglass/`](web/liquidglass/).
 
 ## Building
 
@@ -83,6 +151,12 @@ You need:
 
 - JDK 17
 - Android SDK **build-tools 34** and **platform 34** (`android.jar`)
+- `gson-2.10.1.jar` (the index parser)
+
+Point the script at them with environment variables — `JAVA_HOME`, `SDK`, `BT`,
+`AJ`, `GSON`, `KEYSTORE`, `KS_PASS`, `OUT` — or drop them at the defaults the
+script documents. A keystore is generated on the first build and reused after
+that, so updates keep the same signing identity.
 
 ```bash
 ## Layout
@@ -98,6 +172,7 @@ src/com/liquid/store/
 res/values/             strings, colours, theme
 res/mipmap-*/           launcher icon (transparent background)
 assets/index.html       the entire store UI, one self-contained page
+web/liquidglass/        the vendored LiquidGlass web component (Apache-2.0)
 assets/fonts/           Plus Jakarta Sans (SIL Open Font License)
 ```
 
